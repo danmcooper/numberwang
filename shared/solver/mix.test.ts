@@ -7,19 +7,19 @@ const flat = loadMix(mixData);
 describe('loadMix', () => {
   it('reads the vendored file', () => {
     expect(Object.keys(flat.pred).length).toBeGreaterThan(20);
-    expect(flat.professionShapes.length).toBeGreaterThan(0);
+    expect(flat.colourShapes.length).toBeGreaterThan(0);
   });
 
   it('rejects anything that is not a mix', () => {
     expect(() => loadMix(null)).toThrow(MixFormatError);
     expect(() => loadMix({ pred: {}, feature: {} })).toThrow(MixFormatError);
-    expect(() => loadMix({ pred: { a: -1 }, feature: {}, professionShapes: [] })).toThrow(
+    expect(() => loadMix({ pred: { a: -1 }, feature: {}, colourShapes: [] })).toThrow(
       MixFormatError,
     );
-    expect(() => loadMix({ pred: {}, feature: { a: 'x' }, professionShapes: [] })).toThrow(
+    expect(() => loadMix({ pred: {}, feature: { a: 'x' }, colourShapes: [] })).toThrow(
       MixFormatError,
     );
-    expect(() => loadMix({ pred: {}, feature: {}, professionShapes: [[0]] })).toThrow(
+    expect(() => loadMix({ pred: {}, feature: {}, colourShapes: [[0]] })).toThrow(
       MixFormatError,
     );
   });

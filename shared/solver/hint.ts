@@ -1,16 +1,16 @@
 export type Trait = 'criminal' | 'innocent';
-export type UnitKind = 'row' | 'col' | 'neighbor' | 'between' | 'profession' | 'edge' | 'corner';
+export type UnitKind = 'row' | 'col' | 'neighbor' | 'between' | 'colour' | 'edge' | 'corner';
 
 export type Unit =
   | { kind: 'row'; n: number }
   | { kind: 'col'; n: number }
   | { kind: 'neighbor'; i: number }
   | { kind: 'between'; a: number; b: number }
-  | { kind: 'profession'; name: string }
+  | { kind: 'colour'; name: string }
   | { kind: 'edge' }
   | { kind: 'corner' };
 
-export type ArgKind = 'unit' | 'kind' | 'trait' | 'num' | 'index' | 'profession';
+export type ArgKind = 'unit' | 'kind' | 'trait' | 'num' | 'index' | 'colour';
 
 export type HintArg =
   | { t: 'unit'; unit: Unit }
@@ -18,7 +18,7 @@ export type HintArg =
   | { t: 'trait'; trait: Trait }
   | { t: 'num'; n: number }
   | { t: 'index'; i: number }
-  | { t: 'profession'; name: string };
+  | { t: 'colour'; name: string };
 
 export interface Hint {
   pred: string;
@@ -32,7 +32,7 @@ const T = 'trait' as const;
 const N = 'num' as const;
 const I = 'index' as const;
 const K = 'kind' as const;
-const P = 'profession' as const;
+const P = 'colour' as const;
 
 export const ARG_KINDS: Record<string, ArgKind[]> = {
   has_trait: [I, T],
@@ -63,7 +63,7 @@ export const ARG_KINDS: Record<string, ArgKind[]> = {
   only_one_person_in_unit_has_exactly_n_trait_neighbors: [U, T, N],
   n_in_unit_have_trait_in_dir: [U, T, N, N, N],
   n_t_in_unit_have_trait_in_dir: [U, T, T, N, N, N],
-  n_professions_have_trait_in_dir: [P, T, N, N, N],
+  n_colours_have_trait_in_dir: [P, T, N, N, N],
 };
 
 /** Split on top-level commas, ignoring commas nested inside parentheses. */
@@ -99,7 +99,7 @@ function parseUnit(s: string): Unit {
       if (!pm) throw new HintParseError(`bad between arg: ${arg}`);
       return { kind, a: Number(pm[1]), b: Number(pm[2]) };
     }
-    case 'profession':
+    case 'colour':
       return { kind, name: arg };
     case 'edge':
     case 'corner':
@@ -120,7 +120,7 @@ function parseArg(raw: string, want: ArgKind): HintArg {
         s !== 'col' &&
         s !== 'neighbor' &&
         s !== 'between' &&
-        s !== 'profession' &&
+        s !== 'colour' &&
         s !== 'edge' &&
         s !== 'corner'
       ) {
@@ -134,8 +134,8 @@ function parseArg(raw: string, want: ArgKind): HintArg {
       return { t: 'num', n: Number(s) };
     case 'index':
       return { t: 'index', i: Number(s) };
-    case 'profession':
-      return { t: 'profession', name: s };
+    case 'colour':
+      return { t: 'colour', name: s };
   }
 }
 
@@ -161,8 +161,8 @@ function formatUnit(u: Unit): string {
       return `unit(neighbor,${u.i})`;
     case 'between':
       return `unit(between,pair(${u.a},${u.b}))`;
-    case 'profession':
-      return `unit(profession,${u.name})`;
+    case 'colour':
+      return `unit(colour,${u.name})`;
     default:
       return `unit(${u.kind},void)`;
   }
@@ -180,7 +180,7 @@ function formatArg(a: HintArg): string {
       return String(a.n);
     case 'index':
       return String(a.i);
-    case 'profession':
+    case 'colour':
       return a.name;
   }
 }

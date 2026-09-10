@@ -22,7 +22,7 @@ import {
   minimalPaths,
   solveChain,
 } from './solve';
-import { FLAVOUR, TITLES, type VocabPerson, faceOf, namesFor, professionsFor } from './vocab';
+import { FLAVOUR, TITLES, type VocabPerson, faceOf, namesFor, coloursFor } from './vocab';
 
 /** Every archived puzzle is 4x5, and so is every puzzle we ship. */
 const DEFAULT_WIDTH = 4;
@@ -147,10 +147,10 @@ function shareIn<T>(xs: readonly T[], keys: (x: T) => string[]): Map<string, num
  *
  * Scaling each feature once by target/pool — what this used to do — does not
  * land on the target. A hint's weight is the product of its features' factors,
- * so a clue naming two profession groups picks the profession factor up twice,
- * and that factor is large: profession groups are 0.4% of the pool's unit slots
+ * so a clue naming two colour groups picks the colour factor up twice,
+ * and that factor is large: colour groups are 0.4% of the pool's unit slots
  * against the archive's 7%. The head came out at three times the archive's
- * profession rate, which is a worse error than the under-correction it was
+ * colour rate, which is a worse error than the under-correction it was
  * fixing — the player notices "there are more criminal judges than criminal
  * doctors" twice a puzzle instead of once.
  *
@@ -248,8 +248,8 @@ export interface GenerateInput {
   mix: ClueMix;
   /**
    * Board size, defaulting to the archive's 4x5. The mix is always measured on
-   * the archive's own 4x5 boards; its profession shapes are refitted to whatever
-   * board is asked for here — see `professionShapesFor`.
+   * the archive's own 4x5 boards; its colour shapes are refitted to whatever
+   * board is asked for here — see `colourShapesFor`.
    */
   width?: number;
   height?: number;
@@ -291,8 +291,10 @@ function hexId(rng: () => number): string {
 export interface Cast {
   names: string[];
   genders: ('male' | 'female')[];
-  professions: string[];
+  colours: string[];
   faces: string[];
+  /** A shuffled 1..size, one number per card. */
+  numbers: number[];
 }
 
 /**
@@ -309,12 +311,12 @@ export interface Cast {
  * Sorting by initial is enough to sort the names because the initials are
  * distinct.
  *
- * Professions come from a whole profession shape sampled out of the archive
- * (`ClueMix.professionShapes`): a list of group sizes summing to `size`, e.g.
- * [3,3,3,2,2,2,2,2,1]. This used to be five professions dealt round-robin,
+ * Colours come from a whole colour shape sampled out of the archive
+ * (`ClueMix.colourShapes`): a list of group sizes summing to `size`, e.g.
+ * [3,3,3,2,2,2,2,2,1]. This used to be five colours dealt round-robin,
  * which gave every Dan puzzle the same rigid five-groups-of-four cast — visible
- * at a glance, and a silent constraint on the clues, since a `#PROFS:` unit was
- * then always exactly four people. Real casts run 7 to 11 professions in groups
+ * at a glance, and a silent constraint on the clues, since a `#COLOURS:` unit was
+ * then always exactly four people. Real casts run 7 to 11 colours in groups
  * of mostly two and three.
  */
 const sum = (xs: readonly number[]) => xs.reduce((a, b) => a + b, 0);
@@ -323,13 +325,13 @@ const sum = (xs: readonly number[]) => xs.reduce((a, b) => a + b, 0);
  * Shrink one archive shape onto a smaller board, keeping its character.
  *
  * Cards come off the largest group each time, so the raggedness and the group
- * count survive: a shape that named nine professions still names about nine,
- * which is what makes a `#PROFS:` unit worth reading. Taking whole groups off
+ * count survive: a shape that named nine colours still names about nine,
+ * which is what makes a `#COLOURS:` unit worth reading. Taking whole groups off
  * the end instead would leave a tidier, flatter cast than the archive has.
  *
  * That holds only while there is fat to trim. Shaving alone took every group
- * down to one on a deep shrink — a 3x3 board came out nine professions over
- * nine cards, where `#PROFS:cook` names exactly one card and the unit says
+ * down to one on a deep shrink — a 3x3 board came out nine colours over
+ * nine cards, where `#COLOURS:cook` names exactly one card and the unit says
  * nothing a clue naming that card would not. So a group is never shaved below a
  * pair: past that point whole groups come off the small end instead, and only
  * when even that would overshoot does a single pair break down into one.
@@ -361,7 +363,7 @@ function shrunkShape(base: readonly number[], size: number): number[] {
  * New groups are drawn from `pool` — every group size the archive has ever
  * used, with its multiplicity, so the draw is the archive's own distribution of
  * twos and threes rather than a tidy average. When the remainder is smaller than
- * the group drawn, or the cast has already run out of professions to name, the
+ * the group drawn, or the cast has already run out of colours to name, the
  * remainder goes onto the smallest existing group instead: that is where an
  * extra card changes the shape least, and it keeps the largest group where the
  * archive left it.
@@ -372,13 +374,13 @@ function grownShape(
   size: number,
   pool: readonly number[],
   maxGroup: number,
-  professionCount: number,
+  colourCount: number,
 ): number[] {
   const out = [...base];
   let total = sum(out);
   while (total < size) {
     const draw = pool[randInt(rng, 0, pool.length - 1)];
-    if (out.length < professionCount && draw <= size - total) {
+    if (out.length < colourCount && draw <= size - total) {
       out.push(draw);
       total += draw;
       continue;
@@ -388,9 +390,9 @@ function grownShape(
       if (out[i] < maxGroup && (at === -1 || out[i] < out[at])) at = i;
     }
     if (at === -1) {
-      if (out.length >= professionCount) {
+      if (out.length >= colourCount) {
         throw new GenerationError(
-          `cannot cover ${size} cards with ${professionCount} groups of at most ${maxGroup}`,
+          `cannot cover ${size} cards with ${colourCount} groups of at most ${maxGroup}`,
         );
       }
       out.push(1);
@@ -404,7 +406,7 @@ function grownShape(
 }
 
 /**
- * Profession shapes that cover a `size`-card board.
+ * Colour shapes that cover a `size`-card board.
  *
  * The archive only ever measured 4x5 boards, so every shape it offers sums to
  * twenty. At that size this hands them straight back, and `castOf` deals a real
@@ -412,34 +414,34 @@ function grownShape(
  * `castOf` would rather throw than deal a cast with holes in it, so the shapes
  * are refitted from the archive's rather than invented: one per archive shape,
  * each keeping its own group count and raggedness, so a 5x6 cast still runs the
- * seven to eleven professions in groups of mostly two and three that make a
- * `#PROFS:` clue worth reading.
+ * seven to eleven colours in groups of mostly two and three that make a
+ * `#COLOURS:` clue worth reading.
  *
  * Deterministic, because it is a table derived from a corpus rather than part of
  * any one puzzle's draw — two calls with the same archive and size give the same
  * shapes, and `castOf` does the sampling.
  */
-export function professionShapesFor(
-  professionShapes: readonly number[][],
+export function colourShapesFor(
+  colourShapes: readonly number[][],
   size: number,
 ): number[][] {
-  const professionCount = professionsFor(size).length;
-  const fits = professionShapes.filter((s) => s.length <= professionCount && sum(s) === size);
+  const colourCount = coloursFor(size).length;
+  const fits = colourShapes.filter((s) => s.length <= colourCount && sum(s) === size);
   if (fits.length > 0) return fits.map((s) => [...s]);
 
-  const usable = professionShapes.filter((s) => s.length > 0);
+  const usable = colourShapes.filter((s) => s.length > 0);
   if (usable.length === 0) return [];
   const pool = usable.flat();
   const maxGroup = Math.max(...pool);
   const rng = makeRng(size * 1009 + usable.length);
   return usable.map((s) =>
-    sum(s) > size ? shrunkShape(s, size) : grownShape(rng, s, size, pool, maxGroup, professionCount),
+    sum(s) > size ? shrunkShape(s, size) : grownShape(rng, s, size, pool, maxGroup, colourCount),
   );
 }
 
 export function castOf(
   rng: () => number,
-  professionShapes: readonly number[][],
+  colourShapes: readonly number[][],
   size: number = DEFAULT_SIZE,
 ): Cast {
   // `namesFor`, not `NAMES`: the extra passes only come out for a board the
@@ -479,22 +481,22 @@ export function castOf(
   // sort the names themselves; the cast is still in alphabetical reading order.
   people.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
 
-  // A usable shape has to cover every card and name no more professions than the
+  // A usable shape has to cover every card and name no more colours than the
   // vocabulary stocks. Both hold for the real archive on a 4x5 board — its
   // shapes all sum to twenty and its widest cast needs exactly as many
-  // professions as we have — so say so plainly rather than dealing a cast with
+  // colours as we have — so say so plainly rather than dealing a cast with
   // holes in it when the shapes and the board disagree. For a board the archive
-  // has no shape for, `professionShapesFor` builds some first.
-  // Which professions are on the table depends on the board: the extras only
+  // has no shape for, `colourShapesFor` builds some first.
+  // Which colours are on the table depends on the board: the extras only
   // come out for boards bigger than the archive's own, where the base sixteen
-  // would otherwise be stretched three-to-a-profession. See `professionsFor`.
-  const vocabulary = professionsFor(size);
-  const fits = professionShapes.filter(
+  // would otherwise be stretched three-to-a-colour. See `coloursFor`.
+  const vocabulary = coloursFor(size);
+  const fits = colourShapes.filter(
     (s) => s.length <= vocabulary.length && sum(s) === size,
   );
   if (fits.length === 0) {
     throw new GenerationError(
-      `no archived profession shape covers ${size} cards with ${vocabulary.length} professions`,
+      `no archived colour shape covers ${size} cards with ${vocabulary.length} colours`,
     );
   }
   const shape = fits[randInt(rng, 0, fits.length - 1)];
@@ -503,12 +505,13 @@ export function castOf(
   shape.forEach((size, i) => {
     for (let j = 0; j < size; j++) slots.push(chosen[i].key);
   });
-  const professions = shuffled(rng, slots);
+  const colours = shuffled(rng, slots);
   return {
     names: people.map((p) => p.name),
     genders: people.map((p) => p.gender),
-    professions,
-    faces: professions.map((key, i) => faceOf(key, people[i].gender)),
+    colours,
+    faces: colours.map((key, i) => faceOf(key, people[i].gender)),
+    numbers: shuffled(rng, Array.from({ length: size }, (_, i) => i + 1)),
   };
 }
 
@@ -543,7 +546,7 @@ function buildChain(
   targetAbstractShare: number,
 ): ChainBuild | null {
   const size = shape.grid.size;
-  const board = makeBoard(shape.grid, shape.professions, truth);
+  const board = makeBoard(shape.grid, shape.colours, shape.numbers, truth);
   const clues: Clues = Array.from({ length: size }, () => null);
   const flippedAt: number[][] = Array.from({ length: size }, () => []);
   let flipped = [...initialReveals].sort((a, b) => a - b);
@@ -631,20 +634,20 @@ export function generatePuzzle(input: GenerateInput): GenerateResult {
   // The mix and the bands are both measured on the archive's 4x5 board whatever
   // board we are filling, so refit them once, up front, rather than asking
   // every caller to. Both are the identity at 4x5.
-  const shapes = professionShapesFor(input.mix.professionShapes, grid.size);
+  const shapes = colourShapesFor(input.mix.colourShapes, grid.size);
   const band = bandsFor({ b: input.band }, grid.size).b;
   const failures: string[] = [];
 
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const rng = makeRng(input.seed + attempt * 7919);
     const cast = castOf(rng, shapes, grid.size);
-    const shape: Shape = { grid, professions: cast.professions };
+    const shape: Shape = { grid, colours: cast.colours, numbers: cast.numbers };
 
     const criminals = randInt(rng, band.criminals.min, band.criminals.max);
     const criminalSet = new Set(pickCriminals(rng, grid, criminals));
     const truth = Array.from({ length: grid.size }, (_, i) => criminalSet.has(i));
 
-    const board = makeBoard(grid, cast.professions, truth);
+    const board = makeBoard(grid, cast.colours, cast.numbers, truth);
     const pool = orderPool(rng, board, candidateHints(board), input.mix);
     const initialReveals = [randInt(rng, 0, grid.size - 1)];
 
@@ -690,16 +693,14 @@ export function generatePuzzle(input: GenerateInput): GenerateResult {
     const people: Person[] = truth.map((criminal, i) => {
       const hint = built.clues[i];
       return {
-        name: cast.names[i],
-        profession: cast.professions[i],
-        gender: cast.genders[i],
-        criminal,
-        // A generated board runs to 49 cards and twenty-one professions, where
+        number: cast.numbers[i],
+        colour: cast.colours[i],
+        numberwang: criminal,
+        // A generated board runs to 49 cards and twenty-one colours, where
         // "Exactly 1 cook has …" leaves you counting cooks before you can use it.
-        clue: hint ? render(hint, { professionTotals: true }) : flavour[flavourAt++ % flavour.length],
+        clue: hint ? render(hint, { colourTotals: true }) : flavour[flavourAt++ % flavour.length],
         origHint: hint ? formatHint(hint) : null,
         paths: paths[i],
-        face: cast.faces[i],
       };
     });
 

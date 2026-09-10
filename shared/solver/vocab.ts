@@ -3,7 +3,7 @@ export interface VocabPerson {
   gender: 'male' | 'female';
 }
 
-export interface VocabProfession {
+export interface VocabColour {
   key: string;
   male: string;
   female: string;
@@ -41,7 +41,7 @@ export const NAMES: VocabPerson[] = [
 ];
 
 /**
- * Two more passes through the alphabet, held back the way `EXTRA_PROFESSIONS`
+ * Two more passes through the alphabet, held back the way `EXTRA_PALETTE`
  * is and for a stronger reason.
  *
  * `castOf` shuffles each initial's bucket and deals round-robin, so a name
@@ -83,7 +83,7 @@ export const EXTRA_NAMES: VocabPerson[] = [
   { name: 'Britt', gender: 'female' }, { name: 'Casper', gender: 'male' },
 ];
 
-/** Every name that can appear in a file, for the same reason as `ALL_PROFESSIONS`. */
+/** Every name that can appear in a file, for the same reason as `ALL_PALETTE`. */
 export const ALL_NAMES: VocabPerson[] = [...NAMES, ...EXTRA_NAMES];
 
 /**
@@ -96,9 +96,9 @@ export function namesFor(size: number): VocabPerson[] {
   return size > NAMES.length ? ALL_NAMES : NAMES;
 }
 
-/** Keys and emoji taken from the profession face map the site already ships
+/** Keys and emoji taken from the colour face map the site already ships
  * (`site/src/faces.ts`); each pluralises with a plain -s. */
-export const PROFESSIONS: VocabProfession[] = [
+export const PALETTE: VocabColour[] = [
   { key: 'cop', male: '👮‍♂️', female: '👮‍♀️' },
   { key: 'sleuth', male: '🕵️‍♂️', female: '🕵️‍♀️' },
   { key: 'guard', male: '💂‍♂️', female: '💂‍♀️' },
@@ -118,17 +118,17 @@ export const PROFESSIONS: VocabProfession[] = [
 ];
 
 /**
- * Held back for the boards that actually need them. Sixteen professions covers
+ * Held back for the boards that actually need them. Sixteen colours covers
  * every board size on its own, but from eighteen cards up the widest cast uses
- * all of them, so a 7x7 runs three-to-a-profession and leans on the same
- * profession clue over and over. Adding these to every board would change the
- * feel of the archive-sized ones for no reason, so `professionsFor` only deals
+ * all of them, so a 7x7 runs three-to-a-colour and leans on the same
+ * colour clue over and over. Adding these to every board would change the
+ * feel of the archive-sized ones for no reason, so `coloursFor` only deals
  * them in above the source site's own twenty cards.
  *
  * All of them are in `site/src/faces.ts` too, so a file that predates them
  * still renders.
  */
-export const EXTRA_PROFESSIONS: VocabProfession[] = [
+export const EXTRA_PALETTE: VocabColour[] = [
   { key: 'scientist', male: '👨‍🔬', female: '👩‍🔬' },
   { key: 'firefighter', male: '👨‍🚒', female: '👩‍🚒' },
   { key: 'astronaut', male: '👨‍🚀', female: '👩‍🚀' },
@@ -139,10 +139,10 @@ export const EXTRA_PROFESSIONS: VocabProfession[] = [
 /**
  * A third tier, for boards past anything the daily schedule reaches.
  *
- * Twenty-one professions is plenty up to a 6x6, and badly short of enough on a
+ * Twenty-one colours is plenty up to a 6x6, and badly short of enough on a
  * 10x10: a hundred cards divided twenty-one ways is a cast of five to a
- * profession, against roughly two on the source site's own board. Every
- * profession clue then talks about a fifth of the grid at once, which is both
+ * colour, against roughly two on the source site's own board. Every
+ * colour clue then talks about a fifth of the grid at once, which is both
  * duller to read and weaker to deduce from. Thirty-six brings a hundred cards
  * back to under three each, near where the archive sits.
  *
@@ -151,7 +151,7 @@ export const EXTRA_PROFESSIONS: VocabProfession[] = [
  * dresses its cast up like this for themed puzzles, so it is not out of
  * character — but they only come out on a board no daily puzzle can be.
  */
-export const WIDE_PROFESSIONS: VocabProfession[] = [
+export const WIDE_PALETTE: VocabColour[] = [
   { key: 'clown', male: '🤡', female: '🤡' },
   { key: 'vampire', male: '🧛‍♂️', female: '🧛‍♀️' },
   { key: 'zombie', male: '🧟', female: '🧟' },
@@ -170,14 +170,14 @@ export const WIDE_PROFESSIONS: VocabProfession[] = [
 ];
 
 /** The base sixteen plus the extras: what a board bigger than the source's draws from. */
-export const WIDER_PROFESSIONS: VocabProfession[] = [...PROFESSIONS, ...EXTRA_PROFESSIONS];
+export const WIDER_PALETTE: VocabColour[] = [...PALETTE, ...EXTRA_PALETTE];
 
-/** Every profession that can appear in a file, for lookups like `faceOf`. */
-export const ALL_PROFESSIONS: VocabProfession[] = [...WIDER_PROFESSIONS, ...WIDE_PROFESSIONS];
+/** Every colour that can appear in a file, for lookups like `faceOf`. */
+export const ALL_PALETTE: VocabColour[] = [...WIDER_PALETTE, ...WIDE_PALETTE];
 
 /**
  * The board the source site ships is 4x5. At or below that, the cast is drawn
- * from exactly the professions it always was; above it, the wider set.
+ * from exactly the colours it always was; above it, the wider set.
  */
 export const BASE_PROFESSION_LIMIT = 20;
 
@@ -189,14 +189,14 @@ export const BASE_PROFESSION_LIMIT = 20;
  */
 export const WIDE_PROFESSION_LIMIT = 49;
 
-/** The professions a board of `size` cards may draw from. */
-export function professionsFor(size: number): VocabProfession[] {
-  if (size > WIDE_PROFESSION_LIMIT) return ALL_PROFESSIONS;
-  return size > BASE_PROFESSION_LIMIT ? WIDER_PROFESSIONS : PROFESSIONS;
+/** The colours a board of `size` cards may draw from. */
+export function coloursFor(size: number): VocabColour[] {
+  if (size > WIDE_PROFESSION_LIMIT) return ALL_PALETTE;
+  return size > BASE_PROFESSION_LIMIT ? WIDER_PALETTE : PALETTE;
 }
 
-export function faceOf(profession: string, gender: 'male' | 'female'): string {
-  const entry = ALL_PROFESSIONS.find((p) => p.key === profession);
+export function faceOf(colour: string, gender: 'male' | 'female'): string {
+  const entry = ALL_PALETTE.find((p) => p.key === colour);
   if (!entry) return '😬';
   return gender === 'female' ? entry.female : entry.male;
 }

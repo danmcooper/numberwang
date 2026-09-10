@@ -13,10 +13,13 @@ import type { Hint, HintArg, Trait, Unit, UnitKind } from './hint';
 
 export interface Board {
   grid: Grid;
-  professions: string[];
+  colours: string[];
+  /** 1..size, one per card. The arithmetic predicates in `arith.ts` are the
+   * only readers; every other predicate is a function of the verdict alone. */
+  numbers: number[];
   criminal: boolean[];
-  /** Memoises unit membership; safe because membership depends only on grid and
-   * professions, never on `criminal`. */
+  /** Memoises unit membership; safe because membership depends only on the grid
+   * and colours, never on `criminal` or `numbers`. */
   cache?: Map<string, number[]>;
 }
 
@@ -32,8 +35,8 @@ function computeUnitMembers(b: Board, u: Unit): number[] {
       return neighbors(b.grid, u.i);
     case 'between':
       return segment(b.grid, u.a, u.b);
-    case 'profession':
-      return b.professions.flatMap((p, i) => (p === u.name ? [i] : []));
+    case 'colour':
+      return b.colours.flatMap((p, i) => (p === u.name ? [i] : []));
     case 'edge':
       return edgeMembers(b.grid);
     case 'corner':
@@ -41,8 +44,13 @@ function computeUnitMembers(b: Board, u: Unit): number[] {
   }
 }
 
-export function makeBoard(grid: Grid, professions: string[], criminal: boolean[]): Board {
-  return { grid, professions, criminal, cache: new Map() };
+export function makeBoard(
+  grid: Grid,
+  colours: string[],
+  numbers: number[],
+  criminal: boolean[],
+): Board {
+  return { grid, colours, numbers, criminal, cache: new Map() };
 }
 
 export function unitMembers(b: Board, u: Unit): number[] {
@@ -66,8 +74,8 @@ export function unitsOfKind(b: Board, kind: UnitKind): Unit[] {
       return Array.from({ length: b.grid.size }, (_, i) => ({ kind: 'neighbor', i }));
     case 'between':
       return [];
-    case 'profession':
-      return [...new Set(b.professions)].sort().map((name) => ({ kind: 'profession', name }));
+    case 'colour':
+      return [...new Set(b.colours)].sort().map((name) => ({ kind: 'colour', name }));
     case 'edge':
       return [{ kind: 'edge' }];
     case 'corner':
@@ -159,9 +167,9 @@ function argIndex(a: HintArg[], k: number): number {
   if (x.t !== 'index') throw new UnknownPredicateError(`arg ${k} is not an index`);
   return x.i;
 }
-function argProfession(a: HintArg[], k: number): string {
+function argColour(a: HintArg[], k: number): string {
   const x = a[k];
-  if (x.t !== 'profession') throw new UnknownPredicateError(`arg ${k} is not a profession`);
+  if (x.t !== 'colour') throw new UnknownPredicateError(`arg ${k} is not a colour`);
   return x.name;
 }
 
@@ -345,10 +353,10 @@ export const EVALUATORS: Record<string, (b: Board, a: HintArg[]) => boolean> = {
       argNum(a, 4),
     ) === argNum(a, 5),
 
-  n_professions_have_trait_in_dir: (b, a) =>
+  n_colours_have_trait_in_dir: (b, a) =>
     inDirCount(
       b,
-      unitMembers(b, { kind: 'profession', name: argProfession(a, 0) }),
+      unitMembers(b, { kind: 'colour', name: argColour(a, 0) }),
       argTrait(a, 1),
       argNum(a, 2),
       argNum(a, 3),

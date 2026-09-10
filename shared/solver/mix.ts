@@ -25,8 +25,8 @@ export interface ClueMix {
    * `overlap:<n>`.
    */
   feature: Record<string, number>;
-  /** One entry per archived board: its profession group sizes, descending. */
-  professionShapes: number[][];
+  /** One entry per archived board: its colour group sizes, descending. */
+  colourShapes: number[][];
 }
 
 export class MixFormatError extends Error {}
@@ -47,15 +47,15 @@ const shares = (raw: unknown, what: string): Record<string, number> => {
 export function loadMix(data: unknown): ClueMix {
   if (typeof data !== 'object' || data === null) throw new MixFormatError('mix is not an object');
   const d = data as Record<string, unknown>;
-  if (!Array.isArray(d.professionShapes)) throw new MixFormatError('professionShapes is not an array');
-  const professionShapes = d.professionShapes.map((shape, i) => {
-    if (!Array.isArray(shape)) throw new MixFormatError(`professionShapes[${i}] is not an array`);
+  if (!Array.isArray(d.colourShapes)) throw new MixFormatError('colourShapes is not an array');
+  const colourShapes = d.colourShapes.map((shape, i) => {
+    if (!Array.isArray(shape)) throw new MixFormatError(`colourShapes[${i}] is not an array`);
     return shape.map((n) => {
       if (!Number.isInteger(n) || (n as number) < 1) {
-        throw new MixFormatError(`professionShapes[${i}] must be positive integers`);
+        throw new MixFormatError(`colourShapes[${i}] must be positive integers`);
       }
       return n as number;
     });
   });
-  return { pred: shares(d.pred, 'pred'), feature: shares(d.feature, 'feature'), professionShapes };
+  return { pred: shares(d.pred, 'pred'), feature: shares(d.feature, 'feature'), colourShapes };
 }

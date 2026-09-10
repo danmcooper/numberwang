@@ -5,14 +5,13 @@ import { describe, expect, it } from 'vitest';
 import { regenerateManifest } from './manifest.mts';
 
 function puzzle(date: string, id: string) {
-  const person = {
-    name: 'banda', profession: 'coder', gender: 'male',
-    criminal: false, clue: null, origHint: null, paths: [],
-  };
+  const person = (number: number) => ({
+    number, colour: 'teal', numberwang: false, clue: null, origHint: null, paths: [],
+  });
   return {
     formatVersion: 1, id, date, title: `Title ${date}`, difficulty: 'Easy',
     width: 1, height: 2, initialReveals: [], source: 'generated',
-    people: [person, person],
+    people: [person(1), person(2)],
   };
 }
 

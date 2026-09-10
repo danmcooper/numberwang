@@ -14,7 +14,8 @@ import {
 
 const shape: Shape = {
   grid: makeGrid(4, 5),
-  professions: Array.from({ length: 20 }, (_, i) => (i % 2 === 0 ? 'cook' : 'cop')),
+  colours: Array.from({ length: 20 }, (_, i) => (i % 2 === 0 ? 'cook' : 'cop')),
+  numbers: Array.from({ length: 20 }, (_, i) => i + 1),
 };
 const unknown = () => Array.from({ length: 20 }, () => null) as (boolean | null)[];
 

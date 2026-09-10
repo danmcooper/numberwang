@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { makeGrid } from './grid';
 import { ARG_KINDS, parseHint } from './hint';
-import { type Board, countTrait, evaluate, EVALUATORS, unitMembers, unitsOfKind } from './predicates';
+import { type Board, countTrait, evaluate, EVALUATORS, makeBoard, unitMembers, unitsOfKind } from './predicates';
 
 // 4x5. Criminals at 0, 1, 6, 13, 19.
 const CRIMINALS = [0, 1, 6, 13, 19];
@@ -14,7 +14,8 @@ const PROFS = [
 ];
 const board: Board = {
   grid: makeGrid(4, 5),
-  professions: PROFS,
+  colours: PROFS,
+  numbers: Array.from({ length: 20 }, (_, i) => i + 1),
   criminal: Array.from({ length: 20 }, (_, i) => CRIMINALS.includes(i)),
 };
 
@@ -27,7 +28,7 @@ describe('unitMembers', () => {
     expect(unitMembers(board, { kind: 'neighbor', i: 5 })).toEqual([0, 1, 2, 4, 6, 8, 9, 10]);
     expect(unitMembers(board, { kind: 'between', a: 2, b: 14 })).toEqual([2, 6, 10, 14]);
     expect(unitMembers(board, { kind: 'corner' })).toEqual([0, 3, 16, 19]);
-    expect(unitMembers(board, { kind: 'profession', name: 'cop' })).toEqual([2, 3, 5, 11, 14, 15]);
+    expect(unitMembers(board, { kind: 'colour', name: 'cop' })).toEqual([2, 3, 5, 11, 14, 15]);
   });
 });
 
@@ -37,7 +38,7 @@ describe('unitsOfKind', () => {
     expect(unitsOfKind(board, 'col')).toHaveLength(4);
     expect(unitsOfKind(board, 'neighbor')).toHaveLength(20);
     expect(unitsOfKind(board, 'edge')).toEqual([{ kind: 'edge' }]);
-    expect(unitsOfKind(board, 'profession').map((u) => (u as { name: string }).name).sort()).toEqual(
+    expect(unitsOfKind(board, 'colour').map((u) => (u as { name: string }).name).sort()).toEqual(
       ['cook', 'cop', 'pilot'],
     );
   });
@@ -207,10 +208,25 @@ describe('adjacency and direction predicates', () => {
     expect(ok('n_t_in_unit_have_trait_in_dir(unit(row,1),criminal,innocent,1,0,1)')).toBe(true);
     expect(ok('n_t_in_unit_have_trait_in_dir(unit(row,1),criminal,criminal,1,0,1)')).toBe(true);
   });
-  it('n_professions_have_trait_in_dir ranges over a profession', () => {
+  it('n_colours_have_trait_in_dir ranges over a colour', () => {
     // cooks are 0,1,4,10,12,13,19; directly below each: 4,5,8,14,16,17,off-grid.
     // innocent among those: 4(y),5(y),8(y),14(y),16(y),17(y) -> 6
-    expect(ok('n_professions_have_trait_in_dir(cook,innocent,0,1,6)')).toBe(true);
-    expect(ok('n_professions_have_trait_in_dir(cook,innocent,0,1,7)')).toBe(false);
+    expect(ok('n_colours_have_trait_in_dir(cook,innocent,0,1,6)')).toBe(true);
+    expect(ok('n_colours_have_trait_in_dir(cook,innocent,0,1,7)')).toBe(false);
+  });
+});
+
+describe('board numbers and colours', () => {
+  const grid = makeGrid(2, 2);
+  const colours = ['red', 'blue', 'red', 'teal'];
+  const numbers = [3, 1, 4, 2];
+  const board = makeBoard(grid, colours, numbers, [true, false, true, false]);
+
+  it('exposes each card its number', () => {
+    expect(board.numbers).toEqual([3, 1, 4, 2]);
+  });
+
+  it('groups cards by colour', () => {
+    expect(unitMembers(board, { kind: 'colour', name: 'red' })).toEqual([0, 2]);
   });
 });

@@ -20,7 +20,7 @@ import mixData from '../config/clue-mix.json' with { type: 'json' };
 import { validatePuzzle } from '../shared/puzzle.ts';
 import { loadMix } from '../shared/solver/mix.ts';
 import { bandsFor, classify, loadBands, measure } from '../shared/solver/difficulty.ts';
-import { generatePuzzle, professionShapesFor } from '../shared/solver/generate.ts';
+import { generatePuzzle, colourShapesFor } from '../shared/solver/generate.ts';
 import { makeGrid } from '../shared/solver/grid.ts';
 import { parseHint } from '../shared/solver/hint.ts';
 import { forcedGiven, isUniquelySolvable, parseClues, solveChain } from '../shared/solver/solve.ts';
@@ -78,10 +78,11 @@ check(
 
 const shape = {
   grid: makeGrid(puzzle.width, puzzle.height),
-  professions: puzzle.people.map((p) => p.profession),
+  colours: puzzle.people.map((p) => p.colour),
+  numbers: puzzle.people.map((p) => p.number),
 };
 const clues = parseClues(puzzle.people.map((p) => p.origHint));
-const truth = puzzle.people.map((p) => p.criminal);
+const truth = puzzle.people.map((p) => p.numberwang);
 check(isUniquelySolvable(shape, clues, truth), 'not uniquely solvable');
 check(solveChain(shape, clues, truth, puzzle.initialReveals).solvedAll, 'chain does not solve every card');
 
@@ -131,26 +132,23 @@ const remeasured = measure({
 });
 check(classify(boardBands, remeasured) === puzzle.difficulty, 'label does not survive re-measuring the written puzzle');
 
-// The cast's profession grouping has to be one the generator was offered. Every
+// The cast's colour grouping has to be one the generator was offered. Every
 // archived shape covers exactly twenty cards, so at 4x5 that is the archive's
-// own set; on any other board it is what `professionShapesFor` refitted from it.
+// own set; on any other board it is what `colourShapesFor` refitted from it.
 const groups = new Map<string, number>();
-for (const person of puzzle.people) groups.set(person.profession, (groups.get(person.profession) ?? 0) + 1);
+for (const person of puzzle.people) groups.set(person.colour, (groups.get(person.colour) ?? 0) + 1);
 const castShape = [...groups.values()].sort((a, b) => b - a).join(',');
 const offered = new Set(
-  professionShapesFor(mix.professionShapes, width * height).map((s) => s.join(',')),
+  colourShapesFor(mix.colourShapes, width * height).map((s) => s.join(',')),
 );
-check(offered.has(castShape), `profession shape [${castShape}] is not one of the offered shapes`);
+check(offered.has(castShape), `colour shape [${castShape}] is not one of the offered shapes`);
 
-// Names are how a clue points at a card, so the cast has to stay findable: in
-// reading order, all distinct, and sharing an initial only where the alphabet
-// runs out — which it does above twenty-six cards.
-const names = puzzle.people.map((p) => p.name);
-check(`${names}` === `${[...names].sort()}`, 'cast is not in alphabetical order');
-check(new Set(names).size === names.length, 'two cards carry the same name');
+// Numbers are how a clue points at a card, and the arithmetic clues add them
+// up, so the board has to carry each of 1..N exactly once.
+const numbers = [...shape.numbers].sort((a, b) => a - b);
 check(
-  new Set(names.map((n) => n[0])).size === Math.min(names.length, 26),
-  'cast shares more initials than the alphabet forces',
+  numbers.join(',') === Array.from({ length: numbers.length }, (_, i) => i + 1).join(','),
+  'numbers are not a permutation of 1..N',
 );
 
 const preds = new Map<string, number>();

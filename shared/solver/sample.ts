@@ -23,7 +23,7 @@ const unit = (u: Unit) => ({ t: 'unit' as const, unit: u });
 const kind = (k: UnitKind) => ({ t: 'kind' as const, kind: k });
 const trait = (t: Trait) => ({ t: 'trait' as const, trait: t });
 const index = (i: number) => ({ t: 'index' as const, i });
-const profession = (name: string) => ({ t: 'profession' as const, name });
+const colour = (name: string) => ({ t: 'colour' as const, name });
 
 const other = (t: Trait): Trait => (t === 'criminal' ? 'innocent' : 'criminal');
 
@@ -33,7 +33,7 @@ export interface SampleCtx {
   board: Board;
   shape: Shape;
   truth: boolean[];
-  professions: string[];
+  colours: string[];
   /** Whether card `i` carries trait `t`. */
   has: (i: number, t: Trait) => boolean;
   count: (members: number[], t: Trait) => number;
@@ -52,7 +52,7 @@ export interface SampleCtx {
   findUnit: (ok: (u: Unit) => boolean) => Unit | null;
 }
 
-export function randomUnit(rng: () => number, shape: Shape, professions: string[]): Unit {
+export function randomUnit(rng: () => number, shape: Shape, colours: string[]): Unit {
   const { width, height, size } = shape.grid;
   const pick = Math.floor(rng() * 7);
   if (pick === 0) return { kind: 'row', n: 1 + Math.floor(rng() * height) };
@@ -61,7 +61,7 @@ export function randomUnit(rng: () => number, shape: Shape, professions: string[
   if (pick === 3)
     return { kind: 'between', a: Math.floor(rng() * size), b: Math.floor(rng() * size) };
   if (pick === 4)
-    return { kind: 'profession', name: professions[Math.floor(rng() * professions.length)] };
+    return { kind: 'colour', name: colours[Math.floor(rng() * colours.length)] };
   if (pick === 5) return { kind: 'edge' };
   return { kind: 'corner' };
 }
@@ -240,7 +240,7 @@ export const CLUE_BUILDERS: Record<string, ClueBuilder> = {
   },
 
   units_share_n_traits: (c, t, u) => {
-    const v = randomUnit(c.rng, c.shape, c.professions);
+    const v = randomUnit(c.rng, c.shape, c.colours);
     const first = new Set(c.members(u));
     const both = c.members(v).filter((i) => first.has(i));
     return {
@@ -250,7 +250,7 @@ export const CLUE_BUILDERS: Record<string, ClueBuilder> = {
   },
 
   units_share_odd_n_traits: (c, t, u) => {
-    const v = randomUnit(c.rng, c.shape, c.professions);
+    const v = randomUnit(c.rng, c.shape, c.colours);
     const first = new Set(c.members(u));
     const both = c.members(v).filter((i) => first.has(i));
     if (c.count(both, t) % 2 !== 1) return null;
@@ -258,7 +258,7 @@ export const CLUE_BUILDERS: Record<string, ClueBuilder> = {
   },
 
   unit_shares_n_out_of_n_traits_with_unit: (c, t, u) => {
-    const v = randomUnit(c.rng, c.shape, c.professions);
+    const v = randomUnit(c.rng, c.shape, c.colours);
     const first = new Set(c.members(u));
     const both = c.members(v).filter((i) => first.has(i));
     return {
@@ -331,17 +331,17 @@ export const CLUE_BUILDERS: Record<string, ClueBuilder> = {
     };
   },
 
-  n_professions_have_trait_in_dir: (c, t) => {
+  n_colours_have_trait_in_dir: (c, t) => {
     const d = randomDir(c.rng);
     if (d === null) return null;
-    const name = c.professions[Math.floor(c.rng() * c.professions.length)];
+    const name = c.colours[Math.floor(c.rng() * c.colours.length)];
     const seen = c
-      .members({ kind: 'profession', name })
+      .members({ kind: 'colour', name })
       .map((i) => offsetIndex(c.shape.grid, i, d[0], d[1]))
       .filter((j): j is number => j !== null);
     return {
-      pred: 'n_professions_have_trait_in_dir',
-      args: [profession(name), trait(t), num(d[0]), num(d[1]), num(c.count(seen, t))],
+      pred: 'n_colours_have_trait_in_dir',
+      args: [colour(name), trait(t), num(d[0]), num(d[1]), num(c.count(seen, t))],
     };
   },
 };
@@ -356,14 +356,14 @@ export function makeSampleCtx(
 ): SampleCtx {
   const has = (i: number, t: Trait) => (t === 'criminal' ? truth[i] : !truth[i]);
   const members = (u: Unit) => unitMembers(board, u);
-  const professions = [...new Set(shape.professions)].sort();
+  const colours = [...new Set(shape.colours)].sort();
   const { width, height, size } = shape.grid;
   return {
     rng,
     board,
     shape,
     truth,
-    professions,
+    colours,
     has,
     members,
     count: (ms, t) => ms.filter((i) => has(i, t)).length,
@@ -372,7 +372,7 @@ export function makeSampleCtx(
       ...Array.from({ length: height }, (_, k): Unit => ({ kind: 'row', n: k + 1 })),
       ...Array.from({ length: width }, (_, k): Unit => ({ kind: 'col', n: k + 1 })),
       ...Array.from({ length: size }, (_, i): Unit => ({ kind: 'neighbor', i })),
-      ...professions.map((name): Unit => ({ kind: 'profession', name })),
+      ...colours.map((name): Unit => ({ kind: 'colour', name })),
       { kind: 'edge' },
       { kind: 'corner' },
     ],
@@ -396,5 +396,5 @@ export function makeSampleCtx(
 export function randomTrueClue(c: SampleCtx, preds: string[] = SAMPLED_PREDICATES): Hint | null {
   const pred = preds[Math.floor(c.rng() * preds.length)];
   const t: Trait = c.rng() < 0.5 ? 'criminal' : 'innocent';
-  return CLUE_BUILDERS[pred](c, t, randomUnit(c.rng, c.shape, c.professions));
+  return CLUE_BUILDERS[pred](c, t, randomUnit(c.rng, c.shape, c.colours));
 }

@@ -2,7 +2,7 @@
  * Clues to CNF.
  *
  * Every predicate in `predicates.ts` is a Boolean function of the criminal
- * assignment alone — units, professions and geometry are all fixed before a
+ * assignment alone — units, colours and geometry are all fixed before a
  * single card is decided, which is exactly why `unitMembers` can memoise. So
  * each clue becomes a constraint over one Boolean per card, and the board stops
  * being the thing that sets the cost.
@@ -55,7 +55,7 @@ export const SUPPORTED: ReadonlySet<string> = new Set([
   'unit_shares_n_out_of_n_traits_with_unit',
   'n_in_unit_have_trait_in_dir',
   'n_t_in_unit_have_trait_in_dir',
-  'n_professions_have_trait_in_dir',
+  'n_colours_have_trait_in_dir',
   'more_traits_in_unit_than_unit',
   'equal_number_of_traits_in_units',
   'more_traits_than_traits_in_unit',
@@ -103,9 +103,9 @@ function argIndex(a: HintArg[], k: number): number {
   if (x.t !== 'index') throw new UnsupportedPredicateError(`arg ${k} is not an index`);
   return x.i;
 }
-function argProfession(a: HintArg[], k: number): string {
+function argColour(a: HintArg[], k: number): string {
   const x = a[k];
-  if (x.t !== 'profession') throw new UnsupportedPredicateError(`arg ${k} is not a profession`);
+  if (x.t !== 'colour') throw new UnsupportedPredicateError(`arg ${k} is not a colour`);
   return x.name;
 }
 
@@ -121,7 +121,7 @@ export function encode(shape: Shape, hints: Hint[], known: Known): Encoded {
   const cnf = new Cnf();
   const size = shape.grid.size;
   const vars = Array.from({ length: size }, () => cnf.newVar());
-  const board = makeBoard(shape.grid, shape.professions, new Array(size).fill(false));
+  const board = makeBoard(shape.grid, shape.colours, shape.numbers, new Array(size).fill(false));
 
   for (let i = 0; i < size; i++) {
     if (known[i] === true) cnf.addUnit(vars[i]);
@@ -222,12 +222,12 @@ function encodeHint(cnf: Cnf, board: Board, shape: Shape, vars: number[], hint: 
       );
       return;
 
-    case 'n_professions_have_trait_in_dir':
+    case 'n_colours_have_trait_in_dir':
       exactly(
         cnf,
         litsOf(
           shifted(
-            members({ kind: 'profession', name: argProfession(a, 0) }),
+            members({ kind: 'colour', name: argColour(a, 0) }),
             argNum(a, 2),
             argNum(a, 3),
           ),

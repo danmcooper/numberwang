@@ -14,7 +14,8 @@ import { parseHint } from './hint';
 
 const shape: Shape = {
   grid: makeGrid(4, 5),
-  professions: Array.from({ length: 20 }, () => 'cook'),
+  colours: Array.from({ length: 20 }, () => 'cook'),
+  numbers: Array.from({ length: 20 }, (_, i) => i + 1),
 };
 // Truth: criminals at 0 and 1 only.
 const truth = Array.from({ length: 20 }, (_, i) => i < 2);

@@ -3,7 +3,7 @@
     "number_of_traits_in_unit": 0.15013054830287206,
     "odd_number_of_traits_in_unit": 0.07963446475195822,
     "is_one_of_n_traits_in_unit": 0.08877284595300261,
-    "n_professions_have_trait_in_dir": 0.030026109660574413,
+    "n_colours_have_trait_in_dir": 0.030026109660574413,
     "units_share_n_traits": 0.06266318537859007,
     "only_one_unit_has_exactly_n_traits": 0.016971279373368148,
     "n_in_unit_have_trait_in_dir": 0.022193211488250653,
@@ -37,7 +37,7 @@
     "unit:col": 0.07892595606183889,
     "dir:1,0": 0.009764035801464606,
     "overlap:1": 0.023596419853539462,
-    "unit:profession": 0.05695687550854353,
+    "unit:colour": 0.05695687550854353,
     "unit:between:4": 0.0984540276647681,
     "overlap:0": 0.07567127746135069,
     "overlap:2": 0.05207485760781123,
@@ -51,7 +51,7 @@
     "overlap:4": 0.013832384052074858,
     "dir:0,1": 0.013832384052074858
   },
-  "professionShapes": [
+  "colourShapes": [
     [
       3,
       3,

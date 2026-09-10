@@ -5,7 +5,7 @@
  * 23% are a count with a literal or a second count attached — so a correct
  * totalizer plus a parity chain covers the bulk of the game.
  *
- * The sets are small (a column is `height` cards, a profession a handful), so
+ * The sets are small (a column is `height` cards, a colour a handful), so
  * the totalizer's O(m^2) clauses are cheap and its arc-consistency under unit
  * propagation is worth more than a tighter encoding would be.
  */

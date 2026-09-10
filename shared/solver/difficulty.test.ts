@@ -17,7 +17,7 @@ import {
   measure,
 } from './difficulty';
 
-const shape = { grid: makeGrid(4, 5), professions: Array.from({ length: 20 }, () => 'cook') };
+const shape = { grid: makeGrid(4, 5), colours: Array.from({ length: 20 }, () => 'cook'), numbers: Array.from({ length: 20 }, (_, i) => i + 1) };
 const truth = Array.from({ length: 20 }, (_, i) => i < 2);
 const clues: Clues = Array.from({ length: 20 }, () => null);
 clues[0] = parseHint('number_of_traits(criminal,2)');

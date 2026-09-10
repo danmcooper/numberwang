@@ -17,8 +17,8 @@ describe('parseHint', () => {
       t: 'kind',
       kind: 'col',
     });
-    expect(parseHint('n_professions_have_trait_in_dir(cook,innocent,0,-1,1)').args).toEqual([
-      { t: 'profession', name: 'cook' },
+    expect(parseHint('n_colours_have_trait_in_dir(cook,innocent,0,-1,1)').args).toEqual([
+      { t: 'colour', name: 'cook' },
       { t: 'trait', trait: 'innocent' },
       { t: 'num', n: 0 },
       { t: 'num', n: -1 },
@@ -57,7 +57,7 @@ describe('formatHint', () => {
       'only_one_unit_has_exactly_n_traits(row,criminal,2)',
       'unit_shares_n_out_of_n_traits_with_unit(unit(neighbor,5),unit(row,3),criminal,1,2)',
       'n_t_in_unit_have_trait_in_dir(unit(edge,void),innocent,innocent,1,0,2)',
-      'equal_number_of_traits_in_units(unit(profession,cook),unit(profession,cop),innocent)',
+      'equal_number_of_traits_in_units(unit(colour,cook),unit(colour,cop),innocent)',
     ]) {
       expect(formatHint(parseHint(s))).toBe(s);
     }

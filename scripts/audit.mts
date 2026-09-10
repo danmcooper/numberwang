@@ -19,7 +19,7 @@ import { namedCards } from '../shared/solver/candidates.ts';
 import type { Bands } from '../shared/solver/difficulty.ts';
 import { bandsFor, classify, loadBands, measure } from '../shared/solver/difficulty.ts';
 import type { Shape } from '../shared/solver/enumerate.ts';
-import { professionShapesFor } from '../shared/solver/generate.ts';
+import { colourShapesFor } from '../shared/solver/generate.ts';
 import { makeGrid, neighbors } from '../shared/solver/grid.ts';
 import { loadMix } from '../shared/solver/mix.ts';
 import { makeBoard, unitMembers } from '../shared/solver/predicates.ts';
@@ -45,16 +45,12 @@ const PUZZLE_FILE = /^\d{4}-\d{2}-\d{2}\.json$/;
 const ABSOLUTE_PRED_CAP = 7;
 const WORST_PRED_SHARE = 0.5;
 
-/** The letters a cast can draw a distinct initial from. Above this, the board
- * has more cards than the alphabet has letters and repeats are forced. */
-const ALPHABET = 26;
-
 /** Counts these families never word: "0 persons in a corner have an innocent
  * directly above them" floors at 1 across all 41 real instances. */
 const DIR_FAMILIES = new Set([
   'n_in_unit_have_trait_in_dir',
   'n_t_in_unit_have_trait_in_dir',
-  'n_professions_have_trait_in_dir',
+  'n_colours_have_trait_in_dir',
 ]);
 
 interface Loaded {
@@ -71,10 +67,11 @@ function load(file: string, puzzle: Puzzle): Loaded {
     puzzle,
     shape: {
       grid: makeGrid(puzzle.width, puzzle.height),
-      professions: puzzle.people.map((p) => p.profession),
+      colours: puzzle.people.map((p) => p.colour),
+      numbers: puzzle.people.map((p) => p.number),
     },
     clues: parseClues(puzzle.people.map((p) => p.origHint)),
-    truth: puzzle.people.map((p) => p.criminal),
+    truth: puzzle.people.map((p) => p.numberwang),
   };
 }
 
@@ -143,24 +140,16 @@ export function auditPuzzle(l: Loaded, bands: Bands, shapes: Set<string>): strin
     bad.push('no hint is available from the opening position');
   }
 
-  // Clues name people, so the player has to map a name back to a card. Naming
-  // the cast in alphabetical reading order with a distinct initial per card
-  // makes that a glance rather than a scan. A board with more cards than the
-  // alphabet has letters is required to spend every letter before repeating.
-  const names = puzzle.people.map((p) => p.name);
-  if (names.join(',') !== [...names].sort().join(',')) {
-    bad.push('names are not in alphabetical reading order');
-  }
-  if (new Set(names).size !== names.length) {
-    bad.push(`${names.length - new Set(names).size} card(s) repeat a name`);
-  }
-  const initials = new Set(names.map((n) => n[0]));
-  const wanted = Math.min(names.length, ALPHABET);
-  if (initials.size !== wanted) {
-    bad.push(`cast uses ${initials.size} initials for ${names.length} cards, expected ${wanted}`);
+  // The numbers must be a permutation of 1..size. `validatePuzzle` proves that
+  // too, but this file exists to re-derive rather than to trust, and the
+  // arithmetic clues are only meaningful against a board that has every number
+  // exactly once.
+  const numbers = [...shape.numbers].sort((a, b) => a - b);
+  if (numbers.join(',') !== Array.from({ length: size }, (_, i) => i + 1).join(',')) {
+    bad.push('numbers are not a permutation of 1..size');
   }
 
-  const board = makeBoard(shape.grid, shape.professions, truth);
+  const board = makeBoard(shape.grid, shape.colours, shape.numbers, truth);
   for (let i = 0; i < size; i++) {
     const hint = clues[i];
     if (!hint) continue;
@@ -211,15 +200,15 @@ export function auditPuzzle(l: Loaded, bands: Bands, shapes: Set<string>): strin
     }
   }
 
-  // Real casts run seven to eleven professions in ragged groups of mostly two
+  // Real casts run seven to eleven colours in ragged groups of mostly two
   // and three. Requiring an exact refitted shape is stricter than it has to be,
   // but generation samples one wholesale, so anything else means the sampler
   // broke.
   const groups = new Map<string, number>();
-  for (const p of puzzle.people) groups.set(p.profession, (groups.get(p.profession) ?? 0) + 1);
+  for (const p of puzzle.people) groups.set(p.colour, (groups.get(p.colour) ?? 0) + 1);
   const castShape = [...groups.values()].sort((a, b) => b - a).join(',');
   if (!shapes.has(castShape)) {
-    bad.push(`profession shape [${castShape}] is not one refitted from a real puzzle`);
+    bad.push(`colour shape [${castShape}] is not one refitted from a real puzzle`);
   }
 
   // No puzzle should lean on one predicate harder than any real one does.
@@ -297,7 +286,7 @@ export async function auditAll(
   const shapesFor = (size: number) => {
     let set = shapeCache.get(size);
     if (!set) {
-      set = new Set(professionShapesFor(mix.professionShapes, size).map((s) => s.join(',')));
+      set = new Set(colourShapesFor(mix.colourShapes, size).map((s) => s.join(',')));
       shapeCache.set(size, set);
     }
     return set;

@@ -1,7 +1,7 @@
 export interface Person {
   /** 1..N, unique across the board. Replaces Clues by Sam's `name`. */
   number: number;
-  /** One of `PALETTE`. Replaces `profession`, and groups the same way. */
+  /** One of `PALETTE`. Replaces `colour`, and groups the same way. */
   colour: string;
   /** The hidden verdict. Replaces `criminal`. */
   numberwang: boolean;

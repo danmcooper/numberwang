@@ -4,7 +4,7 @@ import { makeGrid } from './grid';
 import { ARG_KINDS } from './hint';
 import { EVALUATORS } from './predicates';
 
-const shape = { grid: makeGrid(4, 4), professions: Array<string>(16).fill('cook') };
+const shape = { grid: makeGrid(4, 4), colours: Array<string>(16).fill('cook'), numbers: Array.from({ length: 16 }, (_, i) => i + 1) };
 const nothingKnown = Array<null>(16).fill(null);
 
 describe('predicate coverage', () => {
@@ -32,7 +32,7 @@ describe('encode', () => {
   it('refuses a connectivity clue over a unit too large to enumerate', () => {
     // The subset walk is exponential in the unit, so an oversized one has to be
     // refused rather than silently attempted: a 5x6 board's edge is 18 cards.
-    const wide = { grid: makeGrid(6, 5), professions: Array<string>(30).fill('cook') };
+    const wide = { grid: makeGrid(6, 5), colours: Array<string>(30).fill('cook'), numbers: Array.from({ length: 30 }, (_, i) => i + 1) };
     expect(wide.grid.width * 2 + (wide.grid.height - 2) * 2).toBeGreaterThan(MAX_ENUMERATED_UNIT);
     expect(() =>
       encode(

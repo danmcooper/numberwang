@@ -18,10 +18,10 @@ import {
   makeRng,
   orderPool,
   pickCriminals,
-  professionShapesFor,
+  colourShapesFor,
   shuffled,
 } from './generate';
-import { EXTRA_PROFESSIONS, PROFESSIONS, faceOf, professionsFor } from './vocab';
+import { EXTRA_PALETTE, PALETTE, faceOf, coloursFor } from './vocab';
 
 // Wide bands: this test proves the machinery works, not that it hits a target.
 const band: LabelBand = {
@@ -50,7 +50,7 @@ const mix = loadMix(mixData);
  */
 const BOARD = { width: 4, height: 4 };
 
-/** An archive profession shape shrunk to `size` cards, smallest groups last.
+/** An archive colour shape shrunk to `size` cards, smallest groups last.
  * Shaving the largest group repeatedly keeps the raggedness and the group count
  * that `castOf` exists to reproduce, rather than inventing a tidy shape. */
 function trimShape(shape: readonly number[], size: number): number[] {
@@ -65,7 +65,7 @@ function trimShape(shape: readonly number[], size: number): number[] {
 
 const boardMix: ClueMix = {
   ...mix,
-  professionShapes: mix.professionShapes.map((s) => trimShape(s, BOARD.width * BOARD.height)),
+  colourShapes: mix.colourShapes.map((s) => trimShape(s, BOARD.width * BOARD.height)),
 };
 
 describe('castOf', () => {
@@ -74,7 +74,7 @@ describe('castOf', () => {
   // from its first letter instead of by scanning all twenty cards.
   it('names the cast in alphabetical order with one distinct initial each', () => {
     for (let seed = 1; seed <= 25; seed++) {
-      const cast = castOf(makeRng(seed), mix.professionShapes);
+      const cast = castOf(makeRng(seed), mix.colourShapes);
       expect(cast.names.length, `seed ${seed}`).toBe(20);
       expect(cast.names, `seed ${seed}`).toEqual([...cast.names].sort());
       const initials = cast.names.map((n) => n[0]);
@@ -83,20 +83,20 @@ describe('castOf', () => {
   });
 
   it('varies the cast between seeds', () => {
-    const a = castOf(makeRng(1), mix.professionShapes).names.join(',');
-    const b = castOf(makeRng(2), mix.professionShapes).names.join(',');
+    const a = castOf(makeRng(1), mix.colourShapes).names.join(',');
+    const b = castOf(makeRng(2), mix.colourShapes).names.join(',');
     expect(a).not.toBe(b);
   });
 
-  it('gives the cast one of the archive\'s ragged profession shapes', () => {
-    // Not five professions of four apiece, which is what an `i % 5` fill gives
+  it('gives the cast one of the archive\'s ragged colour shapes', () => {
+    // Not five colours of four apiece, which is what an `i % 5` fill gives
     // and what no real puzzle has ever looked like.
-    const known = new Set(mix.professionShapes.map((s) => s.join(',')));
+    const known = new Set(mix.colourShapes.map((s) => s.join(',')));
     const seen = new Set<string>();
     for (let seed = 1; seed <= 30; seed++) {
-      const cast = castOf(makeRng(seed), mix.professionShapes);
+      const cast = castOf(makeRng(seed), mix.colourShapes);
       const counts = new Map<string, number>();
-      for (const p of cast.professions) counts.set(p, (counts.get(p) ?? 0) + 1);
+      for (const p of cast.colours) counts.set(p, (counts.get(p) ?? 0) + 1);
       const shape = [...counts.values()].sort((a, b) => b - a).join(',');
       expect(known.has(shape), `seed ${seed}: ${shape}`).toBe(true);
       seen.add(shape);
@@ -104,16 +104,16 @@ describe('castOf', () => {
     expect(seen.size).toBeGreaterThan(3);
   });
 
-  it('refuses a profession shape that does not cover the board', () => {
+  it('refuses a colour shape that does not cover the board', () => {
     // A shape is dealt out slot by slot, so one that comes up short would leave
-    // cards with no profession at all — caught here rather than at validation.
+    // cards with no colour at all — caught here rather than at validation.
     expect(() => castOf(makeRng(1), [[2]])).toThrow(GenerationError);
   });
 
-  it('keeps each card\'s face agreeing with its own gender and profession', () => {
-    const cast = castOf(makeRng(9), mix.professionShapes);
+  it('keeps each card\'s face agreeing with its own gender and colour', () => {
+    const cast = castOf(makeRng(9), mix.colourShapes);
     for (let i = 0; i < cast.names.length; i++) {
-      expect(cast.faces[i], cast.names[i]).toBe(faceOf(cast.professions[i], cast.genders[i]));
+      expect(cast.faces[i], cast.names[i]).toBe(faceOf(cast.colours[i], cast.genders[i]));
     }
   });
 
@@ -123,91 +123,91 @@ describe('castOf', () => {
   // as the alphabet allows.
   it('fills a thirty-card board, reusing initials only where it must', () => {
     for (let seed = 1; seed <= 10; seed++) {
-      const cast = castOf(makeRng(seed), professionShapesFor(mix.professionShapes, 30), 30);
+      const cast = castOf(makeRng(seed), colourShapesFor(mix.colourShapes, 30), 30);
       expect(cast.names.length, `seed ${seed}`).toBe(30);
       expect(cast.genders.length).toBe(30);
-      expect(cast.professions.length).toBe(30);
+      expect(cast.colours.length).toBe(30);
       expect(cast.faces.length).toBe(30);
       expect(cast.names, `seed ${seed}`).toEqual([...cast.names].sort());
       expect(new Set(cast.names).size, `seed ${seed}`).toBe(30);
       // Thirty names over twenty-six letters shares four of them, and no more.
       expect(new Set(cast.names.map((n) => n[0])).size, `seed ${seed}`).toBe(26);
       for (let i = 0; i < 30; i++) {
-        expect(cast.faces[i], cast.names[i]).toBe(faceOf(cast.professions[i], cast.genders[i]));
+        expect(cast.faces[i], cast.names[i]).toBe(faceOf(cast.colours[i], cast.genders[i]));
       }
     }
   });
 
-  // The extra professions exist for the boards that outgrow the base sixteen,
+  // The extra colours exist for the boards that outgrow the base sixteen,
   // and only for those: a board the size of the archive's own, or smaller, has
   // to deal exactly the cast it always did.
-  it('keeps the extra professions off boards no bigger than the archive\'s', () => {
-    const extras = new Set(EXTRA_PROFESSIONS.map((p) => p.key));
+  it('keeps the extra colours off boards no bigger than the archive\'s', () => {
+    const extras = new Set(EXTRA_PALETTE.map((p) => p.key));
     for (const size of [16, 20]) {
-      const shapes = professionShapesFor(mix.professionShapes, size);
+      const shapes = colourShapesFor(mix.colourShapes, size);
       for (let seed = 1; seed <= 40; seed++) {
         const cast = castOf(makeRng(seed), shapes, size);
-        for (const key of cast.professions) {
+        for (const key of cast.colours) {
           expect(extras.has(key), `${size} cards, seed ${seed}, dealt ${key}`).toBe(false);
         }
       }
     }
   });
 
-  it('deals the extra professions on a board bigger than the archive\'s', () => {
-    const extras = new Set(EXTRA_PROFESSIONS.map((p) => p.key));
-    const shapes = professionShapesFor(mix.professionShapes, 30);
+  it('deals the extra colours on a board bigger than the archive\'s', () => {
+    const extras = new Set(EXTRA_PALETTE.map((p) => p.key));
+    const shapes = colourShapesFor(mix.colourShapes, 30);
     const seen = new Set<string>();
     for (let seed = 1; seed <= 40; seed++) {
-      for (const key of castOf(makeRng(seed), shapes, 30).professions) {
+      for (const key of castOf(makeRng(seed), shapes, 30).colours) {
         if (extras.has(key)) seen.add(key);
       }
     }
     // All of them, not just whichever one the shuffle happens to favour.
-    expect(seen.size).toBe(EXTRA_PROFESSIONS.length);
+    expect(seen.size).toBe(EXTRA_PALETTE.length);
   });
 
-  it('never deals a profession that has no face', () => {
-    // `faceOf` falls back to a shrug rather than throwing, so a profession the
+  it('never deals a colour that has no face', () => {
+    // `faceOf` falls back to a shrug rather than throwing, so a colour the
     // face map has never heard of would ship as 😬 on every card.
-    const known = new Set([...PROFESSIONS, ...EXTRA_PROFESSIONS].map((p) => p.key));
+    const known = new Set([...PALETTE, ...EXTRA_PALETTE].map((p) => p.key));
     for (const size of [16, 20, 30]) {
-      const shapes = professionShapesFor(mix.professionShapes, size);
+      const shapes = colourShapesFor(mix.colourShapes, size);
       const cast = castOf(makeRng(size), shapes, size);
-      for (const key of cast.professions) expect(known.has(key), key).toBe(true);
+      for (const key of cast.colours) expect(known.has(key), key).toBe(true);
       for (const face of cast.faces) expect(face).not.toBe('😬');
     }
   });
 });
 
-describe('professionShapesFor', () => {
+describe('colourShapesFor', () => {
   it('passes the archive\'s own shapes through at the size they were measured', () => {
-    const got = professionShapesFor(mix.professionShapes, 20);
-    expect(got).toEqual(mix.professionShapes);
+    const got = colourShapesFor(mix.colourShapes, 20);
+    expect(got).toEqual(mix.colourShapes);
   });
 
   it('builds shapes covering a board the archive has none for', () => {
-    const got = professionShapesFor(mix.professionShapes, 30);
+    const got = colourShapesFor(mix.colourShapes, 30);
     expect(got.length).toBeGreaterThan(10);
     for (const s of got) {
       expect(s.reduce((a, b) => a + b, 0), s.join(',')).toBe(30);
-      // No more professions than a board this size is allowed to draw on.
-      expect(s.length).toBeLessThanOrEqual(professionsFor(30).length);
+      // No more colours than a board this size is allowed to draw on.
+      expect(s.length).toBeLessThanOrEqual(coloursFor(30).length);
       expect(Math.min(...s)).toBeGreaterThan(0);
     }
   });
 
   it('keeps the archive\'s taste for small ragged groups', () => {
     // Real casts run groups of mostly two and three, which is what makes a
-    // `#PROFS:` unit worth naming. Five groups of six would be a different game,
-    // and so would fifteen groups of one — a "profession group" of one person is
+    // `#COLOURS:` unit worth naming. Five groups of six would be a different game,
+    // and so would fifteen groups of one — a "colour group" of one person is
     // just a card with a longer name, and a clue about it says nothing a clue
     // naming the card would not. Covering the ten extra cards by adding singleton
     // groups satisfies both "small" and "ragged" while doing exactly that, so
     // the archive's own two statistics are what this holds the refit to.
-    const got = professionShapesFor(mix.professionShapes, 30);
+    const got = colourShapesFor(mix.colourShapes, 30);
     const sizes = got.flat();
-    const archive = mix.professionShapes.flat();
+    const archive = mix.colourShapes.flat();
     const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
     const singletons = (xs: number[]) => xs.filter((n) => n === 1).length / xs.length;
 
@@ -217,19 +217,19 @@ describe('professionShapesFor', () => {
     expect(singletons(sizes)).toBeLessThan(singletons(archive) + 0.05);
   });
 
-  it('drops a shape naming more professions than the vocabulary has', () => {
-    // `castOf` deals one profession per group, so a shape with more groups than
-    // there are professions cannot be dealt. Passing it through would leave that
+  it('drops a shape naming more colours than the vocabulary has', () => {
+    // `castOf` deals one colour per group, so a shape with more groups than
+    // there are colours cannot be dealt. Passing it through would leave that
     // rejection to `castOf`, which can only throw.
     const tooMany = Array.from({ length: 20 }, () => 1);
     const usable = [3, 3, 3, 3, 2, 2, 2, 2];
-    expect(professionShapesFor([tooMany, usable], 20)).toEqual([usable]);
+    expect(colourShapesFor([tooMany, usable], 20)).toEqual([usable]);
   });
 
   it('covers a board smaller than the archive\'s too', () => {
     // The cheap 4x4 board the rest of this file generates on needs this as much
     // as a 5x6 does: twenty-card shapes do not deal out onto sixteen cards.
-    const got = professionShapesFor(mix.professionShapes, 16);
+    const got = colourShapesFor(mix.colourShapes, 16);
     expect(got.length).toBeGreaterThan(10);
     for (const s of got) {
       expect(s.reduce((a, b) => a + b, 0), s.join(',')).toBe(16);
@@ -237,19 +237,19 @@ describe('professionShapesFor', () => {
       expect(Math.min(...s)).toBeGreaterThan(0);
     }
     // Shrinking must not tidy the cast into a few big groups.
-    expect(Math.max(...got.flat())).toBeLessThanOrEqual(Math.max(...mix.professionShapes.flat()));
+    expect(Math.max(...got.flat())).toBeLessThanOrEqual(Math.max(...mix.colourShapes.flat()));
   });
 
-  it('does not shrink a cast down to one profession per card', () => {
+  it('does not shrink a cast down to one colour per card', () => {
     // The smallest board a Dan puzzle can draw is 3x3, which is barely half the
     // twenty cards every archive shape covers. Shaving the largest group over
     // and over gets there, but it arrives at nine groups of one — and a
-    // profession group of one is just a card with a longer name, so every
-    // `#PROFS:` clue on that board would say what a clue naming the card says.
-    const archive = mix.professionShapes.flat();
+    // colour group of one is just a card with a longer name, so every
+    // `#COLOURS:` clue on that board would say what a clue naming the card says.
+    const archive = mix.colourShapes.flat();
     const singletons = (xs: number[]) => xs.filter((n) => n === 1).length / xs.length;
     for (const size of [9, 12, 15, 16, 18]) {
-      const got = professionShapesFor(mix.professionShapes, size);
+      const got = colourShapesFor(mix.colourShapes, size);
       for (const s of got) {
         expect(s.reduce((a, b) => a + b, 0), s.join(',')).toBe(size);
         expect(s.some((n) => n > 1), `${size} cards: ${s.join(',')} is all singletons`).toBe(true);
@@ -306,6 +306,7 @@ describe('orderPool', () => {
   const poolBoard = makeBoard(
     makeGrid(4, 5),
     Array.from({ length: 20 }, (_, i) => ['cook', 'cop', 'pilot', 'painter', 'sleuth'][i % 5]),
+    Array.from({ length: 20 }, (_, i) => i + 1),
     Array.from({ length: 20 }, (_, i) => [0, 3, 6, 9, 13, 19].includes(i)),
   );
   const pool = candidateHints(poolBoard);
@@ -366,14 +367,14 @@ describe('orderPool', () => {
   it('lands the rare unit kinds on their archive share instead of overshooting', () => {
     // Scaling each feature once by archiveShare/poolShare does not reach the
     // archive's marginals: a hint carrying the same feature twice gets the
-    // factor squared, and profession groups are 0.4% of the pool's unit slots
+    // factor squared, and colour groups are 0.4% of the pool's unit slots
     // against the archive's 7%, so that factor is large. The head came out at
-    // three times the archive's profession rate — over-correcting a clue type
+    // three times the archive's colour rate — over-correcting a clue type
     // the player then sees far too much of. Every feature should land near its
     // target, not merely on the right side of the pool's own share.
     const head = orderPool(makeRng(11), poolBoard, pool, mix).slice(0, HEAD);
     const s = sharesOf(head);
-    for (const k of ['unit:profession', 'unit:neighbor', 'unit:row', 'unit:col']) {
+    for (const k of ['unit:colour', 'unit:neighbor', 'unit:row', 'unit:col']) {
       expect(s.feature(k), k).toBeGreaterThan(mix.feature[k] * 0.5);
       expect(s.feature(k), k).toBeLessThan(mix.feature[k] * 1.6);
     }
@@ -382,10 +383,10 @@ describe('orderPool', () => {
   it('holds `between` back and lets the rarer units through', () => {
     const head = orderPool(makeRng(11), poolBoard, pool, mix).slice(0, HEAD);
     const s = sharesOf(head);
-    // Uniformly, `between` takes 58% of unit slots and `profession` 0.4%.
+    // Uniformly, `between` takes 58% of unit slots and `colour` 0.4%.
     const between = [2, 3, 4, 5].reduce((a, n) => a + s.feature(`unit:between:${n}`), 0);
     expect(between).toBeLessThan(0.4);
-    expect(s.feature('unit:profession')).toBeGreaterThan(0.02);
+    expect(s.feature('unit:colour')).toBeGreaterThan(0.02);
     expect(s.feature('unit:edge')).toBeGreaterThan(0.02);
   });
 
@@ -425,6 +426,7 @@ describe('orderPool', () => {
     const bigBoard = makeBoard(
       makeGrid(6, 6),
       Array.from({ length: 36 }, (_, i) => ['cook', 'cop', 'pilot', 'painter', 'sleuth'][i % 5]),
+      Array.from({ length: 36 }, (_, i) => i + 1),
       Array.from({ length: 36 }, (_, i) => i % 4 === 0),
     );
     const bigPool = candidateHints(bigBoard);
@@ -469,10 +471,11 @@ describe('generatePuzzle', () => {
     expect(puzzle.difficulty).toBe('Medium');
     const shape = {
       grid: makeGrid(puzzle.width, puzzle.height),
-      professions: puzzle.people.map((p) => p.profession),
+      colours: puzzle.people.map((p) => p.colour),
+      numbers: puzzle.people.map((p) => p.number),
     };
     const clues = parseClues(puzzle.people.map((p) => p.origHint));
-    const truth = puzzle.people.map((p) => p.criminal);
+    const truth = puzzle.people.map((p) => p.numberwang);
     expect(isUniquelySolvable(shape, clues, truth)).toBe(true);
     expect(solveChain(shape, clues, truth, puzzle.initialReveals).solvedAll).toBe(true);
   });
@@ -490,19 +493,19 @@ describe('generatePuzzle', () => {
       date: '2026-01-01', difficulty: 'Medium', band: tenOfTwenty, seed: 5,
       mix: boardMix, ...BOARD,
     });
-    expect(p.people.filter((q) => q.criminal).length).toBe(8);
+    expect(p.people.filter((q) => q.numberwang).length).toBe(8);
   });
 
   // Every caller passes the archive's own mix, whose shapes all sum to twenty.
   // A board that is not 4x5 has to fit them itself rather than making the caller
   // trim or grow them first — otherwise `castOf` throws and no board but the
   // archive's own can ever be generated.
-  it('fits the archive\'s profession shapes to whatever board it was given', () => {
+  it('fits the archive\'s colour shapes to whatever board it was given', () => {
     const { puzzle: p } = generatePuzzle({
       date: '2026-01-01', difficulty: 'Medium', band, seed: 3, mix, ...BOARD,
     });
     expect(p.people.length).toBe(BOARD.width * BOARD.height);
-    expect(p.people.every((q) => q.profession.length > 0)).toBe(true);
+    expect(p.people.every((q) => q.colour.length > 0)).toBe(true);
   });
 
   it('round-trips every generated clue exactly', () => {
@@ -564,10 +567,11 @@ describe('generatePuzzle', () => {
     // work out how few clues would do, and require an offerable step to match.
     const shape = {
       grid: makeGrid(puzzle.width, puzzle.height),
-      professions: puzzle.people.map((p) => p.profession),
+      colours: puzzle.people.map((p) => p.colour),
+      numbers: puzzle.people.map((p) => p.number),
     };
     const clues = parseClues(puzzle.people.map((p) => p.origHint));
-    const truth = puzzle.people.map((p) => p.criminal);
+    const truth = puzzle.people.map((p) => p.numberwang);
     const hints = puzzle.hints as NonNullable<typeof puzzle.hints>;
 
     puzzle.people.forEach((_, card) => {
@@ -728,9 +732,13 @@ describe('labelOf', () => {
       // still schema-valid, uniquely solvable, fully chained, and free of
       // guesses. This is the whole risk of accepting off-band puzzles.
       expect(() => validatePuzzle(p)).not.toThrow();
-      const shape = { grid: makeGrid(p.width, p.height), professions: p.people.map((x) => x.profession) };
+      const shape = {
+        grid: makeGrid(p.width, p.height),
+        colours: p.people.map((x) => x.colour),
+        numbers: p.people.map((x) => x.number),
+      };
       const clues = parseClues(p.people.map((x) => x.origHint));
-      const truth = p.people.map((x) => x.criminal);
+      const truth = p.people.map((x) => x.numberwang);
       expect(isUniquelySolvable(shape, clues, truth)).toBe(true);
       expect(solveChain(shape, clues, truth, p.initialReveals).solvedAll).toBe(true);
       p.people.forEach((person, i) => {

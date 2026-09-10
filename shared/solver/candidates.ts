@@ -16,14 +16,14 @@ const t = (trait: Trait): HintArg => ({ t: 'trait', trait });
 const n = (value: number): HintArg => ({ t: 'num', n: value });
 const idx = (i: number): HintArg => ({ t: 'index', i });
 const k = (kind: Unit['kind']): HintArg => ({ t: 'kind', kind });
-const pr = (name: string): HintArg => ({ t: 'profession', name });
+const pr = (name: string): HintArg => ({ t: 'colour', name });
 
 export function candidateUnits(b: Board): Unit[] {
   const units: Unit[] = [
     ...unitsOfKind(b, 'row'),
     ...unitsOfKind(b, 'col'),
     ...unitsOfKind(b, 'neighbor'),
-    ...unitsOfKind(b, 'profession'),
+    ...unitsOfKind(b, 'colour'),
     ...unitsOfKind(b, 'edge'),
     ...unitsOfKind(b, 'corner'),
   ];
@@ -145,7 +145,7 @@ export function candidateHints(b: Board): Hint[] {
   };
   /**
    * Whether u1 and u2's raw memberships (trait-independent) actually overlap. Membership
-   * is fixed once the board's grid and profession assignment are fixed — it never depends
+   * is fixed once the board's grid and colour assignment are fixed — it never depends
    * on the criminal/innocent assignment — so when this is false, `overlap(u1, u2, trait)`
    * is 0 for every conceivable criminal assignment on this board, not just the actual one.
    * `units_share_n_traits(u1, u2, trait, 0)` in that case is a structural tautology: true
@@ -267,7 +267,7 @@ export function candidateHints(b: Board): Hint[] {
     }
   }
 
-  for (const kind of ['row', 'col', 'profession', 'neighbor'] as const) {
+  for (const kind of ['row', 'col', 'colour', 'neighbor'] as const) {
     const group = unitsOfKind(b, kind);
     if (group.length === 0) continue;
     for (const trait of TRAITS) {
@@ -298,7 +298,7 @@ export function candidateHints(b: Board): Hint[] {
           // The cross-trait pair: "as many innocent cooks as criminal cops". Only
           // the opposite trait, since matching traits would just be the two
           // predicates above with a longer sentence. Same kind for the same reason
-          // they are: the renderer has words for row/row, not for row/profession.
+          // they are: the renderer has words for row/row, not for row/colour.
           const other = trait === 'criminal' ? 'innocent' : 'criminal';
           push('more_traits_in_unit_than_traits_in_unit', [u(u1), t(trait), u(u2), t(other)]);
           push('equal_traits_in_unit_and_traits_in_unit', [u(u1), t(trait), u(u2), t(other)]);
@@ -332,19 +332,19 @@ export function candidateHints(b: Board): Hint[] {
     }
   }
 
-  for (const unit of unitsOfKind(b, 'profession')) {
+  for (const unit of unitsOfKind(b, 'colour')) {
     const name = (unit as { name: string }).name;
     const members = unitMembers(b, unit);
     for (const trait of TRAITS) {
       for (const [dx, dy] of DIRS) {
-        // Same structural boundary check as above: profession membership is fixed given
+        // Same structural boundary check as above: colour membership is fixed given
         // the board (independent of the criminal assignment), so if every card of this
-        // profession structurally lacks a cell in this direction, the count is always 0.
+        // colour structurally lacks a cell in this direction, the count is always 0.
         if (dirIsStructurallyEmpty(b, members, dx, dy)) continue;
         // Same zero-count floor as the two families above.
         const inDir = dirCount(members, trait, dx, dy);
         if (inDir > 0) {
-          push('n_professions_have_trait_in_dir', [pr(name), t(trait), n(dx), n(dy), n(inDir)]);
+          push('n_colours_have_trait_in_dir', [pr(name), t(trait), n(dx), n(dy), n(inDir)]);
         }
       }
     }
@@ -371,8 +371,8 @@ export function referencedCards(b: Board, h: Hint): Set<number> {
       // anchor card is referenced by the clue even though it isn't a member.
       if (arg.unit.kind === 'neighbor') cards.add(arg.unit.i);
     } else if (arg.t === 'index') cards.add(arg.i);
-    else if (arg.t === 'profession') {
-      for (const i of unitMembers(b, { kind: 'profession', name: arg.name })) cards.add(i);
+    else if (arg.t === 'colour') {
+      for (const i of unitMembers(b, { kind: 'colour', name: arg.name })) cards.add(i);
     }
   }
   return cards;
@@ -381,7 +381,7 @@ export function referencedCards(b: Board, h: Hint): Set<number> {
 /**
  * Cards a clue's *rendering* actually names, as opposed to every card that
  * happens to be a member of a unit the clue mentions. Ordinary unit
- * membership (a row, a column, a profession, the edges, the corners) never
+ * membership (a row, a column, a colour, the edges, the corners) never
  * surfaces a card index in the rendered text — only a locative phrase like
  * "in row 3" or "on the edges". Only three shapes put a literal card in the
  * text: a direct `index` argument (renders as `#NAME:i`), a `neighbor`

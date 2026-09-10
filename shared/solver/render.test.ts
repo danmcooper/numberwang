@@ -72,8 +72,8 @@ describe('counting clue templates', () => {
     expect(r('odd_number_of_traits_in_unit(unit(col,3),criminal)')).toBe(
       "There's an odd number of criminals in column #C:3",
     );
-    expect(r('odd_number_of_traits_in_unit(unit(profession,singer),criminal)')).toBe(
-      "There's an odd number of criminal #PROFS:singer",
+    expect(r('odd_number_of_traits_in_unit(unit(colour,singer),criminal)')).toBe(
+      "There's an odd number of criminal #COLOURS:singer",
     );
   });
   it('is_one_of_n_traits_in_unit', () => {
@@ -99,8 +99,8 @@ describe('counting clue templates', () => {
     expect(r('all_units_have_at_least_n_traits(row,innocent,1)')).toBe(
       'Each row has at least one innocent',
     );
-    expect(r('all_units_have_at_least_n_traits(profession,criminal,1)')).toBe(
-      'There is at least one criminal among all professions',
+    expect(r('all_units_have_at_least_n_traits(colour,criminal,1)')).toBe(
+      'There is at least one criminal among all colours',
     );
     expect(r('all_units_have_at_least_n_traits(neighbor,criminal,2)')).toBe(
       'Everyone has at least 2 criminal neighbors',
@@ -131,8 +131,8 @@ describe('comparison clue templates', () => {
       'There are more criminals in column #C:1 than column #C:3',
     );
     expect(
-      r('more_traits_in_unit_than_unit(unit(profession,cook),unit(profession,cop),criminal)'),
-    ).toBe('There are more criminal #PROFS:cook than criminal #PROFS:cop');
+      r('more_traits_in_unit_than_unit(unit(colour,cook),unit(colour,cop),criminal)'),
+    ).toBe('There are more criminal #COLOURS:cook than criminal #COLOURS:cop');
   });
   it('equal_number_of_traits_in_units', () => {
     expect(r('equal_number_of_traits_in_units(unit(neighbor,3),unit(neighbor,9),criminal)')).toBe(
@@ -145,8 +145,8 @@ describe('comparison clue templates', () => {
       "There's an equal number of criminals in columns #C:1 and #C:3",
     );
     expect(
-      r('equal_number_of_traits_in_units(unit(profession,cook),unit(profession,cop),innocent)'),
-    ).toBe('There are as many innocent #PROFS:cook as there are innocent #PROFS:cop');
+      r('equal_number_of_traits_in_units(unit(colour,cook),unit(colour,cop),innocent)'),
+    ).toBe('There are as many innocent #COLOURS:cook as there are innocent #COLOURS:cop');
   });
   it('more_traits_than_traits_in_unit', () => {
     expect(r('more_traits_than_traits_in_unit(unit(between,pair(0,3)),innocent,criminal)')).toBe(
@@ -160,8 +160,8 @@ describe('comparison clue templates', () => {
     expect(r('equal_traits_and_traits_in_unit(unit(between,pair(0,3)),criminal,innocent)')).toBe(
       'There are as many criminals as innocents #BETWEEN:pair(0,3)',
     );
-    expect(r('equal_traits_and_traits_in_unit(unit(profession,cop),innocent,criminal)')).toBe(
-      "There's an equal number of innocent and criminal #PROFS:cop",
+    expect(r('equal_traits_and_traits_in_unit(unit(colour,cop),innocent,criminal)')).toBe(
+      "There's an equal number of innocent and criminal #COLOURS:cop",
     );
   });
   it('more_traits_in_unit_than_traits_in_unit', () => {
@@ -175,8 +175,8 @@ describe('comparison clue templates', () => {
       'There are more criminals in column #C:1 than innocents in column #C:3',
     );
     expect(
-      r('more_traits_in_unit_than_traits_in_unit(unit(profession,cook),innocent,unit(profession,cop),criminal)'),
-    ).toBe('There are more innocent #PROFS:cook than criminal #PROFS:cop');
+      r('more_traits_in_unit_than_traits_in_unit(unit(colour,cook),innocent,unit(colour,cop),criminal)'),
+    ).toBe('There are more innocent #COLOURS:cook than criminal #COLOURS:cop');
   });
   it('equal_traits_in_unit_and_traits_in_unit', () => {
     expect(
@@ -189,8 +189,8 @@ describe('comparison clue templates', () => {
       'There are as many criminals in column #C:1 as innocents in column #C:3',
     );
     expect(
-      r('equal_traits_in_unit_and_traits_in_unit(unit(profession,cook),innocent,unit(profession,cop),criminal)'),
-    ).toBe('There are as many innocent #PROFS:cook as there are criminal #PROFS:cop');
+      r('equal_traits_in_unit_and_traits_in_unit(unit(colour,cook),innocent,unit(colour,cop),criminal)'),
+    ).toBe('There are as many innocent #COLOURS:cook as there are criminal #COLOURS:cop');
   });
   it('has_most_traits', () => {
     expect(r('has_most_traits(unit(col,2),criminal)')).toBe(
@@ -331,12 +331,12 @@ describe('adjacency and direction clue templates', () => {
       r('only_one_person_in_unit_has_exactly_n_trait_neighbors(unit(corner,void),criminal,0)'),
     ).toBe('Only one person in a corner has no criminal neighbors');
     expect(
-      r('only_one_person_in_unit_has_exactly_n_trait_neighbors(unit(profession,mech),criminal,2)'),
-    ).toBe('Only one #PROF:mech has exactly 2 criminal neighbors');
+      r('only_one_person_in_unit_has_exactly_n_trait_neighbors(unit(colour,mech),criminal,2)'),
+    ).toBe('Only one #COLOUR:mech has exactly 2 criminal neighbors');
   });
   it('n_in_unit_have_trait_in_dir', () => {
-    expect(r('n_in_unit_have_trait_in_dir(unit(profession,cook),criminal,1,0,1)')).toBe(
-      'Only one #PROF:cook has a criminal directly to the right of them',
+    expect(r('n_in_unit_have_trait_in_dir(unit(colour,cook),criminal,1,0,1)')).toBe(
+      'Only one #COLOUR:cook has a criminal directly to the right of them',
     );
     expect(r('n_in_unit_have_trait_in_dir(unit(corner,void),criminal,0,1,2)')).toBe(
       '2 persons in a corner have a criminal directly below them',
@@ -344,8 +344,8 @@ describe('adjacency and direction clue templates', () => {
     expect(r('n_in_unit_have_trait_in_dir(unit(edge,void),criminal,0,-1,3)')).toBe(
       '3 persons on the edges have a criminal directly above them',
     );
-    expect(r('n_in_unit_have_trait_in_dir(unit(profession,builder),innocent,0,-1,2)')).toBe(
-      '2 #PROFS:builder have an innocent directly above them',
+    expect(r('n_in_unit_have_trait_in_dir(unit(colour,builder),innocent,0,-1,2)')).toBe(
+      '2 #COLOURS:builder have an innocent directly above them',
     );
   });
   it('n_t_in_unit_have_trait_in_dir', () => {
@@ -364,61 +364,61 @@ describe('adjacency and direction clue templates', () => {
       'Only one criminal in row 2 has an innocent directly to the right of them',
     );
   });
-  it('n_professions_have_trait_in_dir', () => {
-    expect(r('n_professions_have_trait_in_dir(painter,innocent,1,0,2)')).toBe(
-      '2 #PROFS:painter have an innocent directly to the right of them',
+  it('n_colours_have_trait_in_dir', () => {
+    expect(r('n_colours_have_trait_in_dir(painter,innocent,1,0,2)')).toBe(
+      '2 #COLOURS:painter have an innocent directly to the right of them',
     );
-    expect(r('n_professions_have_trait_in_dir(cook,innocent,-1,0,1)')).toBe(
-      'Exactly 1 #PROF:cook has an innocent directly to the left of them',
+    expect(r('n_colours_have_trait_in_dir(cook,innocent,-1,0,1)')).toBe(
+      'Exactly 1 #COLOUR:cook has an innocent directly to the left of them',
     );
-    expect(r('n_professions_have_trait_in_dir(singer,innocent,-1,0,0)')).toBe(
-      'No #PROF:singer has an innocent directly to the left of them',
+    expect(r('n_colours_have_trait_in_dir(singer,innocent,-1,0,0)')).toBe(
+      'No #COLOUR:singer has an innocent directly to the left of them',
     );
   });
 });
 
-// `professionTotals` is an extension, off unless generation asks for it: the
-// source site never states a profession's total, and `corpus.test.ts` measures
+// `colourTotals` is an extension, off unless generation asks for it: the
+// source site never states a colour's total, and `corpus.test.ts` measures
 // the default rendering against every real puzzle. It exists because a 6x6
-// board has more professions than you can count at a glance, so "Exactly 1 cook
+// board has more colours than you can count at a glance, so "Exactly 1 cook
 // has …" leaves a player counting cooks before the clue is usable.
-describe('profession totals', () => {
-  const rt = (s: string) => render(parseHint(s), { professionTotals: true });
+describe('colour totals', () => {
+  const rt = (s: string) => render(parseHint(s), { colourTotals: true });
 
-  it('says how many there are in total, in each shape that counts a profession', () => {
-    expect(rt('n_professions_have_trait_in_dir(painter,innocent,1,0,2)')).toBe(
-      'Exactly 2 of #PROFN:painter have an innocent directly to the right of them',
+  it('says how many there are in total, in each shape that counts a colour', () => {
+    expect(rt('n_colours_have_trait_in_dir(painter,innocent,1,0,2)')).toBe(
+      'Exactly 2 of #COLOURN:painter have an innocent directly to the right of them',
     );
-    expect(rt('n_professions_have_trait_in_dir(cook,innocent,-1,0,1)')).toBe(
-      'Exactly 1 of #PROFN:cook has an innocent directly to the left of them',
+    expect(rt('n_colours_have_trait_in_dir(cook,innocent,-1,0,1)')).toBe(
+      'Exactly 1 of #COLOURN:cook has an innocent directly to the left of them',
     );
-    expect(rt('n_in_unit_have_trait_in_dir(unit(profession,cook),innocent,0,1,1)')).toBe(
-      'Exactly 1 of #PROFN:cook has an innocent directly below them',
+    expect(rt('n_in_unit_have_trait_in_dir(unit(colour,cook),innocent,0,1,1)')).toBe(
+      'Exactly 1 of #COLOURN:cook has an innocent directly below them',
     );
     expect(
-      rt('only_one_person_in_unit_has_exactly_n_trait_neighbors(unit(profession,cook),innocent,2)'),
-    ).toBe('Exactly 1 of #PROFN:cook has exactly 2 innocent neighbors');
+      rt('only_one_person_in_unit_has_exactly_n_trait_neighbors(unit(colour,cook),innocent,2)'),
+    ).toBe('Exactly 1 of #COLOURN:cook has exactly 2 innocent neighbors');
   });
 
   // Zero of them is a "None of …" rather than an "Exactly 0 of …", matching the
   // archive's own habit of writing "No cook has …" instead of "0 cooks have …".
   it('says none rather than exactly zero', () => {
-    expect(rt('n_professions_have_trait_in_dir(singer,innocent,-1,0,0)')).toBe(
-      'None of #PROFN:singer has an innocent directly to the left of them',
+    expect(rt('n_colours_have_trait_in_dir(singer,innocent,-1,0,0)')).toBe(
+      'None of #COLOURN:singer has an innocent directly to the left of them',
     );
   });
 
-  // The clue is about the difference between two professions, and two totals in
-  // one sentence bury it. Nothing in these shapes counts one profession's
+  // The clue is about the difference between two colours, and two totals in
+  // one sentence bury it. Nothing in these shapes counts one colour's
   // members, so the option has nothing to add and leaves them alone.
-  it('leaves profession comparisons and non-profession units untouched', () => {
+  it('leaves colour comparisons and non-colour units untouched', () => {
     for (const hint of [
       // Comparisons: the claim is the difference, and two totals bury it.
-      'more_traits_in_unit_than_unit(unit(profession,judge),unit(profession,mechanic),criminal)',
-      'equal_number_of_traits_in_units(unit(profession,coder),unit(profession,cook),innocent)',
-      // No count of one profession's members to put a total against.
-      'odd_number_of_traits_in_unit(unit(profession,scientist),innocent)',
-      // Same shapes as above, over units that are not professions at all.
+      'more_traits_in_unit_than_unit(unit(colour,judge),unit(colour,mechanic),criminal)',
+      'equal_number_of_traits_in_units(unit(colour,coder),unit(colour,cook),innocent)',
+      // No count of one colour's members to put a total against.
+      'odd_number_of_traits_in_unit(unit(colour,scientist),innocent)',
+      // Same shapes as above, over units that are not colours at all.
       'n_in_unit_have_trait_in_dir(unit(row,2),innocent,0,1,2)',
       'only_one_person_in_unit_has_exactly_n_trait_neighbors(unit(col,1),innocent,2)',
     ]) {
@@ -429,10 +429,10 @@ describe('profession totals', () => {
 
 describe('unsupported shapes', () => {
   it('throws rather than inventing a phrasing', () => {
-    expect(() => r('number_of_traits_in_unit(unit(profession,cook),innocent,2)')).toThrow(
+    expect(() => r('number_of_traits_in_unit(unit(colour,cook),innocent,2)')).toThrow(
       UnsupportedShapeError,
     );
-    expect(canRender(parseHint('number_of_traits_in_unit(unit(profession,cook),innocent,2)'))).toBe(
+    expect(canRender(parseHint('number_of_traits_in_unit(unit(colour,cook),innocent,2)'))).toBe(
       false,
     );
     expect(canRender(parseHint('number_of_traits_in_unit(unit(row,1),innocent,2)'))).toBe(true);

@@ -29,16 +29,17 @@ function mulberry32(seed: number): () => number {
   };
 }
 
-const PROFESSIONS = ['cook', 'clerk', 'doctor', 'cop'];
+const PALETTE = ['cook', 'clerk', 'doctor', 'cop'];
 
 function randomShape(rng: () => number, width: number, height: number): Shape {
   const grid = makeGrid(width, height);
   return {
     grid,
-    professions: Array.from(
+    colours: Array.from(
       { length: grid.size },
-      () => PROFESSIONS[Math.floor(rng() * PROFESSIONS.length)],
+      () => PALETTE[Math.floor(rng() * PALETTE.length)],
     ),
+    numbers: Array.from({ length: grid.size }, (_, i) => i + 1),
   };
 }
 
@@ -57,7 +58,7 @@ function randomCase(
   const shape = randomShape(rng, width, height);
   const size = shape.grid.size;
   const truth = Array.from({ length: size }, () => rng() < 0.35);
-  const board = makeBoard(shape.grid, shape.professions, truth);
+  const board = makeBoard(shape.grid, shape.colours, shape.numbers, truth);
   const ctx = makeSampleCtx(rng, board, shape, truth);
   const clues: Clues = Array.from({ length: size }, () => null);
   for (let i = 0; i < size; i++) {
@@ -110,7 +111,7 @@ describe('SAT engine against the enumerator', () => {
   });
 
   it('agrees that a card is unforced when nothing constrains it', () => {
-    const shape: Shape = { grid: makeGrid(4, 4), professions: Array(16).fill('cook') };
+    const shape: Shape = { grid: makeGrid(4, 4), colours: Array(16).fill('cook'), numbers: Array.from({ length: 16 }, (_, i) => i + 1) };
     const truth = Array.from({ length: 16 }, () => false);
     const clues: Clues = Array.from({ length: 16 }, () => null);
     expect(forcedGivenSat(shape, clues, truth, [])).toEqual(forcedGivenBrute(shape, clues, truth, []));

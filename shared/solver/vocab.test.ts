@@ -1,60 +1,60 @@
 import { describe, expect, it } from 'vitest';
 import {
-  ALL_NAMES, ALL_PROFESSIONS, BASE_PROFESSION_LIMIT, FLAVOUR, NAMES, PROFESSIONS,
-  TITLES, WIDER_PROFESSIONS, WIDE_PROFESSION_LIMIT, faceOf, namesFor, professionsFor,
+  ALL_NAMES, ALL_PALETTE, BASE_PROFESSION_LIMIT, FLAVOUR, NAMES, PALETTE,
+  TITLES, WIDER_PALETTE, WIDE_PROFESSION_LIMIT, faceOf, namesFor, coloursFor,
 } from './vocab';
 
 describe('vocab', () => {
   it('has enough distinct material to fill a 20-card grid', () => {
     expect(NAMES.length).toBeGreaterThanOrEqual(40);
     expect(new Set(NAMES.map((n) => n.name)).size).toBe(NAMES.length);
-    expect(PROFESSIONS.length).toBeGreaterThanOrEqual(10);
+    expect(PALETTE.length).toBeGreaterThanOrEqual(10);
     expect(TITLES.length).toBeGreaterThanOrEqual(20);
     expect(FLAVOUR.length).toBeGreaterThanOrEqual(30);
   });
-  // Every tier, not just the base sixteen: the renderer pluralises a profession
+  // Every tier, not just the base sixteen: the renderer pluralises a colour
   // by sticking an -s on it, with `witch` the one special case the site knows
-  // about. A profession that needed a second special case would render wrong on
+  // about. A colour that needed a second special case would render wrong on
   // whatever board dealt it in.
-  it('uses only regularly pluralising professions', () => {
-    for (const p of ALL_PROFESSIONS) {
+  it('uses only regularly pluralising colours', () => {
+    for (const p of ALL_PALETTE) {
       expect(p.key, `${p.key} does not pluralise with a plain -s`).toMatch(/[^sxz]$/);
       expect(p.key).not.toMatch(/(ch|sh)$/);
     }
   });
-  it('gives every profession a face for both genders', () => {
-    for (const p of ALL_PROFESSIONS) {
+  it('gives every colour a face for both genders', () => {
+    for (const p of ALL_PALETTE) {
       expect(faceOf(p.key, 'male')).toBe(p.male);
       expect(faceOf(p.key, 'female')).toBe(p.female);
     }
   });
 });
 
-describe('professionsFor', () => {
-  it('keys every profession once, across all three tiers', () => {
-    expect(new Set(ALL_PROFESSIONS.map((p) => p.key)).size).toBe(ALL_PROFESSIONS.length);
+describe('coloursFor', () => {
+  it('keys every colour once, across all three tiers', () => {
+    expect(new Set(ALL_PALETTE.map((p) => p.key)).size).toBe(ALL_PALETTE.length);
   });
 
-  // Each tier exists to stop the cast running too many cards to a profession.
+  // Each tier exists to stop the cast running too many cards to a colour.
   // The archive's own board sits near two cards each; a 10x10 on twenty-one
-  // professions would be five, which is what the third tier is for.
-  it('keeps a 10x10 under three cards to a profession', () => {
-    expect(100 / professionsFor(100).length).toBeLessThan(3);
+  // colours would be five, which is what the third tier is for.
+  it('keeps a 10x10 under three cards to a colour', () => {
+    expect(100 / coloursFor(100).length).toBeLessThan(3);
   });
 
   // The gate is the point: a board that never needed the wider sets still draws
   // from exactly what it always did, so no shipped puzzle changes.
   it('deals each tier in only above the board size that needs it', () => {
-    expect(professionsFor(BASE_PROFESSION_LIMIT)).toBe(PROFESSIONS);
-    expect(professionsFor(BASE_PROFESSION_LIMIT + 1)).toBe(WIDER_PROFESSIONS);
-    expect(professionsFor(WIDE_PROFESSION_LIMIT)).toBe(WIDER_PROFESSIONS);
-    expect(professionsFor(WIDE_PROFESSION_LIMIT + 1)).toBe(ALL_PROFESSIONS);
+    expect(coloursFor(BASE_PROFESSION_LIMIT)).toBe(PALETTE);
+    expect(coloursFor(BASE_PROFESSION_LIMIT + 1)).toBe(WIDER_PALETTE);
+    expect(coloursFor(WIDE_PROFESSION_LIMIT)).toBe(WIDER_PALETTE);
+    expect(coloursFor(WIDE_PROFESSION_LIMIT + 1)).toBe(ALL_PALETTE);
   });
 
   // The weekday schedule tops out at a 6x6, so nothing a daily puzzle can draw
   // ever reaches the third tier.
   it('never reaches the third tier on a scheduled board', () => {
-    expect(professionsFor(6 * 6)).toBe(WIDER_PROFESSIONS);
+    expect(coloursFor(6 * 6)).toBe(WIDER_PALETTE);
   });
 });
 

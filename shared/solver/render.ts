@@ -4,32 +4,32 @@ export class UnsupportedShapeError extends Error {}
 
 const name = (i: number) => `#NAME:${i}`;
 const names = (i: number) => `#NAMES:${i}`;
-const prof = (p: string) => `#PROF:${p}`;
-const profs = (p: string) => `#PROFS:${p}`;
+const colour = (c: string) => `#COLOUR:${c}`;
+const colours = (c: string) => `#COLOURS:${c}`;
 /**
- * "3 teachers" — the profession's whole cast, not just the ones being counted.
+ * "3 teal cards" — the colour's whole group, not just the ones being counted.
  * Expanded by the site, which has the board and can count; the renderer works
  * from the hint alone and has no way to know.
  */
-const profN = (p: string) => `#PROFN:${p}`;
+const colourN = (c: string) => `#COLOURN:${c}`;
 
 /**
  * How much the renderer says beyond what the source site says.
  *
- * `professionTotals` turns "Exactly 1 cook has an innocent directly below them"
+ * `colourTotals` turns "Exactly 1 cook has an innocent directly below them"
  * into "Exactly 1 of 3 cooks has …". The source never states the total, which is
  * fine on its 4x5 board where you can count five cooks at a glance and less fine
- * on a 7x7 with twenty-one professions. Off by default so that `render` stays a
+ * on a 7x7 with twenty-one colours. Off by default so that `render` stays a
  * claim about what the source would write, which is what the archive fidelity
  * test in corpus.test.ts checks; generation turns it on.
  *
- * Only for clues that put a number on one profession's members. A comparison
- * between two professions ("more criminal judges than criminal mechanics") is
+ * Only for clues that put a number on one colour's members. A comparison
+ * between two colours ("more criminal judges than criminal mechanics") is
  * about the difference, and two totals in one sentence obscure it rather than
  * help.
  */
 export interface RenderOptions {
-  professionTotals?: boolean;
+  colourTotals?: boolean;
 }
 
 const NO_EXTRAS: RenderOptions = {};
@@ -89,8 +89,8 @@ export function where(u: Unit): string {
       return 'on the edges';
     case 'corner':
       return 'in the corners';
-    case 'profession':
-      throw new UnsupportedShapeError('profession has no locative phrase');
+    case 'colour':
+      throw new UnsupportedShapeError('colour has no locative phrase');
   }
 }
 
@@ -138,9 +138,9 @@ function argIndex(a: HintArg[], k: number): number {
   if (x.t !== 'index') throw new UnsupportedShapeError(`arg ${k} is not an index`);
   return x.i;
 }
-function argProfession(a: HintArg[], k: number): string {
+function argColour(a: HintArg[], k: number): string {
   const x = a[k];
-  if (x.t !== 'profession') throw new UnsupportedShapeError(`arg ${k} is not a profession`);
+  if (x.t !== 'colour') throw new UnsupportedShapeError(`arg ${k} is not a colour`);
   return x.name;
 }
 
@@ -156,11 +156,11 @@ function pairOfSameKind<U extends Unit>(u1: U, u2: Unit): asserts u2 is U {
   }
 }
 
-/** Subject phrase for direction clues: "3 persons on the edges" / "2 #PROFS:cook". */
+/** Subject phrase for direction clues: "3 persons on the edges" / "2 #COLOURS:cook". */
 function dirSubject(u: Unit, n: number, o: RenderOptions): string {
-  if (u.kind === 'profession') {
-    if (o.professionTotals) return `Exactly ${n} of ${profN(u.name)}`;
-    return n === 1 ? `Only one ${prof(u.name)}` : `${n} ${profs(u.name)}`;
+  if (u.kind === 'colour') {
+    if (o.colourTotals) return `Exactly ${n} of ${colourN(u.name)}`;
+    return n === 1 ? `Only one ${colour(u.name)}` : `${n} ${colours(u.name)}`;
   }
   return n === 1 ? `Only one person ${wherePerson(u)}` : `${n} persons ${wherePerson(u)}`;
 }
@@ -196,7 +196,7 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
   odd_number_of_traits_in_unit: (a) => {
     const u = argUnit(a, 0);
     const t = argTrait(a, 1);
-    if (u.kind === 'profession') return `There's an odd number of ${t} ${profs(u.name)}`;
+    if (u.kind === 'colour') return `There's an odd number of ${t} ${colours(u.name)}`;
     return `There's an odd number of ${t}s ${where(u)}`;
   },
 
@@ -218,9 +218,9 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     const k = argKind(a, 0);
     const t = argTrait(a, 1);
     const n = argNum(a, 2);
-    if (k === 'profession') {
-      if (n !== 1) throw new UnsupportedShapeError('profession form only attested for n=1');
-      return `There is at least one ${t} among all professions`;
+    if (k === 'colour') {
+      if (n !== 1) throw new UnsupportedShapeError('colour form only attested for n=1');
+      return `There is at least one ${t} among all colours`;
     }
     if (k === 'neighbor') return `Everyone has at least ${n} ${t} neighbors`;
     return `Each ${kindWord(k)} has at least ${bareQuantity(n, t)}`;
@@ -248,9 +248,9 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
       case 'col':
         pairOfSameKind(u1, u2);
         return `There are more ${t}s in column${NBSP}${col(u1.n)} than column${NBSP}${col(u2.n)}`;
-      case 'profession':
+      case 'colour':
         pairOfSameKind(u1, u2);
-        return `There are more ${t} ${profs(u1.name)} than ${t} ${profs(u2.name)}`;
+        return `There are more ${t} ${colours(u1.name)} than ${t} ${colours(u2.name)}`;
       default:
         throw new UnsupportedShapeError(`more_traits_in_unit_than_unit over ${u1.kind}`);
     }
@@ -270,9 +270,9 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
       case 'col':
         pairOfSameKind(u1, u2);
         return `There's an equal number of ${t}s in columns ${col(u1.n)} and ${col(u2.n)}`;
-      case 'profession':
+      case 'colour':
         pairOfSameKind(u1, u2);
-        return `There are as many ${t} ${profs(u1.name)} as there are ${t} ${profs(u2.name)}`;
+        return `There are as many ${t} ${colours(u1.name)} as there are ${t} ${colours(u2.name)}`;
       default:
         throw new UnsupportedShapeError(`equal_number_of_traits_in_units over ${u1.kind}`);
     }
@@ -293,9 +293,9 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
       case 'col':
         pairOfSameKind(u1, u2);
         return `There are more ${t1}s in column${NBSP}${col(u1.n)} than ${t2}s in column${NBSP}${col(u2.n)}`;
-      case 'profession':
+      case 'colour':
         pairOfSameKind(u1, u2);
-        return `There are more ${t1} ${profs(u1.name)} than ${t2} ${profs(u2.name)}`;
+        return `There are more ${t1} ${colours(u1.name)} than ${t2} ${colours(u2.name)}`;
       default:
         throw new UnsupportedShapeError(`more_traits_in_unit_than_traits_in_unit over ${u1.kind}`);
     }
@@ -316,9 +316,9 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
       case 'col':
         pairOfSameKind(u1, u2);
         return `There are as many ${t1}s in column${NBSP}${col(u1.n)} as ${t2}s in column${NBSP}${col(u2.n)}`;
-      case 'profession':
+      case 'colour':
         pairOfSameKind(u1, u2);
-        return `There are as many ${t1} ${profs(u1.name)} as there are ${t2} ${profs(u2.name)}`;
+        return `There are as many ${t1} ${colours(u1.name)} as there are ${t2} ${colours(u2.name)}`;
       default:
         throw new UnsupportedShapeError(`equal_traits_in_unit_and_traits_in_unit over ${u1.kind}`);
     }
@@ -336,8 +336,8 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     const u = argUnit(a, 0);
     const t1 = argTrait(a, 1);
     const t2 = argTrait(a, 2);
-    if (u.kind === 'profession') {
-      return `There's an equal number of ${t1} and ${t2} ${profs(u.name)}`;
+    if (u.kind === 'colour') {
+      return `There's an equal number of ${t1} and ${t2} ${colours(u.name)}`;
     }
     return `There are as many ${t1}s as ${t2}s ${where(u)}`;
   },
@@ -464,11 +464,11 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     const t = argTrait(a, 1);
     const n = argNum(a, 2);
     const head =
-      u.kind !== 'profession'
+      u.kind !== 'colour'
         ? `Only one person ${wherePerson(u)}`
-        : o.professionTotals
-          ? `Exactly 1 of ${profN(u.name)}`
-          : `Only one ${prof(u.name)}`;
+        : o.colourTotals
+          ? `Exactly 1 of ${colourN(u.name)}`
+          : `Only one ${colour(u.name)}`;
     const tail =
       n === 0 ? `no ${t} neighbors` : n === 1 ? `exactly one ${t} neighbor` : `exactly ${n} ${t} neighbors`;
     return `${head} has ${tail}`;
@@ -499,21 +499,21 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     return `${head} ${where(u)} ${verb} ${article(t2)} ${dirPhrase(argNum(a, 3), argNum(a, 4))}`;
   },
 
-  n_professions_have_trait_in_dir: (a, o) => {
-    const p = argProfession(a, 0);
+  n_colours_have_trait_in_dir: (a, o) => {
+    const p = argColour(a, 0);
     const t = argTrait(a, 1);
     const n = argNum(a, 4);
     // Zero of them is a "No X has ..." in the archive (puzzles/2026-09-01.json),
     // never a "0 Xs have ...". The other counts keep their own phrasings.
-    const head = o.professionTotals
+    const head = o.colourTotals
       ? n === 0
-        ? `None of ${profN(p)} has`
-        : `Exactly ${n} of ${profN(p)} ${n === 1 ? 'has' : 'have'}`
+        ? `None of ${colourN(p)} has`
+        : `Exactly ${n} of ${colourN(p)} ${n === 1 ? 'has' : 'have'}`
       : n === 0
-        ? `No ${prof(p)} has`
+        ? `No ${colour(p)} has`
         : n === 1
-          ? `Exactly 1 ${prof(p)} has`
-          : `${n} ${profs(p)} have`;
+          ? `Exactly 1 ${colour(p)} has`
+          : `${n} ${colours(p)} have`;
     return `${head} ${article(t)} ${dirPhrase(argNum(a, 2), argNum(a, 3))}`;
   },
 };

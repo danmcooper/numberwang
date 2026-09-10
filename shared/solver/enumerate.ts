@@ -4,7 +4,9 @@ import { type Board, evaluate, makeBoard } from './predicates';
 
 export interface Shape {
   grid: Grid;
-  professions: string[];
+  colours: string[];
+  /** 1..size, one per card, in card order. */
+  numbers: number[];
 }
 
 export type Known = (boolean | null)[];
@@ -41,7 +43,7 @@ export function allMasks(shape: Shape, known: Known): Uint32Array {
 export function filterMasks(shape: Shape, masks: Uint32Array, hints: Hint[]): Uint32Array {
   const size = shape.grid.size;
   const criminal = new Array<boolean>(size).fill(false);
-  const board: Board = makeBoard(shape.grid, shape.professions, criminal);
+  const board: Board = makeBoard(shape.grid, shape.colours, shape.numbers, criminal);
   let current = masks;
   for (const hint of hints) {
     let write = 0;

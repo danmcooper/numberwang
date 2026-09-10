@@ -8,6 +8,7 @@ import { candidateHints, candidateUnits, namedCards, referencedCards } from './c
 const board = makeBoard(
   makeGrid(4, 5),
   Array.from({ length: 20 }, (_, i) => (i % 3 === 0 ? 'cook' : i % 3 === 1 ? 'cop' : 'pilot')),
+  Array.from({ length: 20 }, (_, i) => i + 1),
   Array.from({ length: 20 }, (_, i) => [0, 1, 6, 13, 19].includes(i)),
 );
 
@@ -15,7 +16,7 @@ describe('candidateUnits', () => {
   it('includes every kind, and between segments only along a row or column', () => {
     const units = candidateUnits(board);
     const kinds = new Set(units.map((u) => u.kind));
-    expect(kinds).toEqual(new Set(['row', 'col', 'neighbor', 'between', 'profession', 'edge', 'corner']));
+    expect(kinds).toEqual(new Set(['row', 'col', 'neighbor', 'between', 'colour', 'edge', 'corner']));
     const betweens = units.filter((u) => u.kind === 'between');
     // 5 rows * C(4,2) [width=4] + 4 cols * C(5,2) [height=5] = 5*6 + 4*10 = 30 + 40 = 70
     expect(betweens.length).toBe(70);
@@ -123,16 +124,16 @@ describe('candidateHints', () => {
     expect(seen).toBeGreaterThan(0);
   });
   it('never counts zero in a directional clue — the archive floors all three families at one, ' +
-    'and "0 #PROFS:guard have a criminal directly above them" is not how the source words it', () => {
+    'and "0 #COLOURS:guard have a criminal directly above them" is not how the source words it', () => {
     // These read as a template that never got its "no one" branch: the source
     // says "Only one person in a corner has an innocent above them", never
     // "0 persons in a corner have...". Measured over the 54 real puzzles, by
     // argument position: n_in_unit 1x9/2x5/4x2, n_t_in_unit 1x4/2x6/3x1/4x1,
-    // n_professions 1x13/2x8 — not one zero among the 41.
+    // n_colours 1x13/2x8 — not one zero among the 41.
     const dirFamilies = new Set([
       'n_in_unit_have_trait_in_dir',
       'n_t_in_unit_have_trait_in_dir',
-      'n_professions_have_trait_in_dir',
+      'n_colours_have_trait_in_dir',
     ]);
     let seen = 0;
     for (const h of hints) {
@@ -199,7 +200,7 @@ describe('candidateHints exhaustive tautology regression', () => {
     () => {
       // 3x3 (9 cells) keeps 2^9 = 512 assignments small enough to enumerate exhaustively —
       // exact rather than sampled — while still exercising every unit kind (row, col,
-      // neighbor, between, edge, corner, profession) and every direction, including the
+      // neighbor, between, edge, corner, colour) and every direction, including the
       // boundary geometry (topmost row + "above", corner-cell neighbor cliques, etc.) that
       // only shows up on a real grid shape.
       //
@@ -215,12 +216,13 @@ describe('candidateHints exhaustive tautology regression', () => {
       // checked once), and require every distinct hint to be false for at least one of
       // the 512 assignments.
       const grid = makeGrid(3, 3);
-      const professions = Array.from({ length: 9 }, (_, i) => (i % 2 === 0 ? 'cook' : 'cop'));
+      const colours = Array.from({ length: 9 }, (_, i) => (i % 2 === 0 ? 'cook' : 'cop'));
+      const numbers = Array.from({ length: 9 }, (_, i) => i + 1);
 
       const allBoards: Board[] = [];
       for (let mask = 0; mask < 512; mask++) {
         const criminal = Array.from({ length: 9 }, (_, i) => ((mask >> i) & 1) === 1);
-        allBoards.push(makeBoard(grid, professions, criminal));
+        allBoards.push(makeBoard(grid, colours, numbers, criminal));
       }
 
       const distinct = new Map<string, Hint>();
@@ -284,6 +286,6 @@ describe('namedCards', () => {
     expect(
       namedCards(board, parseHint('all_traits_are_neighbors_in_unit(unit(between,pair(0,3)),criminal)')),
     ).toEqual(new Set([0, 3]));
-    expect(namedCards(board, parseHint('has_most_traits(unit(profession,cook),criminal)'))).toEqual(new Set());
+    expect(namedCards(board, parseHint('has_most_traits(unit(colour,cook),criminal)'))).toEqual(new Set());
   });
 });
