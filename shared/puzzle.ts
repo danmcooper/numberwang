@@ -1,13 +1,13 @@
 export interface Person {
-  name: string;
-  profession: string;
-  gender: string;
-  criminal: boolean;
+  /** 1..N, unique across the board. Replaces Clues by Sam's `name`. */
+  number: number;
+  /** One of `PALETTE`. Replaces `profession`, and groups the same way. */
+  colour: string;
+  /** The hidden verdict. Replaces `criminal`. */
+  numberwang: boolean;
   clue: string | null;
   origHint: string | null;
   paths: number[][] | null;
-  /** Emoji from the source bundle's face map; absent in older puzzle files. */
-  face?: string | null;
 }
 
 /** One precomputed deduction step: with `flipped` on the table, the clues on
@@ -71,19 +71,24 @@ export function validatePuzzle(data: unknown): Puzzle {
       );
     if (!ok) fail('hints must be absent or an array of {flipped, clues, reveals} in-range index arrays');
   }
+  // A number appearing once and inside 1..count, over exactly `count` cards, is
+  // a permutation of 1..count — uniqueness plus a range of exactly that size
+  // leaves nothing else it could be, and nothing has to be sorted to see it.
+  const seen = new Set<number>();
   p.people.forEach((raw, i) => {
     const where = `people[${i}]`;
     if (typeof raw !== 'object' || raw === null) fail(`${where} is not an object`);
     const q = raw as Record<string, unknown>;
-    if (typeof q.name !== 'string' || q.name === '') fail(`${where}.name must be a non-empty string`);
-    if (typeof q.profession !== 'string' || q.profession === '') fail(`${where}.profession must be a non-empty string`);
-    if (typeof q.gender !== 'string') fail(`${where}.gender must be a string`);
-    if (typeof q.criminal !== 'boolean') fail(`${where}.criminal must be a boolean`);
+    const num = q.number;
+    if (!Number.isInteger(num) || (num as number) < 1 || (num as number) > count) {
+      fail(`${where}.number must be an integer in 1..${count}`);
+    }
+    if (seen.has(num as number)) fail(`${where}.number ${String(num)} appears twice`);
+    seen.add(num as number);
+    if (typeof q.colour !== 'string' || q.colour === '') fail(`${where}.colour must be a non-empty string`);
+    if (typeof q.numberwang !== 'boolean') fail(`${where}.numberwang must be a boolean`);
     if (q.clue !== null && typeof q.clue !== 'string') fail(`${where}.clue must be a string or null`);
     if (q.origHint !== null && typeof q.origHint !== 'string') fail(`${where}.origHint must be a string or null`);
-    if (q.face !== undefined && q.face !== null && typeof q.face !== 'string') {
-      fail(`${where}.face must be a string, null, or absent`);
-    }
     if (q.paths !== null) {
       const ok =
         Array.isArray(q.paths) &&
