@@ -1,0 +1,30 @@
+{
+  "name": "numberwang",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:generate": "tsx scripts/check-generation.mts",
+    "manifest": "tsx scripts/manifest.mts",
+    "generate": "tsx scripts/generate.mts",
+    "audit": "tsx scripts/audit.mts"
+  },
+  "dependencies": {
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^26.1.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "jsdom": "^29.1.1",
+    "tsx": "^4.23.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.1.3",
+    "vitest": "^4.1.10",
+    "yaml": "^2.9.0"
+  }
+}

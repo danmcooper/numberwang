@@ -1,0 +1,66 @@
+import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { describe, expect, it } from 'vitest';
+import { regenerateManifest } from './manifest.mts';
+
+function puzzle(date: string, id: string) {
+  const person = {
+    name: 'banda', profession: 'coder', gender: 'male',
+    criminal: false, clue: null, origHint: null, paths: [],
+  };
+  return {
+    formatVersion: 1, id, date, title: `Title ${date}`, difficulty: 'Easy',
+    width: 1, height: 2, initialReveals: [], source: 'generated',
+    people: [person, person],
+  };
+}
+
+describe('regenerateManifest', () => {
+  it('writes index.json sorted by date descending, ignoring non-puzzle files', async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), 'nw-manifest-'));
+    await writeFile(path.join(dir, '2026-07-01.json'), JSON.stringify(puzzle('2026-07-01', 'aaaaaaaaaaaa')));
+    await writeFile(path.join(dir, '2026-07-03.json'), JSON.stringify(puzzle('2026-07-03', 'bbbbbbbbbbbb')));
+    await writeFile(path.join(dir, 'index.json'), '[]');
+    await writeFile(path.join(dir, 'notes.txt'), 'ignore me');
+
+    const entries = await regenerateManifest(dir);
+
+    expect(entries.map((e) => e.date)).toEqual(['2026-07-03', '2026-07-01']);
+    expect(entries[0]).toEqual({
+      date: '2026-07-03', id: 'bbbbbbbbbbbb', difficulty: 'Easy',
+      title: 'Title 2026-07-03', width: 1, height: 2,
+    });
+    const onDisk = JSON.parse(await readFile(path.join(dir, 'index.json'), 'utf8'));
+    expect(onDisk).toEqual(entries);
+  });
+
+  it('fails loudly on an invalid puzzle file', async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), 'nw-manifest-'));
+    await writeFile(path.join(dir, '2026-07-01.json'), '{"formatVersion":1}');
+    await expect(regenerateManifest(dir)).rejects.toThrow(/2026-07-01\.json/);
+  });
+
+  it('refuses a file whose name and contents disagree about the date', async () => {
+    // The site addresses a puzzle by its filename and reads its date out of the
+    // file, so the two disagreeing means one of them lies to a player.
+    const dir = await mkdtemp(path.join(tmpdir(), 'nw-manifest-'));
+    await writeFile(
+      path.join(dir, '2026-07-01.json'),
+      JSON.stringify(puzzle('2026-07-02', 'aaaaaaaaaaaa')),
+    );
+    await expect(regenerateManifest(dir)).rejects.toThrow(/date disagree/);
+  });
+
+  it('ignores a file whose name is not a bare date', async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), 'nw-manifest-'));
+    await writeFile(path.join(dir, 'draft.json'), JSON.stringify(puzzle('2026-07-01', 'aaaaaaaaaaaa')));
+    await writeFile(path.join(dir, '2026-07-01-dan.json'), JSON.stringify(puzzle('2026-07-01', 'cccccccccccc')));
+    await writeFile(path.join(dir, '2026-07-01.json'), JSON.stringify(puzzle('2026-07-01', 'bbbbbbbbbbbb')));
+
+    const entries = await regenerateManifest(dir);
+
+    expect(entries.map((e) => e.date)).toEqual(['2026-07-01']);
+    expect(entries[0].id).toBe('bbbbbbbbbbbb');
+  });
+});
