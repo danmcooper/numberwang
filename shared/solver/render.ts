@@ -114,6 +114,21 @@ export function where(u: Unit): string {
   }
 }
 
+/**
+ * `where`, but with a phrase for a colour group too.
+ *
+ * A colour group is not anywhere, so the phrase is partitive rather than
+ * locative: "among the teal cards". `where` itself keeps refusing it, and that
+ * refusal is load-bearing — `number_of_traits_in_unit` and
+ * `min_number_of_traits_in_unit` have no colour branch of their own, so a total
+ * `where` would silently start phrasing clue shapes the archive never contained.
+ * The predicates that do want a colour phrasing ask for it, the way
+ * `odd_number_of_traits_in_unit` already does inline.
+ */
+export function unitPhrase(u: Unit): string {
+  return u.kind === 'colour' ? `among ${colours(u.name)}` : where(u);
+}
+
 /** Locative phrase used after "Only one person …": corners read "in a corner". */
 export function wherePerson(u: Unit): string {
   return u.kind === 'corner' ? 'in a corner' : where(u);
@@ -535,6 +550,30 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
           ? `Exactly 1 ${colour(p)} has`
           : `${n} ${colours(p)} have`;
     return `${head} ${article(t)} ${dirPhrase(argNum(a, 2), argNum(a, 3))}`;
+  },
+
+  // The four arithmetic families. Each takes its noun from `plural` and its unit
+  // phrase from `unitPhrase`, so all inherit the #COLOURS tokens and the
+  // non-breaking spaces the other twenty-nine already agreed on. `plural(t, 2)`
+  // is the plural form even when the unit holds one card: "The Numberwang cards
+  // in row 2 add to 25" is right whether that row holds one of them or four.
+  sum_of_trait_in_unit: (a) =>
+    `The ${plural(argTrait(a, 1), 2)} ${unitPhrase(argUnit(a, 0))} add to ${argNum(a, 2)}`,
+
+  diff_of_two_traits_in_unit: (a) =>
+    `Two ${plural(argTrait(a, 1), 2)} ${unitPhrase(argUnit(a, 0))} subtract to ${argNum(a, 2)}`,
+
+  more_sum_in_unit_than_unit: (a) => {
+    const t = argTrait(a, 2);
+    return (
+      `The ${plural(t, 2)} ${unitPhrase(argUnit(a, 0))} add to more than ` +
+      `the ${plural(t, 2)} ${where(argUnit(a, 1))}`
+    );
+  },
+
+  sum_parity_in_unit: (a) => {
+    const parity = argNum(a, 2) === 0 ? 'even' : 'odd';
+    return `The ${plural(argTrait(a, 1), 2)} ${unitPhrase(argUnit(a, 0))} add to an ${parity} number`;
   },
 };
 

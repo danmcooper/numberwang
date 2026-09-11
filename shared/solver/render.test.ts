@@ -447,3 +447,59 @@ describe('trait nouns', () => {
     expect(plural('not_numberwang', 3)).toBe('Not Numberwang cards');
   });
 });
+
+describe('arithmetic clue text', () => {
+  const say = (src: string) => render(parseHint(src));
+  // The archive glues "row"/"column" to what follows with U+00A0. Spelling it as
+  // an escape here rather than pasting the character keeps the expectation
+  // readable in a diff — see the note at the top of this file.
+  const NBSP = '\u00a0';
+
+  it('renders a sum over a row', () => {
+    expect(say('sum_of_trait_in_unit(unit(row,2),numberwang,25)')).toBe(
+      `The Numberwang cards in row${NBSP}2 add to 25`,
+    );
+  });
+
+  it('renders a sum over a colour group as a token the app expands', () => {
+    expect(say('sum_of_trait_in_unit(unit(colour,teal),numberwang,12)')).toBe(
+      'The Numberwang cards among #COLOURS:teal add to 12',
+    );
+  });
+
+  it('renders a pair difference', () => {
+    expect(say('diff_of_two_traits_in_unit(unit(colour,teal),numberwang,6)')).toBe(
+      'Two Numberwang cards among #COLOURS:teal subtract to 6',
+    );
+  });
+
+  it('renders a comparison', () => {
+    expect(say('more_sum_in_unit_than_unit(unit(row,1),unit(row,3),numberwang)')).toBe(
+      `The Numberwang cards in row${NBSP}1 add to more than ` +
+        `the Numberwang cards in row${NBSP}3`,
+    );
+  });
+
+  it('renders even parity, with the column as a #C token', () => {
+    expect(say('sum_parity_in_unit(unit(col,2),numberwang,0)')).toBe(
+      `The Numberwang cards in column${NBSP}#C:2 add to an even number`,
+    );
+  });
+
+  it('renders odd parity, and the other trait', () => {
+    expect(say('sum_parity_in_unit(unit(col,2),not_numberwang,1)')).toBe(
+      `The Not Numberwang cards in column${NBSP}#C:2 add to an odd number`,
+    );
+  });
+
+  it('can render every arithmetic predicate', () => {
+    for (const src of [
+      'sum_of_trait_in_unit(unit(row,1),numberwang,25)',
+      'diff_of_two_traits_in_unit(unit(row,1),numberwang,9)',
+      'more_sum_in_unit_than_unit(unit(row,1),unit(row,3),numberwang)',
+      'sum_parity_in_unit(unit(row,1),numberwang,1)',
+    ]) {
+      expect(canRender(parseHint(src)), src).toBe(true);
+    }
+  });
+});

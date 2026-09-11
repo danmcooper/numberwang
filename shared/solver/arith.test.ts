@@ -139,6 +139,16 @@ describe('arithCandidates', () => {
     }
   });
 
+  it('does not propose a parity the unit could not have contradicted', () => {
+    // Pink is cards 6 and 7 — 12 and 26, both even — so every assignment of them
+    // sums to an even number and "adds to an even number" is a tautology.
+    const pink: Unit[] = [{ kind: 'colour', name: 'pink' }];
+    const proposed = arithCandidates(board(), pink).map(formatHint);
+    expect(proposed.filter((s) => s.startsWith('sum_parity_in_unit'))).toEqual([]);
+    // The sum itself still says something, and is still proposed.
+    expect(proposed).toContain('sum_of_trait_in_unit(unit(colour,pink),numberwang,12)');
+  });
+
   it('does not propose a sum over a unit with none of the trait', () => {
     // A sum of 0 tells a player the unit is empty of the trait, which the
     // counting predicates already say better.

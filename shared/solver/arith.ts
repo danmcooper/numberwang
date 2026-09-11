@@ -157,7 +157,15 @@ export function arithCandidates(b: Board, units: Unit[]): Hint[] {
       if (held.length > 0) {
         const sum = traitSum(b, mem, trait);
         out.push({ pred: 'sum_of_trait_in_unit', args: [u(unit), t(trait), n(sum)] });
-        out.push({ pred: 'sum_parity_in_unit', args: [u(unit), t(trait), n(sum % 2)] });
+        // Parity only says something if it could have come out the other way.
+        // Flipping one card changes the sum's parity exactly when that card's
+        // number is odd, so a unit of all-even numbers sums even under every
+        // assignment and the clue is a tautology — true of the board, but true
+        // of every other board too, which is worse than uninformative because
+        // the generator would count it as progress.
+        if (mem.some((i) => b.numbers[i] % 2 === 1)) {
+          out.push({ pred: 'sum_parity_in_unit', args: [u(unit), t(trait), n(sum % 2)] });
+        }
       }
 
       // Every distinct gap between two of the trait's members.
