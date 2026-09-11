@@ -64,6 +64,12 @@ export const ARG_KINDS: Record<string, ArgKind[]> = {
   n_in_unit_have_trait_in_dir: [U, T, N, N, N],
   n_t_in_unit_have_trait_in_dir: [U, T, T, N, N, N],
   n_colours_have_trait_in_dir: [P, T, N, N, N],
+
+  // The four that read the numbers as values. See `arith.ts`.
+  sum_of_trait_in_unit: [U, T, N],
+  diff_of_two_traits_in_unit: [U, T, N],
+  more_sum_in_unit_than_unit: [U, U, T],
+  sum_parity_in_unit: [U, T, N],
 };
 
 /** Split on top-level commas, ignoring commas nested inside parentheses. */

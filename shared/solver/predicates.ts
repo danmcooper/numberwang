@@ -10,6 +10,7 @@ import {
   segment,
 } from './grid';
 import type { Hint, HintArg, Trait, Unit, UnitKind } from './hint';
+import { ARITH_EVALUATORS } from './arith';
 
 export interface Board {
   grid: Grid;
@@ -361,6 +362,11 @@ export const EVALUATORS: Record<string, (b: Board, a: HintArg[]) => boolean> = {
       argNum(a, 2),
       argNum(a, 3),
     ) === argNum(a, 4),
+
+  // The four that read the numbers as values. `arith.ts` imports `Board`,
+  // `hasTrait` and `unitMembers` back from here; ESM resolves the cycle
+  // because neither module does anything at load beyond declaring consts.
+  ...ARITH_EVALUATORS,
 };
 
 export function evaluate(b: Board, h: Hint): boolean {

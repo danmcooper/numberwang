@@ -1,0 +1,84 @@
+/**
+ * The four clue families that do arithmetic on the cards' numbers.
+ *
+ * Everything Clues by Sam wrote is a function of the hidden verdict alone —
+ * counting cards, comparing counts, checking adjacency. These four read the
+ * numbers as values, which is the one thing a name could never do.
+ *
+ * Semantics, candidate enumeration and CNF encoding all live here rather than
+ * in the three modules that would otherwise own a third each. They have to
+ * agree exactly — an encoding that admits one assignment the semantics reject
+ * produces a puzzle that is unsolvable or multiply-solvable, silently — and the
+ * differential test that proves they agree reads better when it can see both.
+ */
+import type { HintArg, Trait, Unit } from './hint';
+import { type Board, hasTrait, unitMembers } from './predicates';
+
+export class ArithError extends Error {}
+
+/** The four, in the order this file defines them. */
+export const ARITH_PREDS = [
+  'sum_of_trait_in_unit',
+  'diff_of_two_traits_in_unit',
+  'more_sum_in_unit_than_unit',
+  'sum_parity_in_unit',
+] as const;
+
+export const IS_ARITH: ReadonlySet<string> = new Set(ARITH_PREDS);
+
+/** Sum of the numbers on the members that hold `t`. Empty sums to 0. */
+export function traitSum(b: Board, members: number[], t: Trait): number {
+  let s = 0;
+  for (const i of members) if (hasTrait(b, i, t)) s += b.numbers[i];
+  return s;
+}
+
+function argUnit(a: HintArg[], k: number): Unit {
+  const x = a[k];
+  if (x.t !== 'unit') throw new ArithError(`arg ${k} is not a unit`);
+  return x.unit;
+}
+function argTrait(a: HintArg[], k: number): Trait {
+  const x = a[k];
+  if (x.t !== 'trait') throw new ArithError(`arg ${k} is not a trait`);
+  return x.trait;
+}
+function argNum(a: HintArg[], k: number): number {
+  const x = a[k];
+  if (x.t !== 'num') throw new ArithError(`arg ${k} is not a number`);
+  return x.n;
+}
+
+/** True when some two members holding `t` have numbers differing by `n`. An
+ * existential over pairs: it says nothing about the rest of the unit. */
+function hasPairDiff(b: Board, members: number[], t: Trait, n: number): boolean {
+  const nums = members.filter((i) => hasTrait(b, i, t)).map((i) => b.numbers[i]);
+  for (let x = 0; x < nums.length; x++) {
+    for (let y = x + 1; y < nums.length; y++) {
+      if (Math.abs(nums[x] - nums[y]) === n) return true;
+    }
+  }
+  return false;
+}
+
+export const ARITH_EVALUATORS: Record<string, (b: Board, a: HintArg[]) => boolean> = {
+  sum_of_trait_in_unit: (b, a) =>
+    traitSum(b, unitMembers(b, argUnit(a, 0)), argTrait(a, 1)) === argNum(a, 2),
+
+  diff_of_two_traits_in_unit: (b, a) =>
+    hasPairDiff(b, unitMembers(b, argUnit(a, 0)), argTrait(a, 1), argNum(a, 2)),
+
+  more_sum_in_unit_than_unit: (b, a) => {
+    const t = argTrait(a, 2);
+    return (
+      traitSum(b, unitMembers(b, argUnit(a, 0)), t) >
+      traitSum(b, unitMembers(b, argUnit(a, 1)), t)
+    );
+  },
+
+  sum_parity_in_unit: (b, a) => {
+    const want = argNum(a, 2);
+    if (want !== 0 && want !== 1) throw new ArithError(`parity must be 0 or 1, got ${want}`);
+    return traitSum(b, unitMembers(b, argUnit(a, 0)), argTrait(a, 1)) % 2 === want;
+  },
+};
