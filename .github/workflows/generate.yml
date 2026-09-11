@@ -1,0 +1,54 @@
+name: generate
+
+on:
+  schedule:
+    # 03:17 UTC, off the hour so it does not queue behind everyone else's cron.
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Two runs pushing to `puzzles/` at once would collide; a late run should wait
+# for the one ahead of it rather than be dropped, since each fills a different
+# day's slot.
+concurrency:
+  group: generate
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      # Fills yesterday through today + 6, skipping dates already committed, so
+      # a run that fails or is skipped costs only that night's headroom. A 4x5
+      # board is seconds of SAT solving on a good seed and minutes on a bad one,
+      # which is the other reason to keep a week in hand.
+      - run: npm run generate
+      # `runGenerate` already rewrites the manifest; this is the belt to that
+      # braces, and it is what fixes the index if a hand-edited puzzle ever
+      # lands without one.
+      - run: npm run manifest
+      # The archive only grows and a puzzle is never edited after the night it
+      # is written, so re-deriving all of it would cost more every day forever.
+      # Audit the live window; `npm run audit` with no flags is the local
+      # whole-archive check.
+      - run: npm run audit -- --recent=10
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add puzzles
+          git diff --cached --quiet && exit 0
+          git commit -m "Generate puzzles through $(date -u -d '+6 days' +%F)"
+          git push || {
+            git pull --rebase
+            git push
+          }
