@@ -28,15 +28,24 @@
   /* The three card states. */
   /* The same gray the archive's rows are drawn on. An unsolved card is the
      absence of a verdict, and a near-white one read as a third verdict next to
-     the peach; against the gray the group colour on the number is the only
-     thing on the card with any colour in it, which is the point of it. */
+     the two that mean something; against the gray the group colour on the
+     number is the only thing on the card with any colour in it, which is the
+     point of it. */
   --card-unsolved: #322f3b;
   --card-unsolved-text: #f3f3f3;
   --card-unsolved-border: #4a4b55;
-  --card-numberwang: #ffd9b8;
-  --card-numberwang-text: #3a2a1c;
-  --card-wangernumb: #14305e;
-  --card-wangernumb-text: #fff;
+  /* The two verdicts: aqua green for Numberwang, pinkish red for Wangernumb.
+     One is light and one is dark, so which verdict a card carries is legible
+     across a board at arm's length and not only to someone who can tell the two
+     hues apart. The `-edge` tokens are each verdict at the contrast the dark
+     page and the dark modal need — a card's border against the ground, and the
+     outline on the verdict buttons, which are not filled. */
+  --card-numberwang: #5cbd84;
+  --card-numberwang-text: #08301c;
+  --card-numberwang-edge: #3f9a68;
+  --card-wangernumb: #9e2547;
+  --card-wangernumb-text: #ffe6ec;
+  --card-wangernumb-edge: #e0728f;
   --confetti-blue: #7fb2e5;
   --confetti-pink: #f2a6c4;
 
@@ -376,26 +385,31 @@ a {
 .card.numberwang {
   background: var(--card-numberwang);
   color: var(--card-numberwang-text);
-  border-color: #e8bd93;
-  --tag-neutral: #f0c9a6;
+  border-color: var(--card-numberwang-edge);
+  --tag-neutral: #49ab77;
 }
 .card.wangernumb {
   background: var(--card-wangernumb);
   color: var(--card-wangernumb-text);
   /* The page ground is #1a1d24, so the card needs an edge or it dissolves into
      the gap between cards. */
-  border-color: #3d5a8a;
-  --tag-neutral: #2b456e;
+  border-color: #c05070;
+  --tag-neutral: #7d1c38;
 }
 
 /* Confetti: six gradient dots rather than six elements, offset per card by
    --confetti-seed so twenty solved cards are not twenty identical stamps. The
-   dots are a background layer under the number, which sits at z-index 3. */
+   dots are a background layer under the number, which sits at z-index 3, and
+   under the clue, which sits at 2. `pointer-events: none` because this covers
+   the whole card below the band: a pseudo-element is still a hit target, and
+   with it left on, every click meant for the clue text of a Numberwang card
+   landed on the confetti instead and the clue would not dim. */
 .card.numberwang::before {
   content: '';
   position: absolute;
-  inset: 9px 0 0 0;   /* below the band */
+  inset: 14px 0 0 0;   /* below the band */
   z-index: 1;
+  pointer-events: none;
   opacity: 0.5;
   background-image:
     radial-gradient(circle 2px at 50% 50%, var(--confetti-blue) 99%, transparent 100%),
@@ -452,9 +466,8 @@ a {
 }
 /* An unsolved card is nothing but its number and its band, so the number is
    the card: as large as the card will hold, and drawn in the band's colour so
-   the two agree at a glance. Solved cards hand the space to the clue and leave
-   the number in the card's text colour, which is the only readable ink on
-   peach or on black. */
+   the two agree at a glance. Solved cards hand the space to the clue and keep
+   the colour on the number, lifted where the card underneath is dark. */
 .card:not(.flipped) .card-number {
   font-size: 52px;
   line-height: 52px;
@@ -472,7 +485,7 @@ a {
 }
 /* The group colours were picked to sit on a dark band as a 14px strip, not to
    be read as ink on one. On the two dark card states the darker half of them
-   need lifting; the blue group on the blue card needs it most. */
+   need lifting; on the red card the red and pink groups need it most. */
 .card.wangernumb .card-number,
 .card:not(.flipped) .card-number {
   filter: brightness(1.35);
@@ -499,6 +512,9 @@ a {
   margin: auto 0;
   cursor: pointer;
   transition: opacity 0.1s ease-in-out;
+  /* Above the confetti, which would otherwise speckle the words. */
+  position: relative;
+  z-index: 2;
 }
 /* The fact cards. Not a clue, and shaped like one — the italic is the only
    thing that separates them at card size. */
@@ -638,11 +654,11 @@ a {
   font-weight: 700;
   min-width: 100px;
 }
-/* The two verdicts are cued by their border, not by a fill: a solid peach and a
-   solid black button either side of the card's own number read as two cards
-   rather than as two choices about one. The border is the colour the card will
-   become — black is invisible on this modal, so Wangernumb borrows its white
-   text colour instead. */
+/* The two verdicts are cued by their border, not by a fill: two solid buttons
+   either side of the card's own number read as two cards rather than as two
+   choices about one. The border is the colour the card will become, at the
+   `-edge` contrast: the green is light enough to outline a button on this modal
+   as it is, the red is not. */
 .btn-numberwang,
 .btn-wangernumb {
   border-width: 2px;
@@ -653,17 +669,26 @@ a {
   border-color: var(--card-numberwang);
 }
 .btn-wangernumb {
-  color: var(--card-wangernumb-text);
-  border-color: var(--card-wangernumb-text);
+  color: var(--card-wangernumb-edge);
+  border-color: var(--card-wangernumb-edge);
 }
-/* Popup buttons fill with their color on hover, like the real site. */
-.btn-numberwang:hover:not(:disabled) {
+/* Popup buttons fill with their color on hover, like the real site, and on
+   press as well: a phone has no hover, so without the `:active` half of this
+   tapping a verdict looked like nothing had happened at all. The dim on top of
+   the fill is what reads as the press. */
+.btn-numberwang:hover:not(:disabled),
+.btn-numberwang:active:not(:disabled) {
   background: var(--card-numberwang);
   color: var(--card-numberwang-text);
 }
-.btn-wangernumb:hover:not(:disabled) {
+.btn-wangernumb:hover:not(:disabled),
+.btn-wangernumb:active:not(:disabled) {
   background: var(--card-wangernumb);
   color: var(--card-wangernumb-text);
+}
+.btn-numberwang:active:not(:disabled),
+.btn-wangernumb:active:not(:disabled) {
+  filter: brightness(0.8);
 }
 .btn-continue {
   transition: background-color 0.15s, color 0.15s;

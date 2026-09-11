@@ -30,6 +30,18 @@
   group draws a small bar of it after the word (eight groups is more than a
   player can hold by name), and a card whose text is a fact rather than a clue
   sets that text in italic.
+- **The two verdict colours are aqua green and pinkish red** — Numberwang
+  `#5cbd84` with `#08301c` ink, Wangernumb `#9e2547` with `#ffe6ec`. Asked for
+  after Task 5, and it supersedes the peach and the black in the card-state
+  constraint above; the confetti stays blue and pink, and the gray unsolved
+  ground stays. One light and one dark on purpose, so the verdict on a card is
+  legible across the board and not only to someone who can separate the hues.
+- **Most of a board carries a clue, not a fact.** Generator-side, and recorded
+  here because it was asked for while this plan was being executed: the chain
+  now prefers a clue that flips a single card, which took a twenty-card board
+  from about 10 clue cards to 14-18, and the arithmetic budget went from 0.23
+  of the clues to 0.375 weighted toward the three predicates that add, so
+  "add to" turns up on nearly every board.
 - **No analytics.** `cbsbd`'s `index.html` carries a umami script with cbsbd's own website id; it does not come along.
 - **Deploy base path is `/numberwang/`**, with no UUID and no `config/site.json`.
 - **Local-storage keys are namespaced `nw:`**, so a browser that has played `cbsbd` on the same host cannot collide.
