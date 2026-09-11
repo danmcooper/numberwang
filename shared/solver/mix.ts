@@ -69,28 +69,29 @@ export function loadMix(data: unknown): ClueMix {
  * same problem `CROSS_TRAIT_RATE` solves for the cross-trait comparisons, at
  * eight times the size.
  *
- * They are not weighted evenly. An exact sum pins its unit outright most of the
- * time on a five-card unit — it is the strongest single clue in the game, and a
- * puzzle with two of them is a puzzle with two rows handed over. It gets the
- * smallest share here and a hard cap in `generate.ts` besides. The two parity
- * counts are next-smallest because they say the least per clue and because
- * between them and `sum_parity_in_unit` the puzzle can start to read as one long
- * argument about even numbers.
+ * They are not weighted evenly. The three that add — an exact total, a
+ * comparison of two totals, and the parity of a total — carry nearly half the
+ * budget between them, because addition is the arithmetic a player actually
+ * does here and at the first budget it turned up about once every other board.
+ * An exact sum still pins its unit outright most of the time on a five-card
+ * unit, which makes it the strongest single clue in the game; what stops two
+ * landing on one board is the hard cap in `generate.ts`, not its share, so the
+ * share is free to be large enough that a board usually has one.
  *
- * The total comes to 0.23, so roughly a quarter of a puzzle's clues do
- * arithmetic. That is a deliberate quarter: the game is called Numberwang, and
- * the four sum predicates alone were the whole reason the number replaced the
- * name.
+ * The total comes to 0.375, and the pool weighting delivers a little under its
+ * target, so something over a third of a puzzle's clues do arithmetic. That is
+ * deliberate: the game is called Numberwang, and the sum predicates were the
+ * whole reason the number replaced the name.
  */
 export const ARITH_RATE: Record<string, number> = {
-  sum_of_trait_in_unit: 0.02,
-  diff_of_two_traits_in_unit: 0.035,
-  more_sum_in_unit_than_unit: 0.035,
-  sum_parity_in_unit: 0.03,
-  n_traits_in_unit_are_prime: 0.03,
-  n_traits_in_unit_are_even: 0.025,
-  n_traits_in_unit_are_odd: 0.025,
-  n_traits_in_unit_are_divisible: 0.03,
+  sum_of_trait_in_unit: 0.05,
+  diff_of_two_traits_in_unit: 0.055,
+  more_sum_in_unit_than_unit: 0.07,
+  sum_parity_in_unit: 0.06,
+  n_traits_in_unit_are_prime: 0.04,
+  n_traits_in_unit_are_even: 0.03,
+  n_traits_in_unit_are_odd: 0.03,
+  n_traits_in_unit_are_divisible: 0.04,
 };
 
 /**

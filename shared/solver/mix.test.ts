@@ -54,18 +54,23 @@ describe('withArithBudgets', () => {
     expect(total).toBeCloseTo(1, 10);
   });
 
-  it('spends 20 to 26 percent of the mix on arithmetic', () => {
+  it('spends 33 to 42 percent of the mix on arithmetic', () => {
     const out = withArithBudgets(base);
     const arith = ARITH_PREDS.reduce((a, p) => a + out.pred[p], 0);
-    expect(arith).toBeGreaterThanOrEqual(0.2);
-    expect(arith).toBeLessThanOrEqual(0.26);
+    expect(arith).toBeGreaterThanOrEqual(0.33);
+    expect(arith).toBeLessThanOrEqual(0.42);
   });
 
-  it('makes the exact sum the smallest of them', () => {
+  // Addition is the arithmetic a player actually performs on this board — the
+  // counting predicates only ask them to look at a number and say what kind it
+  // is — so no counting predicate may outrank one that adds.
+  it('gives every predicate that adds a larger share than any that counts', () => {
     const out = withArithBudgets(base);
-    for (const p of ARITH_PREDS) {
-      if (p === 'sum_of_trait_in_unit') continue;
-      expect(out.pred[p], p).toBeGreaterThan(out.pred.sum_of_trait_in_unit);
+    const adds = ['sum_of_trait_in_unit', 'more_sum_in_unit_than_unit', 'sum_parity_in_unit'];
+    const counts = ARITH_PREDS.filter((p) => p.startsWith('n_traits_in_unit_are_'));
+    expect(counts.length).toBe(4);
+    for (const a of adds) {
+      for (const c of counts) expect(out.pred[a], `${a} vs ${c}`).toBeGreaterThan(out.pred[c]);
     }
   });
 

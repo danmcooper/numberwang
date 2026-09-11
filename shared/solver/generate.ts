@@ -315,6 +315,24 @@ export const MAX_EXACT_SUMS = 1;
 
 export const EXACT_SUM = 'sum_of_trait_in_unit';
 
+/**
+ * What a candidate that flips exactly one card is worth against the two ranking
+ * preferences, which are scored at 2 apiece.
+ *
+ * Every step of the chain puts one clue on the board and flips whatever that
+ * clue forces, so a step that flips three cards is two cards that will never
+ * carry a clue of their own. Left to itself the chain took whatever it found
+ * first and half of a twenty-card board came out holding a maths fact instead
+ * of a clue. Worth less than either rank, so it breaks ties rather than
+ * deciding the shape of the puzzle: a board that can only progress three cards
+ * at a time still progresses.
+ */
+const SINGLE_REVEAL_BONUS = 1;
+
+/** The score of a candidate that wins on both ranks and flips one card: nothing
+ * later in the pool can beat it, so the search for this step can stop. */
+const TOP_SCORE = 3 * 2 + SINGLE_REVEAL_BONUS;
+
 interface ChainBuild {
   clues: Clues;
   flippedAt: number[][];
@@ -371,17 +389,19 @@ function buildChain(
         ((predUsed.get(hint.pred) ?? 0) < REPEAT_CAP ? 1 : 0);
 
       let tried = 0;
-      let best: { hint: Hint; reveals: number[]; rank: number } | null = null;
+      let best: { hint: Hint; reveals: number[]; score: number } | null = null;
 
-      while (tried < trialsPerStep && cursor < pool.length && best?.rank !== 3) {
+      while (tried < trialsPerStep && cursor < pool.length && best?.score !== TOP_SCORE) {
         const hint = pool[cursor++];
         tried++;
         if (hint.pred === EXACT_SUM && (predUsed.get(EXACT_SUM) ?? 0) >= MAX_EXACT_SUMS) continue;
         const rank = rankOf(hint);
-        // A candidate that cannot outrank what is already in hand cannot change
-        // the outcome, so skip the expensive forcedGiven/reveal check for it.
-        // Purely a cost optimization — rank is decided by the hint alone.
-        if (best && rank <= best.rank) continue;
+        // The most this candidate could score is its rank plus the single-reveal
+        // bonus, so if even that cannot beat what is already in hand it cannot
+        // change the outcome: skip the expensive forcedGiven/reveal check. The
+        // bound is admissible, so this only ever skips candidates that would
+        // have lost anyway. Purely a cost optimization.
+        if (best && rank * 2 + 1 <= best.score) continue;
         if (namedCards(board, hint).has(host)) continue;
         clues[host] = hint;
         const forced = forcedGiven(shape, clues, truth, flipped);
@@ -392,7 +412,9 @@ function buildChain(
         clues[host] = null;
         if (reveals.length === 0 || reveals.length > maxReveals) continue;
 
-        best = { hint, reveals, rank };
+        const score = rank * 2 + (reveals.length === 1 ? SINGLE_REVEAL_BONUS : 0);
+        if (best && score <= best.score) continue;
+        best = { hint, reveals, score };
       }
 
       const chosen = best;
