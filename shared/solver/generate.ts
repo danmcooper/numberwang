@@ -303,6 +303,18 @@ function hexId(rng: () => number): string {
  */
 const REPEAT_CAP = 2;
 
+/**
+ * How many exact-sum clues one puzzle may carry.
+ *
+ * One, and unlike REPEAT_CAP this is a filter rather than a preference. A sum
+ * clue usually pins its whole unit — on a five-card row there are few ways to
+ * hit a given total — so a second one is usually a second row handed over, and
+ * the share in ARITH_RATE alone does not stop two landing on the same board.
+ */
+export const MAX_EXACT_SUMS = 1;
+
+const EXACT_SUM = 'sum_of_trait_in_unit';
+
 interface ChainBuild {
   clues: Clues;
   flippedAt: number[][];
@@ -364,6 +376,7 @@ function buildChain(
       while (tried < trialsPerStep && cursor < pool.length && best?.rank !== 3) {
         const hint = pool[cursor++];
         tried++;
+        if (hint.pred === EXACT_SUM && (predUsed.get(EXACT_SUM) ?? 0) >= MAX_EXACT_SUMS) continue;
         const rank = rankOf(hint);
         // A candidate that cannot outrank what is already in hand cannot change
         // the outcome, so skip the expensive forcedGiven/reveal check for it.

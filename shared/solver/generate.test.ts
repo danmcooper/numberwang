@@ -9,10 +9,12 @@ import { hintFeatures, makeBoard, unitMembers } from './predicates';
 import { render } from './render';
 import { forcedGiven, isUniquelySolvable, parseClues, solveChain } from './solve';
 import { candidateHints } from './candidates';
+import { IS_ARITH } from './arith';
 import mixData from '../../config/clue-mix.json' with { type: 'json' };
-import { type ClueMix, loadMix } from './mix';
+import { type ClueMix, loadMix, withArithBudgets } from './mix';
 import {
   GenerationError,
+  MAX_EXACT_SUMS,
   generatePuzzle,
   makeRng,
   orderPool,
@@ -61,10 +63,13 @@ function trimShape(shape: readonly number[], size: number): number[] {
   return out.sort((a, b) => b - a);
 }
 
-const boardMix: ClueMix = {
+// Budgeted, the way every real generation path loads it. The archive measured no
+// arithmetic clue, so a bare mix gives the eight share 0 and `orderPool`
+// multiplies by share — this file would then never see one.
+const boardMix: ClueMix = withArithBudgets({
   ...mix,
   colourShapes: mix.colourShapes.map((s) => trimShape(s, BOARD.width * BOARD.height)),
-};
+});
 
 describe('pickNumberwangs', () => {
   // 70% of a 4x5 board is edge, so a uniform draw puts 70% of the numberwangs
@@ -296,6 +301,36 @@ describe('generatePuzzle', () => {
       mix: boardMix, ...BOARD,
     });
     expect(p.people.filter((q) => q.numberwang).length).toBe(8);
+  });
+
+  it('actually spends its arithmetic budget', () => {
+    // A budget that produces nothing is a budget that does not work, and that
+    // failure is silent: `orderPool` would simply never surface the eight and
+    // every other test here would still pass. Measured over these ten seeds the
+    // arithmetic share is 0.165 and seven of the eight families turn up; the
+    // floors sit well under both.
+    const seen = new Map<string, number>();
+    let clues = 0;
+    for (let seed = 1; seed <= 10; seed++) {
+      const { puzzle: p } = generatePuzzle({
+        date: '2026-01-01', difficulty: 'Medium', band, seed, mix: boardMix, ...BOARD,
+      });
+      for (const person of p.people) {
+        if (!person.origHint) continue;
+        clues++;
+        const pred = person.origHint.slice(0, person.origHint.indexOf('('));
+        if (IS_ARITH.has(pred)) seen.set(pred, (seen.get(pred) ?? 0) + 1);
+      }
+    }
+    const arith = [...seen.values()].reduce((a, b) => a + b, 0);
+    expect(arith / clues, `${arith} of ${clues} clues`).toBeGreaterThan(0.08);
+    expect(seen.size, `families seen: ${[...seen.keys()]}`).toBeGreaterThanOrEqual(5);
+  }, 120_000);
+
+  it('never spends more than one exact sum on a puzzle', () => {
+    const sums = puzzle.people.filter((p) => p.origHint?.startsWith('sum_of_trait_in_unit(')).length;
+    expect(MAX_EXACT_SUMS).toBe(1);
+    expect(sums).toBeLessThanOrEqual(MAX_EXACT_SUMS);
   });
 
   it('round-trips every generated clue exactly', () => {
