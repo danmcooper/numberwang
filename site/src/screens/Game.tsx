@@ -215,7 +215,7 @@ function GuessModal({
 }: {
   puzzle: Puzzle;
   index: number;
-  /** Verdicts already rejected for this suspect; disabled until the next reveal. */
+  /** Verdicts already rejected for this card; disabled until the next reveal. */
   blocked: Guess[];
   onGuess: (guess: Guess) => void;
   onClose: () => void;
@@ -379,7 +379,7 @@ function Board({ puzzle, slug }: { puzzle: Puzzle; slug: string }) {
   }, [pickerIndex]);
 
   // "Correct!" speech bubble on the card that just flipped (real-site pop-fade).
-  // Also flashed on the most recent correct suspect right from mount (a
+  // Also flashed on the most recent correct card right from mount (a
   // refresh) - set via the initial state itself so it's there on the very
   // first paint, not a follow-up effect - and again when coming out of pause,
   // so the feedback isn't lost mid-solve.

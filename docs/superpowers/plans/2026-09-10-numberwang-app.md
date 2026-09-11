@@ -1512,7 +1512,9 @@ with it, and the document head.
 - Consumes: `ManifestEntry` and `ArchiveFilters` as Task 1 left them
 - Produces: an archive with exactly two filters, entries keyed and linked by date
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**  *(Done: two of the four were already
+in the file — Task 1's own tests cover the play links and the difficulty
+options — so the two added were the no-source-filter check and the note.)*
 
 `Archive.test.tsx` renders with a bare `render(<Archive />)` against a
 module-level `manifest` served by a stubbed `fetch`; there is no render helper.
@@ -1570,7 +1572,9 @@ it('takes no variant filter', () => {
 });
 ```
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**  *(Done: the note failed, "Unable
+to find an element with the text: /measured, not aimed at/". The other three
+passed, as the step expected.)*
 
 Run: `npx vitest run site/src/screens/`
 Expected: FAIL on the note (nothing in the tree has `.arch-note`) and on the
@@ -1578,7 +1582,9 @@ difficulty options (Task 1 deleted that test). The other two should already pass
 they assert what Task 1 built, and a test that cannot fail first is worth knowing
 about.
 
-- [ ] **Step 3: Finish the archive screen**
+- [x] **Step 3: Finish the archive screen**  *(Done. Also replaced the empty-
+archive line, which still said the scraper runs daily; here a generator runs
+nightly.)*
 
 `cbsbd`'s archive explains that a generated puzzle's difficulty is the source's
 label for the puzzle it is a sibling of. That relationship does not exist here.
@@ -1631,12 +1637,15 @@ The umami `<script>` is deliberately absent. It carried cbsbd's own website id,
 so leaving it in would file this game's traffic under that one — and nobody asked
 for analytics here.
 
-- [ ] **Step 5: Run the tests to verify they pass**
+- [x] **Step 5: Run the tests to verify they pass**  *(Done: 70 passed.)*
 
 Run: `npx vitest run site/src/screens/`
 Expected: PASS
 
-- [ ] **Step 6: Run the whole suite and sweep for stale copy**
+- [x] **Step 6: Run the whole suite and sweep for stale copy**  *(Done: 1088
+passed. The sweep left four "suspect" comments and one "scraper" line, all
+internal; renamed. The remaining hits are the archive note's deliberate credit
+and storage.ts explaining why the key prefix is not cbsbd's.)*
 
 ```bash
 npx tsc --noEmit && npm test
@@ -1646,13 +1655,15 @@ grep -rni 'clues by sam\|cbs\b\|suspect\|criminal' site/src site/index.html
 Every hit should be either a class name that is not player-facing or a deliberate
 reference to the parent game (the archive note above is one). Fix the rest.
 
-- [ ] **Step 7: Look at the archive**
+- [x] **Step 7: Look at the archive**  *(Done, in the headless-screenshot loop
+rather than `npm run dev`: note, both filters, year and month sections, one row
+per date, statuses reading from local storage.)*
 
 Run: `npm run generate && npm run manifest && npm run dev` and open the archive.
 Expected: puzzles grouped by year and month, two working filters, statuses that
 reflect what you have played, and every link opening its board.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add -A

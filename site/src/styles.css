@@ -436,13 +436,23 @@ a {
 .card.rejected {
   animation: shake 0.3s;
 }
+/* The grid reference, in the top left but clear of the band: level with the
+   number a solved card draws, so the two read as one line. Against the band it
+   was part of the band. */
 .card-pos {
   position: absolute;
-  top: 2px;
-  left: 2px;
+  top: 20px;
+  left: 3px;
   color: var(--text-muted);
   font-size: 10px;
   line-height: 10px;
+}
+/* The muted gray is a colour for the dark unsolved card. On a solved one the
+   card's own ink, stepped back, is the same idea in a way that works on both
+   the green and the red. */
+.card.flipped .card-pos {
+  color: inherit;
+  opacity: 0.5;
 }
 /* A plain strip the card background never reaches, so the colour survives both
    solved states — clues name colour groups constantly, and losing the group the
@@ -703,7 +713,7 @@ a {
 .btn-close:hover {
   background: #7f818c;
 }
-/* A rejected verdict stays disabled until the next suspect is revealed. */
+/* A rejected verdict stays disabled until the next card is revealed. */
 .modal button:disabled {
   opacity: 0.35;
   cursor: not-allowed;
@@ -856,15 +866,12 @@ a {
 .arch-title {
   flex: 1;
 }
-/* Only rendered under Source: Both, where two rows per date would otherwise
-   be indistinguishable at a glance. */
-.arch-source {
-  align-self: center;
-  padding: 0.05rem 0.35rem;
-  border: 1px solid var(--border-neutral);
-  border-radius: 4px;
-  font-size: 0.75rem;
-  color: var(--text-muted);
+/* The line under the archive's heading. What the label on a row means, since
+   nothing here was ever set by a person. */
+.arch-note {
+  margin: 0 0 14px;
+  font-size: 12px;
+  opacity: 0.62;
 }
 .arch-status.status-done {
   color: var(--accent-green);

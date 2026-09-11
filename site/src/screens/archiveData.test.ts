@@ -69,6 +69,11 @@ describe('filterEntries', () => {
     saveProgress('done-id', { flipped: [0, 1], mistakes: 0, elapsedMs: 1, completed: true });
     expect(filterEntries(entries, { status: 'done' }).map((e) => e.date)).toEqual(['2026-07-03']);
   });
+
+  it('takes no variant filter', () => {
+    // @ts-expect-error variant is not part of the archive any more
+    filterEntries([], { variant: 'real' });
+  });
 });
 
 describe('statusFor', () => {

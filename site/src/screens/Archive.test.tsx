@@ -30,6 +30,22 @@ describe('Archive', () => {
     expect(links[1].textContent).toContain('done');
   });
 
+  // The two the archive has, and the one it used to have: `cbsbd` filtered by
+  // source because a date could hold a scraped puzzle and a generated sibling.
+  // Here a date is one puzzle, so there is nothing to tell apart.
+  it('offers difficulty and status filters, and no source filter', async () => {
+    render(<Archive />);
+    await screen.findByText('July 2026');
+    expect(screen.getByLabelText(/difficulty/i)).toBeTruthy();
+    expect(screen.getByLabelText(/status/i)).toBeTruthy();
+    expect(screen.queryByLabelText(/source/i)).toBeNull();
+  });
+
+  it('says that difficulty is measured rather than aimed at', async () => {
+    render(<Archive />);
+    expect((await screen.findByText(/measured, not aimed at/)).className).toContain('arch-note');
+  });
+
   it('groups puzzles under a year section', async () => {
     render(<Archive />);
     const heading = await screen.findByText('2026');

@@ -24,7 +24,7 @@ export interface GameState {
   rejectedIndex: number | null;
   /** The verdict the player picked when rejectedIndex was set. */
   rejectedGuess: Guess | null;
-  /** Rejected verdicts per card, disabled until the next suspect is revealed. */
+  /** Rejected verdicts per card, disabled until the next card is revealed. */
   blocked: Record<number, Guess[]>;
   completed: boolean;
   tags: Record<number, Tag>;

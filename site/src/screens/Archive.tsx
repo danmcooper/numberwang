@@ -33,7 +33,12 @@ export default function Archive() {
   return (
     <main className="archive">
       <h1>Puzzle Archive</h1>
-      {data.length === 0 && <p>No puzzles yet — the scraper runs daily.</p>}
+      <p className="arch-note">
+        Difficulty is measured, not aimed at. The bands come from Clues by Sam's own
+        puzzles, so treat the label as a rough guide to a board nobody has played yet
+        rather than a promise.
+      </p>
+      {data.length === 0 && <p>No puzzles yet — the generator runs nightly.</p>}
       {data.length > 0 && (
         <div className="archive-filters">
           <label>
