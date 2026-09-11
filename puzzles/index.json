@@ -1,65 +1,65 @@
 [
   {
     "date": "2026-09-17",
-    "id": "968f69755ac8",
+    "id": "b0a5daae3087",
     "difficulty": "Medium",
-    "title": "An Even Number, Obviously",
+    "title": "The Colours Are Not a Hint",
     "width": 4,
     "height": 5
   },
   {
     "date": "2026-09-16",
-    "id": "01ec485e5616",
+    "id": "4347d900b543",
+    "difficulty": "Medium",
+    "title": "Rotate the Board",
+    "width": 4,
+    "height": 5
+  },
+  {
+    "date": "2026-09-15",
+    "id": "cae240702f59",
+    "difficulty": "Medium",
+    "title": "One Row Gives It Away",
+    "width": 4,
+    "height": 5
+  },
+  {
+    "date": "2026-09-14",
+    "id": "87d7b64788ba",
     "difficulty": "Medium",
     "title": "Somebody Has Miscounted",
     "width": 4,
     "height": 5
   },
   {
-    "date": "2026-09-15",
-    "id": "46545a819a66",
-    "difficulty": "Medium",
-    "title": "The Numbers Were Always There",
-    "width": 4,
-    "height": 5
-  },
-  {
-    "date": "2026-09-14",
-    "id": "969d2010f91c",
-    "difficulty": "Medium",
-    "title": "The Quiet Half of the Board",
-    "width": 4,
-    "height": 5
-  },
-  {
     "date": "2026-09-13",
-    "id": "53c792d8fab8",
+    "id": "8ae2e18f4b11",
+    "difficulty": "Medium",
+    "title": "Nineteen Was Never in Doubt",
+    "width": 4,
+    "height": 5
+  },
+  {
+    "date": "2026-09-12",
+    "id": "193731d28d2c",
+    "difficulty": "Medium",
+    "title": "Sum of the Parts",
+    "width": 4,
+    "height": 5
+  },
+  {
+    "date": "2026-09-11",
+    "id": "ebcda483673f",
     "difficulty": "Medium",
     "title": "The Board Does Not Explain Itself",
     "width": 4,
     "height": 5
   },
   {
-    "date": "2026-09-12",
-    "id": "cc4e00f7b83e",
-    "difficulty": "Medium",
-    "title": "Let Us Move to the Next Round",
-    "width": 4,
-    "height": 5
-  },
-  {
-    "date": "2026-09-11",
-    "id": "1fcb8e27e481",
-    "difficulty": "Medium",
-    "title": "Not All Numbers Are Numberwang",
-    "width": 4,
-    "height": 5
-  },
-  {
     "date": "2026-09-10",
-    "id": "c7d497424097",
+    "id": "06983023c3fd",
     "difficulty": "Medium",
-    "title": "Round Three: Wangernumb",
+    "title": "A Perfectly Ordinary Total",
     "width": 4,
     "height": 5
   }

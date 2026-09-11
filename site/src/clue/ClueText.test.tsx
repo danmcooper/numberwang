@@ -190,8 +190,8 @@ describe('numbers and colours', () => {
   });
 
   it('expands a column token to its letter', () => {
-    expect(say('The Numberwang cards in column #C:2 add to an even number')).toBe(
-      'The Numberwang cards in column B add to an even number',
+    expect(say('The Numberwang cards in column #C:2 add to an even total')).toBe(
+      'The Numberwang cards in column B add to an even total',
     );
   });
 

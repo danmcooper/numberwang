@@ -223,12 +223,26 @@ describe('arithCandidates over number properties', () => {
     expect(srcs).toContain('n_traits_in_unit_are_even(unit(colour,pink),numberwang,1)');
   });
 
+  const divisorsOver = (units: Unit[]) =>
+    [
+      ...new Set(
+        srcsOver(units)
+          .filter((x) => x.startsWith('n_traits_in_unit_are_divisible'))
+          .map((x) => Number(/,(\d+),\d+\)$/.exec(x)![1])),
+      ),
+    ].sort((a, b) => a - b);
+
   it('never names a divisor below the floor, or one that divides nothing here', () => {
-    const divisors = srcsOver([{ kind: 'colour', name: 'pink' }])
-      .filter((x) => x.startsWith('n_traits_in_unit_are_divisible'))
-      .map((x) => Number(/,(\d+),\d+\)$/.exec(x)![1]));
-    // Pink holds 12 and 26; 3, 4, 6 and 12 divide the first, 13 and 26 the second.
-    expect([...new Set(divisors)].sort((a, b) => a - b)).toEqual([3, 4, 6, 12, 13, 26]);
+    // Row 2 holds 9, 31, 12 and 26. Only 3 reaches two of them (9 and 12); 2 is
+    // below the floor and everything above 12 divides at most the 26.
+    expect(divisorsOver([{ kind: 'row', n: 2 }])).toEqual([3]);
+  });
+
+  it('never names a divisor that picks out a single card', () => {
+    // Pink holds 12 and 26. Every divisor from 3 up divides exactly one of
+    // them, so "exactly one of the pink cards is evenly divisible by 13" would
+    // only be saying which verdict 26 carries.
+    expect(divisorsOver([{ kind: 'colour', name: 'pink' }])).toEqual([]);
   });
 
   it('proposes only clues that are true of the board', () => {

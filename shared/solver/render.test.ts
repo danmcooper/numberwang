@@ -482,13 +482,13 @@ describe('arithmetic clue text', () => {
 
   it('renders even parity, with the column as a #C token', () => {
     expect(say('sum_parity_in_unit(unit(col,2),numberwang,0)')).toBe(
-      `The Numberwang cards in column${NBSP}#C:2 add to an even number`,
+      `The Numberwang cards in column${NBSP}#C:2 add to an even total`,
     );
   });
 
   it('renders odd parity, and the other trait', () => {
     expect(say('sum_parity_in_unit(unit(col,2),not_numberwang,1)')).toBe(
-      `The Wangernumb cards in column${NBSP}#C:2 add to an odd number`,
+      `The Wangernumb cards in column${NBSP}#C:2 add to an odd total`,
     );
   });
 
@@ -518,7 +518,7 @@ describe('arithmetic clue text', () => {
 
   it('names the divisor, and the colour group as a token', () => {
     expect(say('n_traits_in_unit_are_divisible(unit(colour,teal),not_numberwang,3,2)')).toBe(
-      '2 of the Wangernumb cards among the #COLOURS:teal are divisible by 3',
+      '2 of the Wangernumb cards among the #COLOURS:teal are evenly divisible by 3',
     );
   });
 

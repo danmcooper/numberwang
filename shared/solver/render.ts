@@ -598,15 +598,24 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     );
   },
 
+  // "add to an odd total", not "add to an odd number": every card on this board
+  // *is* a number, so "an odd number" reads as "one of the odd-numbered cards"
+  // and the clue turns into a question about which cards are being added rather
+  // than about their sum. "Total" is the one word here that cannot be a card.
   sum_parity_in_unit: (a) => {
     const parity = argNum(a, 2) === 0 ? 'even' : 'odd';
-    return `The ${plural(argTrait(a, 1), 2)} ${unitPhrase(argUnit(a, 0))} add to an ${parity} number`;
+    return `The ${plural(argTrait(a, 1), 2)} ${unitPhrase(argUnit(a, 0))} add to an ${parity} total`;
   },
 
   n_traits_in_unit_are_prime: (a) => propertyCount(a, 2, 'prime'),
   n_traits_in_unit_are_even: (a) => propertyCount(a, 2, 'even'),
   n_traits_in_unit_are_odd: (a) => propertyCount(a, 2, 'odd'),
-  n_traits_in_unit_are_divisible: (a) => propertyCount(a, 3, `divisible by ${argNum(a, 2)}`),
+  // "evenly divisible", not "divisible": the plain word is exact to a
+  // mathematician and ambiguous to everyone else, who can read 20 divided by 3
+  // as a thing one is allowed to do. The adverb says the division leaves
+  // nothing over, which is the whole of what the clue claims.
+  n_traits_in_unit_are_divisible: (a) =>
+    propertyCount(a, 3, `evenly divisible by ${argNum(a, 2)}`),
 };
 
 export function render(h: Hint, options: RenderOptions = NO_EXTRAS): string {

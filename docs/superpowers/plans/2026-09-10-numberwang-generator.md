@@ -1696,9 +1696,12 @@ Three judgements worth keeping:
   the unit has the property, the count is 0 under every assignment and the clue
   is a tautology — the same failure `sum_parity_in_unit` had over a unit of
   all-even numbers.
-- **Divisors are drawn from what actually divides something in the unit**, and
-  never above the unit's largest number: "divisible by 19" over a unit whose
-  biggest card is 12 is a roundabout way of saying none of them are.
+- **Divisors need at least two multiples in the unit** (`MIN_MULTIPLES`), which
+  also keeps them below its largest number: "divisible by 19" over a unit whose
+  biggest card is 12 is a roundabout way of saying none of them are, and a
+  divisor with one multiple makes the count that single card's verdict in
+  arithmetic — "exactly one of the teal cards is evenly divisible by 9" is
+  "18 is Numberwang" with the answer printed on it.
 
 `ARITH_PREDS` is now `SUM_PREDS` plus `PROP_PREDS`, so everything keyed off it —
 `IS_ARITH`, `SUPPORTED`, the differential test, Task 10's budgets — picks the

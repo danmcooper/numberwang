@@ -63,6 +63,17 @@ export function isPrime(x: number): boolean {
  */
 export const MIN_DIVISOR = 3;
 
+/**
+ * The fewest multiples of a divisor a unit must hold for the clue to be worth
+ * asking.
+ *
+ * Two. See the proposal loop: below that the divisor picks out one card and the
+ * count stops being arithmetic. This is also what keeps the divisors small
+ * without naming a ceiling — on a 1..20 board only 3, 4 and 5 have two
+ * multiples inside a colour group often enough to matter.
+ */
+export const MIN_MULTIPLES = 2;
+
 /** Count of the members holding `t` whose number satisfies `ok`. */
 function countWhere(
   b: Board,
@@ -275,11 +286,16 @@ export function arithCandidates(b: Board, units: Unit[]): Hint[] {
       propose('n_traits_in_unit_are_prime', isPrime, []);
       propose('n_traits_in_unit_are_even', (x) => x % 2 === 0, []);
       propose('n_traits_in_unit_are_odd', (x) => x % 2 === 1, []);
-      // Only divisors that actually divide something here, and only up to the
-      // unit's own largest number — "divisible by 19" over a unit whose biggest
-      // card is 12 is a roundabout way of saying none of them are.
+      // Only divisors with at least `MIN_MULTIPLES` multiples inside the unit,
+      // which also rules out every divisor above its largest number. One
+      // multiple is the degenerate case the tautology guard above misses: with
+      // a single multiple in the unit, the count is that one card's verdict
+      // written in arithmetic, so "exactly one of the teal cards is evenly
+      // divisible by 9" is just "18 is Numberwang" with the answer spelled out.
+      // Two is what makes the player choose between cards.
       const largest = Math.max(0, ...mem.map((i) => b.numbers[i]));
       for (let d = MIN_DIVISOR; d <= largest; d++) {
+        if (mem.filter((i) => b.numbers[i] % d === 0).length < MIN_MULTIPLES) continue;
         propose('n_traits_in_unit_are_divisible', (x) => x % d === 0, [n(d)]);
       }
     }
