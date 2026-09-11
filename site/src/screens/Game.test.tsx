@@ -900,17 +900,23 @@ describe('colour group ring', () => {
       .getAllByRole('group')
       .flatMap((card, i) => (card.className.includes('colour-ref') ? [i] : []));
 
-  it('rings one group at a time: the newest clue, and the one before it on a dim', async () => {
+  it('rings the group a reveal names, and clears it on the next guess', async () => {
     const user = userEvent.setup();
     await renderGame(user);
-    expect(ringed()).toEqual([3]); // the blue group, from the clue on the board
+    expect(ringed()).toEqual([]); // a restored board revealed its clues long ago
     await user.click(screen.getByText('1'));
     await user.click(screen.getByRole('button', { name: 'Numberwang' }));
-    expect(ringed()).toEqual([0, 2]); // the newer clue's red group, alone
-    await user.click(document.querySelectorAll('.card-clue')[1] as HTMLElement);
-    expect(ringed()).toEqual([3]); // dimmed: the ring goes back, it does not vanish
-    await user.click(document.querySelectorAll('.card-clue')[1] as HTMLElement);
-    expect(ringed()).toEqual([0, 2]); // un-dimming is a reveal, so it is newest again
+    expect(ringed()).toEqual([0, 2]); // the clue that just came up names red
+    await user.click(screen.getByText('2'));
+    await user.click(screen.getByRole('button', { name: 'Wangernumb' })); // wrong
+    expect(ringed()).toEqual([]); // a guess ends the ring however it goes
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    // Tapping a dimmed clue back on is a reveal of its own.
+    const clue = () => document.querySelectorAll('.card-clue')[1] as HTMLElement;
+    await user.click(clue());
+    expect(ringed()).toEqual([]);
+    await user.click(clue());
+    expect(ringed()).toEqual([0, 2]);
   });
 });
 

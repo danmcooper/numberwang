@@ -50,21 +50,30 @@ export default function Grid({
     if (refs.colours.length) colourClues.set(i, refs.colours);
   });
 
-  // One ring at a time, and it belongs to the newest colour clue. A ring lights
-  // a whole group at once, so two of them running together stop reading as two
-  // answers to two clues and start reading as one smear across the board — the
-  // number halo can stack because it marks single cards. Order of activation is
-  // remembered so that dimming the newest clue hands the ring back to the one
-  // before it, rather than leaving an open colour clue with nothing to show.
-  // Keeping the order in a ref is safe under a double render: the rebuild
-  // below is a filter and an append of what is missing, so it lands on the same
-  // list every time.
-  const ringOrder = useRef<number[]>([]);
-  ringOrder.current = [
-    ...ringOrder.current.filter((i) => colourClues.has(i)),
-    ...[...colourClues.keys()].filter((i) => !ringOrder.current.includes(i)),
-  ];
-  const ringClue = ringOrder.current.at(-1) ?? null;
+  // The ring belongs to a reveal, not to the board. It lights the group of the
+  // colour clue that just came up — a fresh flip, or a dimmed clue tapped back
+  // on — and it is gone by the player's next guess, right or wrong. A ring
+  // lights a whole group at once, so leaving them up meant that by mid-board
+  // most of the grid was ringed most of the time, which reads the same as
+  // nothing being ringed. (The number halo can stay: it marks single cards.)
+  // Each accepted guess either flips a card or scores a mistake, so this sum
+  // counts them; nothing else moves it.
+  const guessCount = state.flipped.length + state.mistakes;
+  const ring = useRef<{ clue: number; at: number } | null>(null);
+  const prevColourClues = useRef<number[] | null>(null);
+  const activeColourClues = [...colourClues.keys()];
+  // Mount rings nothing: a restored board revealed its clues in some earlier
+  // session, the same reason the bounce does not replay on load.
+  const previouslyActive = prevColourClues.current;
+  if (previouslyActive) {
+    const revealed = activeColourClues.filter((i) => !previouslyActive.includes(i));
+    if (revealed.length) ring.current = { clue: revealed[revealed.length - 1], at: guessCount };
+  }
+  prevColourClues.current = activeColourClues;
+  if (ring.current && (!colourClues.has(ring.current.clue) || guessCount > ring.current.at)) {
+    ring.current = null;
+  }
+  const ringClue = ring.current?.clue ?? null;
   const colourRefs = new Set<number>(ringClue === null ? [] : (colourClues.get(ringClue) ?? []));
   const otherColourRefs = new Set<number>([...colourRefs].filter((n) => n !== ringClue));
 

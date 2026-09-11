@@ -107,9 +107,10 @@ lose the ability to reason about the group you just learned something about.
 Both solved states own the card's *background*, so colour lives in the **number's
 own ink** — the digits are drawn in the group's colour, lifted for the dark
 ground, in all three states. The guess modal draws its number the same way, and
-a clue naming a colour group rings that group's cards in their colour — only one
-group is ringed at a time, the newest such clue's, because a ring covers a whole
-group where the number halo marks single cards and can stack.
+a clue naming a colour group rings that group's cards in their colour. That ring
+is a reveal, not a state: it lasts from the clue coming up until the next guess.
+A ring covers a whole group, where the number halo marks single cards and can
+stack, so a standing ring is most of the board most of the time.
 
 *Superseded:* colour was a plain band across the top of the card until the ink
 proved enough on its own; the band and its 14px strip are gone, and so is the
