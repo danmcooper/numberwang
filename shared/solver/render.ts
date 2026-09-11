@@ -16,8 +16,8 @@ const colourN = (c: string) => `#COLOURN:${c}`;
 /**
  * How much the renderer says beyond what the source site says.
  *
- * `colourTotals` turns "Exactly 1 cook has an not_numberwang directly below them"
- * into "Exactly 1 of 3 cooks has …". The source never states the total, which is
+ * `colourTotals` turns "Exactly 1 teal card has a Not Numberwang card below it"
+ * into "Exactly 1 of 3 teal cards has …". The source never states the total, which is
  * fine on its 4x5 board where you can count five cooks at a glance and less fine
  * on a 7x7 with twenty-one colours. Off by default so that `render` stays a
  * claim about what the source would write, which is what the archive fidelity
@@ -126,10 +126,13 @@ export function where(u: Unit): string {
  * `odd_number_of_traits_in_unit` already does inline.
  */
 export function unitPhrase(u: Unit): string {
-  return u.kind === 'colour' ? `among ${colours(u.name)}` : where(u);
+  // The article is written here rather than carried by #COLOURS, because every
+  // other site wants the bare noun: "more Numberwang orange cards", "2 orange
+  // cards have …".
+  return u.kind === 'colour' ? `among the ${colours(u.name)}` : where(u);
 }
 
-/** Locative phrase used after "Only one person …": corners read "in a corner". */
+/** Locative phrase used after "Only one card …": corners read "in a corner". */
 export function wherePerson(u: Unit): string {
   return u.kind === 'corner' ? 'in a corner' : where(u);
 }
@@ -191,13 +194,13 @@ function pairOfSameKind<U extends Unit>(u1: U, u2: Unit): asserts u2 is U {
   }
 }
 
-/** Subject phrase for direction clues: "3 persons on the edges" / "2 #COLOURS:cook". */
+/** Subject phrase for direction clues: "3 cards on the edges" / "2 #COLOURS:teal". */
 function dirSubject(u: Unit, n: number, o: RenderOptions): string {
   if (u.kind === 'colour') {
     if (o.colourTotals) return `Exactly ${n} of ${colourN(u.name)}`;
     return n === 1 ? `Only one ${colour(u.name)}` : `${n} ${colours(u.name)}`;
   }
-  return n === 1 ? `Only one person ${wherePerson(u)}` : `${n} persons ${wherePerson(u)}`;
+  return n === 1 ? `Only one card ${wherePerson(u)}` : `${n} cards ${wherePerson(u)}`;
 }
 
 /**
@@ -516,7 +519,7 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     const n = argNum(a, 2);
     const head =
       u.kind !== 'colour'
-        ? `Only one person ${wherePerson(u)}`
+        ? `Only one card ${wherePerson(u)}`
         : o.colourTotals
           ? `Exactly 1 of ${colourN(u.name)}`
           : `Only one ${colour(u.name)}`;

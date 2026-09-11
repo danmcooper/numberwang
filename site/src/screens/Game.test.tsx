@@ -436,20 +436,20 @@ describe('timer under a minute', () => {
 });
 
 describe('consumed clues', () => {
-  it('clicking a clue dims it and drops name emphasis; clicking again restores', async () => {
+  it('clicking a clue dims it and drops number emphasis; clicking again restores', async () => {
     const user = userEvent.setup();
     await renderGame();
     await user.click(screen.getByText('1'));
     await user.click(screen.getByRole('button', { name: 'Numberwang' }));
     const card = screen.getAllByRole('group')[1];
-    // Active clue: its own card name is emphasized.
-    expect(card.querySelector('.card-name')?.className).toContain('referenced');
+    // Active clue: its own card number is emphasized.
+    expect(card.querySelector('.card-number')?.className).toContain('referenced');
     await user.click(screen.getByText('Clue of me'));
     expect(card.className).toContain('consumed');
-    expect(card.querySelector('.card-name')?.className).not.toContain('referenced');
+    expect(card.querySelector('.card-number')?.className).not.toContain('referenced');
     await user.click(screen.getByText('Clue of me'));
     expect(card.className).not.toContain('consumed');
-    expect(card.querySelector('.card-name')?.className).toContain('referenced');
+    expect(card.querySelector('.card-number')?.className).toContain('referenced');
   });
 });
 
@@ -665,14 +665,14 @@ describe('seconds preference', () => {
 });
 
 describe('correct-guess animation', () => {
-  it('pops a Correct! speech bubble on the freshly flipped card only', async () => {
+  it('pops a solve speech bubble on the freshly flipped card only', async () => {
     const user = userEvent.setup();
     await renderGame();
     expect(document.querySelector('.speech-bubble')).toBeNull(); // none on initial reveals
     await user.click(screen.getByText('1'));
     await user.click(screen.getByRole('button', { name: 'Numberwang' }));
     const cards = screen.getAllByRole('group');
-    expect(cards[1].querySelector('.speech-bubble')?.textContent).toBe('Correct!');
+    expect(cards[1].querySelector('.speech-bubble')?.textContent).toBe("That's Numberwang!");
     expect(cards[0].querySelector('.speech-bubble')).toBeNull();
   });
 
@@ -683,7 +683,7 @@ describe('correct-guess animation', () => {
     );
     render(<Game slug="2026-07-07" />);
     const cards = await screen.findAllByRole('group');
-    expect(cards[1].querySelector('.speech-bubble')?.textContent).toBe('Correct!');
+    expect(cards[1].querySelector('.speech-bubble')?.textContent).toBe("That's Numberwang!");
     expect(cards[0].querySelector('.speech-bubble')).toBeNull(); // initial reveal, not a guess
   });
 
@@ -699,7 +699,7 @@ describe('correct-guess animation', () => {
     await user.click(screen.getByRole('button', { name: 'Pause' }));
     await user.click(screen.getByRole('button', { name: 'Unpause' }));
     const cards = screen.getAllByRole('group');
-    expect(cards[1].querySelector('.speech-bubble')?.textContent).toBe('Correct!');
+    expect(cards[1].querySelector('.speech-bubble')?.textContent).toBe("That's Numberwang!");
   });
 });
 
@@ -876,12 +876,12 @@ describe('reference bounce animation', () => {
     await user.click(screen.getByText('1'));
     await user.click(screen.getByRole('button', { name: 'Numberwang' }));
     const cards = screen.getAllByRole('group');
-    const oneName = cards[1].querySelector('.card-name');
-    const fourName = cards[2].querySelector('.card-name');
-    expect(oneName?.className).toContain('referenced');
-    expect(oneName?.className).not.toContain('bounce'); // the clue's own card: no bounce
-    expect(fourName?.className).toContain('referenced');
-    expect(fourName?.className).toContain('bounce'); // the referenced card: bounces
+    const oneNumber = cards[1].querySelector('.card-number');
+    const fourNumber = cards[2].querySelector('.card-number');
+    expect(oneNumber?.className).toContain('referenced');
+    expect(oneNumber?.className).not.toContain('bounce'); // the clue's own card: no bounce
+    expect(fourNumber?.className).toContain('referenced');
+    expect(fourNumber?.className).toContain('bounce'); // the referenced card: bounces
   });
 
   it('does not replay the bounce for a reference that was already active on load', async () => {
@@ -891,9 +891,9 @@ describe('reference bounce animation', () => {
     );
     render(<Game slug="2026-07-07" />);
     const cards = await screen.findAllByRole('group');
-    const fourName = cards[2].querySelector('.card-name');
-    expect(fourName?.className).toContain('referenced'); // still statically highlighted
-    expect(fourName?.className).not.toContain('bounce'); // no replay on refresh
+    const fourNumber = cards[2].querySelector('.card-number');
+    expect(fourNumber?.className).toContain('referenced'); // still statically highlighted
+    expect(fourNumber?.className).not.toContain('bounce'); // no replay on refresh
   });
 
   it('bounces again when the clue is hidden and unhidden', async () => {
@@ -903,10 +903,10 @@ describe('reference bounce animation', () => {
     await user.click(screen.getByRole('button', { name: 'Numberwang' }));
     await user.click(screen.getByText('Clue about 4'));
     let cards = screen.getAllByRole('group');
-    expect(cards[2].querySelector('.card-name')?.className).not.toContain('referenced');
+    expect(cards[2].querySelector('.card-number')?.className).not.toContain('referenced');
     await user.click(screen.getByText('Clue about 4'));
     cards = screen.getAllByRole('group');
-    expect(cards[2].querySelector('.card-name')?.className).toContain('bounce');
+    expect(cards[2].querySelector('.card-number')?.className).toContain('bounce');
   });
 });
 

@@ -35,7 +35,7 @@ function prepass(clue: string, self: number | undefined): string {
   return s;
 }
 
-function nameRef(props: ClueTextProps, index: number): string {
+function numberRef(props: ClueTextProps, index: number): string {
   if (index === props.selfIndex) return 'me';
   return String(props.people[index].number);
 }
@@ -62,50 +62,54 @@ function betweenParts(
   const refs = (...indices: number[]) => indices.filter((i) => i !== props.selfIndex);
   if (sameRow) {
     if (loCol === 0 && hiCol === width - 1) return { text: `in row ${loRow + 1}`, refs: [] };
-    if (loCol === 0) return { text: `to the left of ${nameRef(props, after)}`, refs: refs(after) };
+    if (loCol === 0) return { text: `to the left of ${numberRef(props, after)}`, refs: refs(after) };
     if (hiCol === width - 1) {
-      return { text: `to the right of ${nameRef(props, before)}`, refs: refs(before) };
+      return { text: `to the right of ${numberRef(props, before)}`, refs: refs(before) };
     }
   } else {
     if (loRow === 0 && hiRow === height - 1) {
       return { text: `in column ${columnLetter(loCol)}`, refs: [] };
     }
-    if (loRow === 0) return { text: `above ${nameRef(props, after)}`, refs: refs(after) };
-    if (hiRow === height - 1) return { text: `below ${nameRef(props, before)}`, refs: refs(before) };
+    if (loRow === 0) return { text: `above ${numberRef(props, after)}`, refs: refs(after) };
+    if (hiRow === height - 1) return { text: `below ${numberRef(props, before)}`, refs: refs(before) };
   }
   if (props.selfIndex === before) {
-    return { text: `in between ${nameRef(props, after)} and me`, refs: refs(after) };
+    return { text: `in between ${numberRef(props, after)} and me`, refs: refs(after) };
   }
   if (props.selfIndex === after) {
-    return { text: `in between ${nameRef(props, before)} and me`, refs: refs(before) };
+    return { text: `in between ${numberRef(props, before)} and me`, refs: refs(before) };
   }
   return {
-    text: `in between ${nameRef(props, before)} and ${nameRef(props, after)}`,
+    text: `in between ${numberRef(props, before)} and ${numberRef(props, after)}`,
     refs: refs(before, after),
   };
 }
 
-/** Cards a clue mentions (by name, boundary phrase, or colour), excluding the clue's own card. */
+/** Cards a clue mentions (by number, boundary phrase, or colour group),
+ * excluding the clue's own card. */
 export function clueReferencedIndices(
   clue: string,
   people: Person[],
   width: number,
   selfIndex: number,
-): { names: number[]; profs: number[] } {
-  const names = new Set<number>();
-  const profs = new Set<number>();
+): { numbers: number[]; colours: number[] } {
+  const numbers = new Set<number>();
+  const colours = new Set<number>();
   for (const seg of tokenizeClue(clue)) {
     if (seg.kind === 'name') {
-      if (seg.index !== selfIndex && people[seg.index]) names.add(seg.index);
-    } else if (seg.kind === 'prof') {
+      if (seg.index !== selfIndex && people[seg.index]) numbers.add(seg.index);
+    } else if (seg.kind === 'colour') {
       people.forEach((p, i) => {
-        if (p.colour === seg.word) profs.add(i);
+        if (p.colour === seg.word) colours.add(i);
       });
     } else if (seg.kind === 'between') {
-      betweenParts(seg, { clue, people, width, selfIndex })?.refs.forEach((i) => names.add(i));
+      betweenParts(seg, { clue, people, width, selfIndex })?.refs.forEach((i) => numbers.add(i));
     }
   }
-  return { names: [...names].sort((a, b) => a - b), profs: [...profs].sort((a, b) => a - b) };
+  return {
+    numbers: [...numbers].sort((a, b) => a - b),
+    colours: [...colours].sort((a, b) => a - b),
+  };
 }
 
 function rawToken(seg: ClueSegment): string {
@@ -127,18 +131,24 @@ function segmentText(seg: ClueSegment, props: ClueTextProps): string {
     case 'name': {
       const p = props.people[seg.index];
       if (!p) return rawToken(seg);
-      const name = String(p.number);
-      return seg.possessive ? `${name}'s` : name;
+      const n = String(p.number);
+      // A number never ends in "s", so the possessive is always "'s".
+      return seg.possessive ? `${n}'s` : n;
     }
-    case 'prof': {
-      // A counted colour takes its number from the board, and its plural from
-      // that number rather than from the token — a cast of one reads "1 cook".
+    case 'colour': {
+      // A counted group takes its number from the board, and its plural from
+      // that number rather than from the token — a group of one reads "1 pink
+      // card".
       const n = seg.counted
         ? props.people.filter((p) => p.colour === seg.word).length
         : null;
       const plural = n === null ? seg.plural : n !== 1;
-      const word = plural ? (seg.word === 'witch' ? 'witches' : `${seg.word}s`) : seg.word;
-      return n === null ? word : `${n} ${word}`;
+      const noun = plural ? 'cards' : 'card';
+      // Never an article: the clue text around the token supplies one where it
+      // wants one ("among the teal cards"), and most phrasings do not
+      // ("more Numberwang teal cards than …", "2 teal cards have …").
+      if (n !== null) return `${n} ${seg.word} ${noun}`;
+      return `${seg.word} ${noun}`;
     }
     case 'column':
       // #C:n is 1-based ("column #C:1" is column A); the word "column" is in the source text.

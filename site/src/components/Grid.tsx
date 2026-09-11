@@ -29,42 +29,45 @@ export default function Grid({
   onPickMark,
   onToggleClue,
 }: GridProps) {
-  // Every active (flipped, unconsumed) clue emphasizes its own card's name
-  // plus the names/colours it mentions.
-  const nameRefs = new Set<number>();
-  const profRefs = new Set<number>();
+  // Every active (flipped, unconsumed) clue emphasizes its own card's number
+  // plus the numbers/colours it mentions.
+  const numberRefs = new Set<number>();
+  const colourRefs = new Set<number>();
   // Subset of the above excluding the clue's own card: only these are
   // eligible for the reveal bounce (the card a player just clicked doesn't
   // need to bounce at itself).
-  const otherNameRefs = new Set<number>();
-  const otherProfRefs = new Set<number>();
+  const otherNumberRefs = new Set<number>();
+  const otherColourRefs = new Set<number>();
   puzzle.people.forEach((person, i) => {
     if (!person.clue || !state.flipped.includes(i) || state.consumed.includes(i)) return;
-    nameRefs.add(i);
+    numberRefs.add(i);
     const refs = clueReferencedIndices(person.clue, puzzle.people, puzzle.width, i);
-    refs.names.forEach((n) => {
-      nameRefs.add(n);
-      if (n !== i) otherNameRefs.add(n);
+    refs.numbers.forEach((n) => {
+      numberRefs.add(n);
+      if (n !== i) otherNumberRefs.add(n);
     });
-    refs.profs.forEach((n) => {
-      profRefs.add(n);
-      if (n !== i) otherProfRefs.add(n);
+    refs.colours.forEach((n) => {
+      colourRefs.add(n);
+      if (n !== i) otherColourRefs.add(n);
     });
   });
 
   // Bounce animation plays only for cards newly emphasized by an unhidden
   // clue (a fresh flip or un-consuming), never on the initial mount (so a
   // refresh doesn't replay it for clues that were already active).
-  const prevOtherRefs = useRef<{ names: Set<number>; profs: Set<number> } | null>(null);
-  const [bounceNames, setBounceNames] = useState<Set<number>>(new Set());
-  const [bounceProfs, setBounceProfs] = useState<Set<number>>(new Set());
+  const prevOtherRefs = useRef<{ numbers: Set<number>; colours: Set<number> } | null>(null);
+  const [bounceNumbers, setBounceNumbers] = useState<Set<number>>(new Set());
+  const [bounceColours, setBounceColours] = useState<Set<number>>(new Set());
   useEffect(() => {
     const prev = prevOtherRefs.current;
     if (prev) {
-      setBounceNames(new Set([...otherNameRefs].filter((i) => !prev.names.has(i))));
-      setBounceProfs(new Set([...otherProfRefs].filter((i) => !prev.profs.has(i))));
+      setBounceNumbers(new Set([...otherNumberRefs].filter((i) => !prev.numbers.has(i))));
+      setBounceColours(new Set([...otherColourRefs].filter((i) => !prev.colours.has(i))));
     }
-    prevOtherRefs.current = { names: new Set(otherNameRefs), profs: new Set(otherProfRefs) };
+    prevOtherRefs.current = {
+      numbers: new Set(otherNumberRefs),
+      colours: new Set(otherColourRefs),
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.flipped, state.consumed]);
 
@@ -91,10 +94,10 @@ export default function Grid({
             !state.flipped.includes(i) &&
             (state.hint?.reveals.includes(i) ?? false)
           }
-          nameReferenced={nameRefs.has(i)}
-          profReferenced={profRefs.has(i)}
-          nameBounce={bounceNames.has(i) && otherNameRefs.has(i)}
-          profBounce={bounceProfs.has(i) && otherProfRefs.has(i)}
+          numberReferenced={numberRefs.has(i)}
+          colourReferenced={colourRefs.has(i)}
+          numberBounce={bounceNumbers.has(i) && otherNumberRefs.has(i)}
+          colourBounce={bounceColours.has(i) && otherColourRefs.has(i)}
           clueNode={
             person.clue ? (
               <ClueText

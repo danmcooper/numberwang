@@ -844,7 +844,7 @@ The clue is the game. This task is what turns `The Numberwang cards among
 - Consumes: the token table in **The Contract With The Generator**
 - Produces: `ClueSegment` variant `{ kind: 'colour'; word: string; plural: boolean; counted: boolean }`; `clueReferencedIndices(clue, people, width, selfIndex): { numbers: number[]; colours: number[] }`
 
-- [ ] **Step 1: Write the failing tokenizer tests**
+- [x] **Step 1: Write the failing tokenizer tests**
 
 Add to `site/src/clue/tokenize.test.ts`:
 
@@ -878,12 +878,12 @@ it('keeps parsing names, columns and ranges', () => {
 });
 ```
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `npx vitest run site/src/clue/tokenize.test.ts`
 Expected: FAIL — `#COLOUR:teal` falls through to the raw-text fallback.
 
-- [ ] **Step 3: Teach the tokenizer the colour tokens**
+- [x] **Step 3: Teach the tokenizer the colour tokens**
 
 In `tokenize.ts`, replace the `prof` segment variant and its cases:
 
@@ -908,12 +908,12 @@ In `tokenize.ts`, replace the `prof` segment variant and its cases:
 The `TOKEN` regex is `/#([A-Z]+)(?::(pair\(\d+,\d+\)|\w+))?/g` and needs no
 change; `COLOURN` matches `[A-Z]+` already.
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `npx vitest run site/src/clue/tokenize.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Write the failing `ClueText` tests**
+- [x] **Step 5: Write the failing `ClueText` tests**
 
 `ClueText.test.tsx` already has a `renderClue(clue, opts)` helper returning the
 container's text, and Task 1 rewrote its `person` helper. Add a board whose
@@ -992,13 +992,13 @@ describe('clueReferencedIndices with colours', () => {
 
 The tests already in this file, which Task 1 renamed to numbers, stay as they are.
 
-- [ ] **Step 6: Run them to verify they fail**
+- [x] **Step 6: Run them to verify they fail**
 
 Run: `npx vitest run site/src/clue/ClueText.test.tsx`
 Expected: FAIL — the `prof` segment kind is gone, `clueReferencedIndices` still
 returns `{ names, profs }`, and `capitalize` is being applied to a number.
 
-- [ ] **Step 7: Rework `ClueText.tsx`**
+- [x] **Step 7: Rework `ClueText.tsx`**
 
 Four changes.
 
@@ -1075,12 +1075,12 @@ sketch's own register — and it works on `#NAME:` tokens, which still exist. Th
 one thing to check is its `capitalize` of the finished clue: `'17 is …'` is
 unchanged by it, so it stays.
 
-- [ ] **Step 8: Run them to verify they pass**
+- [x] **Step 8: Run them to verify they pass**
 
 Run: `npx vitest run site/src/clue/ClueText.test.tsx`
 Expected: PASS
 
-- [ ] **Step 9: Rewire `Grid.tsx`**
+- [x] **Step 9: Rewire `Grid.tsx`**
 
 Rename its four sets and pass the renamed props through:
 
@@ -1117,12 +1117,12 @@ Rename the two `useState` sets and the `prevOtherRefs` ref fields to match. The
 bounce logic itself — never on mount, only for newly emphasized cards — is
 unchanged and still correct.
 
-- [ ] **Step 10: Run the whole suite**
+- [x] **Step 10: Run the whole suite**
 
 Run: `npx tsc --noEmit && npm test`
 Expected: PASS
 
-- [ ] **Step 11: Read the clues on a real board**
+- [x] **Step 11: Read the clues on a real board**
 
 Run: `npm run dev` and solve most of a board. Read every clue that appears out
 loud. Expected: complete English sentences, no `#` anywhere on screen, the
@@ -1136,7 +1136,7 @@ If a board has none, generate a few more dates and check one that does — the
 counted token only appears when the generator turns `colourTotals` on for a clue
 that names one group.
 
-- [ ] **Step 12: Commit**
+- [x] **Step 12: Commit**
 
 ```bash
 git add -A

@@ -325,11 +325,11 @@ describe('adjacency and direction clue templates', () => {
   });
   it('only_one_person_in_unit_has_exactly_n_trait_neighbors', () => {
     expect(r('only_one_person_in_unit_has_exactly_n_trait_neighbors(unit(row,2),not_numberwang,3)')).toBe(
-      'Only one person in row 2 has exactly 3 Not Numberwang neighbors',
+      'Only one card in row 2 has exactly 3 Not Numberwang neighbors',
     );
     expect(
       r('only_one_person_in_unit_has_exactly_n_trait_neighbors(unit(corner,void),numberwang,0)'),
-    ).toBe('Only one person in a corner has no Numberwang neighbors');
+    ).toBe('Only one card in a corner has no Numberwang neighbors');
     expect(
       r('only_one_person_in_unit_has_exactly_n_trait_neighbors(unit(colour,mech),numberwang,2)'),
     ).toBe('Only one #COLOUR:mech has exactly 2 Numberwang neighbors');
@@ -339,10 +339,10 @@ describe('adjacency and direction clue templates', () => {
       'Only one #COLOUR:cook has a Numberwang card directly to the right of them',
     );
     expect(r('n_in_unit_have_trait_in_dir(unit(corner,void),numberwang,0,1,2)')).toBe(
-      '2 persons in a corner have a Numberwang card directly below them',
+      '2 cards in a corner have a Numberwang card directly below them',
     );
     expect(r('n_in_unit_have_trait_in_dir(unit(edge,void),numberwang,0,-1,3)')).toBe(
-      '3 persons on the edges have a Numberwang card directly above them',
+      '3 cards on the edges have a Numberwang card directly above them',
     );
     expect(r('n_in_unit_have_trait_in_dir(unit(colour,builder),not_numberwang,0,-1,2)')).toBe(
       '2 #COLOURS:builder have a Not Numberwang card directly above them',
@@ -463,13 +463,13 @@ describe('arithmetic clue text', () => {
 
   it('renders a sum over a colour group as a token the app expands', () => {
     expect(say('sum_of_trait_in_unit(unit(colour,teal),numberwang,12)')).toBe(
-      'The Numberwang cards among #COLOURS:teal add to 12',
+      'The Numberwang cards among the #COLOURS:teal add to 12',
     );
   });
 
   it('renders a pair difference', () => {
     expect(say('diff_of_two_traits_in_unit(unit(colour,teal),numberwang,6)')).toBe(
-      'Two Numberwang cards among #COLOURS:teal subtract to 6',
+      'Two Numberwang cards among the #COLOURS:teal subtract to 6',
     );
   });
 
@@ -518,7 +518,7 @@ describe('arithmetic clue text', () => {
 
   it('names the divisor, and the colour group as a token', () => {
     expect(say('n_traits_in_unit_are_divisible(unit(colour,teal),not_numberwang,3,2)')).toBe(
-      '2 of the Not Numberwang cards among #COLOURS:teal are divisible by 3',
+      '2 of the Not Numberwang cards among the #COLOURS:teal are divisible by 3',
     );
   });
 

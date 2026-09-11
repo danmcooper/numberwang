@@ -1,8 +1,9 @@
 export type ClueSegment =
   | { kind: 'text'; text: string }
   | { kind: 'name'; index: number; possessive: boolean }
-  /** `counted` prefixes the colour's whole cast: "3 cooks" rather than "cooks". */
-  | { kind: 'prof'; word: string; plural: boolean; counted: boolean }
+  /** `counted` prefixes the group's whole size: "3 teal cards" rather than
+   * "teal cards". */
+  | { kind: 'colour'; word: string; plural: boolean; counted: boolean }
   | { kind: 'column'; column: number }
   | { kind: 'between'; a: number; b: number };
 
@@ -15,14 +16,14 @@ function parseToken(tag: string, arg: string | undefined): ClueSegment | null {
       if (arg === undefined || !/^\d+$/.test(arg)) return null;
       return { kind: 'name', index: Number(arg), possessive: tag === 'NAMES' };
     }
-    // #PROFN is ours, not the source's: "Exactly 1 of #PROFN:cook has …" reads as
-    // "Exactly 1 of 3 cooks has …". The count comes from the board, so only the
-    // site can fill it in — see RenderOptions.colourTotals.
-    case 'PROF':
-    case 'PROFS':
-    case 'PROFN': {
+    // #COLOURN is ours, not the source's: "Exactly 1 of #COLOURN:teal has …"
+    // reads as "Exactly 1 of 3 teal cards has …". The count comes from the
+    // board, so only the site can fill it in — see RenderOptions.colourTotals.
+    case 'COLOUR':
+    case 'COLOURS':
+    case 'COLOURN': {
       if (arg === undefined || /^\d/.test(arg)) return null;
-      return { kind: 'prof', word: arg, plural: tag !== 'PROF', counted: tag === 'PROFN' };
+      return { kind: 'colour', word: arg, plural: tag !== 'COLOUR', counted: tag === 'COLOURN' };
     }
     case 'C': {
       if (arg === undefined || !/^\d+$/.test(arg)) return null;

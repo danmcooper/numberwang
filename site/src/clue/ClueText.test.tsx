@@ -45,33 +45,6 @@ describe('ClueText', () => {
     expect(renderClue('#NAME:1 and #NAME:0 are cousins', { selfIndex: 1 })).toBe('1 and I are cousins');
   });
 
-  it('renders colours, pluralizing witch specially', () => {
-    expect(renderClue('The #PROF:coder saw two #PROFS:witch', { people, width: 3 })).toBe(
-      'The coder saw two witches',
-    );
-  });
-
-  // #PROFN carries no number of its own — the renderer cannot know one, because
-  // it works from the hint and never sees the board. Counting the cast is the
-  // site's job, which is the whole reason the token exists.
-  it('counts the cast for a #PROFN colour', () => {
-    const cast = [person(1, 'cook'), person(2, 'cook'), person(3, 'chef'),
-      person(4, 'cook')];
-    expect(renderClue('exactly 1 of #PROFN:cook has an not_numberwang below them', {
-      people: cast, width: 2,
-    })).toBe('Exactly 1 of 3 cooks has an not_numberwang below them');
-  });
-
-  // Plural from the count rather than from the token: a cast of one is "1 chef",
-  // not "1 chefs". Nothing else can decide this, since the renderer wrote the
-  // token before anyone had counted.
-  it('reads a cast of one as singular', () => {
-    const cast = [person(1, 'cook'), person(2, 'chef')];
-    expect(renderClue('exactly 1 of #PROFN:chef has an not_numberwang below them', {
-      people: cast, width: 2,
-    })).toBe('Exactly 1 of 1 chef has an not_numberwang below them');
-  });
-
   it('renders 1-based #C column tokens as letters', () => {
     // Real data: card 8's "There is only one numberwang in column #C:1" renders as column A.
     expect(renderClue('There is only one numberwang in column #C:1')).toBe(
@@ -134,20 +107,96 @@ describe('ClueText', () => {
 });
 
 describe('clueReferencedIndices', () => {
-  it('collects name, colour, and between-boundary references, excluding self', () => {
+  it('collects number, colour, and between-boundary references, excluding self', () => {
     const refs = clueReferencedIndices(
-      'The #PROF:red saw #NAME:2 and #NAME:9 #BETWEEN:pair(0,4)',
-      grid.map((p, i) => (i === 2 ? { ...p, colour: 'cook' } : p)),
+      'The #COLOUR:red saw #NAME:2 and #NAME:9 #BETWEEN:pair(0,4)',
+      grid.map((p, i) => (i === 2 ? { ...p, colour: 'teal' } : p)),
       4,
       9,
     );
     // #NAME:9 is self (excluded); pair(0,4) touches the top so it references card 8.
-    expect(refs.names).toEqual([2, 8]);
-    // every red card (all but index 2, which we made a cook)
-    expect(refs.profs).toEqual(grid.map((_, i) => i).filter((i) => i !== 2));
+    expect(refs.numbers).toEqual([2, 8]);
+    // every red card (all but index 2, which we made teal)
+    expect(refs.colours).toEqual(grid.map((_, i) => i).filter((i) => i !== 2));
   });
 
   it('returns nothing for flavor clues', () => {
-    expect(clueReferencedIndices('Nothing to see here', grid, 4, 0)).toEqual({ names: [], profs: [] });
+    expect(clueReferencedIndices('Nothing to see here', grid, 4, 0)).toEqual({
+      numbers: [],
+      colours: [],
+    });
+  });
+});
+
+// Cards 0..3 are row 1. Groups: teal x3, red x2, blue x2, pink x1.
+const board = [
+  person(17, 'red'), person(4, 'teal'), person(23, 'teal'), person(8, 'blue'),
+  person(9, 'teal'), person(31, 'red'), person(12, 'blue'), person(26, 'pink'),
+];
+const say = (clue: string, selfIndex?: number) =>
+  renderClue(clue, { people: board, width: 4, selfIndex });
+
+describe('numbers and colours', () => {
+  it('renders a card reference as its number', () => {
+    expect(say('#NAME:0 is Numberwang')).toBe('17 is Numberwang');
+  });
+
+  it('renders a possessive reference', () => {
+    expect(say('#NAMES:2 neighbors are Numberwang')).toBe("23's neighbors are Numberwang");
+  });
+
+  it('renders a singular colour reference', () => {
+    expect(say('Only one #COLOUR:teal is Numberwang')).toBe('Only one teal card is Numberwang');
+  });
+
+  it('renders a plural colour reference as a bare noun phrase', () => {
+    // The generator writes the article itself where a phrase wants one, so the
+    // token expands to "teal cards" and never "the teal cards".
+    expect(say('The Numberwang cards among the #COLOURS:teal add to 12')).toBe(
+      'The Numberwang cards among the teal cards add to 12',
+    );
+    expect(say('There are more Numberwang #COLOURS:teal than Numberwang #COLOURS:blue')).toBe(
+      'There are more Numberwang teal cards than Numberwang blue cards',
+    );
+  });
+
+  it('counts the group for a #COLOURN reference', () => {
+    expect(say('Exactly 1 of #COLOURN:teal has a Numberwang neighbor')).toBe(
+      'Exactly 1 of 3 teal cards has a Numberwang neighbor',
+    );
+  });
+
+  it('says "card" not "cards" for a group of one', () => {
+    expect(say('Exactly 1 of #COLOURN:pink is Numberwang')).toBe(
+      'Exactly 1 of 1 pink card is Numberwang',
+    );
+  });
+
+  it('expands a column token to its letter', () => {
+    expect(say('The Numberwang cards in column #C:2 add to an even number')).toBe(
+      'The Numberwang cards in column B add to an even number',
+    );
+  });
+
+  it('speaks in the first person on its own card', () => {
+    expect(say('#NAME:0 is Numberwang', 0)).toBe('I am Numberwang');
+    expect(say('#NAME:1 and #NAME:0 are Numberwang', 0)).toBe('4 and I are Numberwang');
+    expect(say('#NAMES:0 neighbors are Numberwang', 0)).toBe('My neighbors are Numberwang');
+  });
+
+  it('leaves an unknown token as raw text rather than dropping the clue', () => {
+    expect(say('#WHAT:5 is Numberwang')).toBe('#WHAT:5 is Numberwang');
+  });
+});
+
+describe('clueReferencedIndices with colours', () => {
+  it('reports the cards a clue names and the cards its colour groups hold', () => {
+    const refs = clueReferencedIndices('#NAME:3 and #COLOURS:teal', board, 4, 0);
+    expect(refs.numbers).toEqual([3]);
+    expect(refs.colours).toEqual([1, 2, 4]);
+  });
+
+  it("excludes the clue's own card from the named set", () => {
+    expect(clueReferencedIndices('#NAME:0 and #NAME:3', board, 4, 0).numbers).toEqual([3]);
   });
 });

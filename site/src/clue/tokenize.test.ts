@@ -19,11 +19,11 @@ describe('tokenizeClue', () => {
   });
 
   it('tokenizes colours, columns, and between-pairs', () => {
-    expect(tokenizeClue('The #PROF:coder and two #PROFS:chef in #C:2')).toEqual([
+    expect(tokenizeClue('The #COLOUR:teal and two #COLOURS:red in #C:2')).toEqual([
       { kind: 'text', text: 'The ' },
-      { kind: 'prof', word: 'coder', plural: false, counted: false },
+      { kind: 'colour', word: 'teal', plural: false, counted: false },
       { kind: 'text', text: ' and two ' },
-      { kind: 'prof', word: 'chef', plural: true, counted: false },
+      { kind: 'colour', word: 'red', plural: true, counted: false },
       { kind: 'text', text: ' in ' },
       { kind: 'column', column: 2 },
     ]);
@@ -33,14 +33,42 @@ describe('tokenizeClue', () => {
     ]);
   });
 
-  // #PROFN is ours rather than the source's: the renderer emits it when a clue
-  // counts one colour's members, and only the site can say how many there
+  // #COLOURN is ours rather than the source's: the renderer emits it when a clue
+  // counts one colour group's members, and only the site can say how many there
   // are, because only the site has the board.
-  it('marks a #PROFN colour as counted so the site fills in the total', () => {
-    expect(tokenizeClue('Exactly 1 of #PROFN:cook has')).toEqual([
+  it('marks a #COLOURN colour as counted so the site fills in the total', () => {
+    expect(tokenizeClue('Exactly 1 of #COLOURN:teal has')).toEqual([
       { kind: 'text', text: 'Exactly 1 of ' },
-      { kind: 'prof', word: 'cook', plural: true, counted: true },
+      { kind: 'colour', word: 'teal', plural: true, counted: true },
       { kind: 'text', text: ' has' },
+    ]);
+  });
+
+  it('parses the three colour tokens', () => {
+    expect(tokenizeClue('#COLOUR:teal')).toEqual([
+      { kind: 'colour', word: 'teal', plural: false, counted: false },
+    ]);
+    expect(tokenizeClue('#COLOURS:teal')).toEqual([
+      { kind: 'colour', word: 'teal', plural: true, counted: false },
+    ]);
+    expect(tokenizeClue('#COLOURN:teal')).toEqual([
+      { kind: 'colour', word: 'teal', plural: true, counted: true },
+    ]);
+  });
+
+  it('does not parse the old profession tokens', () => {
+    expect(tokenizeClue('#PROF:cook')).toEqual([{ kind: 'text', text: '#PROF:cook' }]);
+  });
+
+  it('keeps parsing names, columns and ranges', () => {
+    expect(tokenizeClue('#NAME:3 and #NAMES:4 in column #C:2 #BETWEEN:pair(4,7)')).toEqual([
+      { kind: 'name', index: 3, possessive: false },
+      { kind: 'text', text: ' and ' },
+      { kind: 'name', index: 4, possessive: true },
+      { kind: 'text', text: ' in column ' },
+      { kind: 'column', column: 2 },
+      { kind: 'text', text: ' ' },
+      { kind: 'between', a: 4, b: 7 },
     ]);
   });
 
