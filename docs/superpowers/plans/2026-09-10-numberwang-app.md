@@ -131,7 +131,7 @@ showing raw fields, but real and clickable.
 - Consumes: `Person`, `Puzzle`, `validatePuzzle` from `shared/puzzle.ts`; `Shape` from `shared/solver/enumerate.ts`; `ManifestEntry` from `scripts/manifest.mts`
 - Produces: `Guess = 'numberwang' | 'not_numberwang'`; `parseHash(hash: string): Route` with `Route = { screen: 'archive' } | { screen: 'play'; slug: string }`; local-storage keys prefixed `nw:`
 
-- [ ] **Step 1: Copy the app in**
+- [x] **Step 1: Copy the app in**
 
 ```bash
 cd /Users/dan/code/numberwang
@@ -144,7 +144,7 @@ cp /Users/dan/code/cbsbd/vite.config.ts ./vite.config.ts
 above found nothing at the repo root, that is correct — `site/index.html` came
 across with the rsync.
 
-- [ ] **Step 2: Restore the app scripts to `package.json`**
+- [x] **Step 2: Restore the app scripts to `package.json`**
 
 The generator plan removed these because there was nothing to serve:
 
@@ -156,7 +156,7 @@ The generator plan removed these because there was nothing to serve:
 
 Put them back above `"test"`, keeping the rest of `scripts` as it is.
 
-- [ ] **Step 3: Point `vite.config.ts` at `/numberwang/` and stop reading a deleted file**
+- [x] **Step 3: Point `vite.config.ts` at `/numberwang/` and stop reading a deleted file**
 
 The inherited config reads `config/site.json` for a UUID base path; the generator
 plan deleted that file. Replace the top of the file:
@@ -176,7 +176,7 @@ const base = '/numberwang/';
 Leave the `servePuzzles` plugin and the `defineConfig` call as they are — the
 plugin closes over `base` and needs no change.
 
-- [ ] **Step 4: Delete `faces.ts`**
+- [x] **Step 4: Delete `faces.ts`**
 
 ```bash
 rm site/src/faces.ts site/src/faces.test.ts
@@ -186,7 +186,7 @@ A profession needed a picture because "cook" is a word; a number is already a
 glyph, and the biggest thing on the card. Every `faceFor` call goes away in Tasks
 2 and 4; for now, expect the typecheck to name them.
 
-- [ ] **Step 5: Write the failing tests for the two renamed contracts**
+- [x] **Step 5: Write the failing tests for the two renamed contracts**
 
 Add to `site/src/router.test.ts`:
 
@@ -221,13 +221,13 @@ it('namespaces progress under nw:, not cbs:', () => {
 });
 ```
 
-- [ ] **Step 6: Run them to verify they fail**
+- [x] **Step 6: Run them to verify they fail**
 
 Run: `npx vitest run site/src/router.test.ts site/src/game/storage.test.ts`
 Expected: FAIL — `router.ts` still imports `VARIANTS` and `ONE_OFFS`, which no
 longer exist, so the module will not even load; `storage.ts` still writes `cbs:`.
 
-- [ ] **Step 7: Simplify `router.ts`**
+- [x] **Step 7: Simplify `router.ts`**
 
 Both alternations existed to route a *suffix* or a *name*. Neither exists now, so
 the whole mechanism collapses to a date:
@@ -256,7 +256,7 @@ export function parseHash(hash: string): Route {
 Keep the rest of the file — the route-identity helper and the `useRoute` hook —
 exactly as it is.
 
-- [ ] **Step 8: Renamespace `storage.ts`**
+- [x] **Step 8: Renamespace `storage.ts`**
 
 ```ts
 /**
@@ -278,7 +278,7 @@ grep -rn "'cbs:" site/src
 - `Archive.tsx`'s `SOURCE_KEY` (`cbs:pref:archiveSource`) — deleted, not renamed.
   It remembers a source filter that Step 11 removes.
 
-- [ ] **Step 9: Rename the trait through the game layer**
+- [x] **Step 9: Rename the trait through the game layer**
 
 ```bash
 cd /Users/dan/code/numberwang
@@ -308,7 +308,7 @@ card's look; until then the classes the TSX emits and the classes the stylesheet
 defines disagree, and the board renders unstyled cards. That is expected and the
 tests do not depend on it.
 
-- [ ] **Step 10: Give `deduce.ts` the numbers the solver now requires**
+- [x] **Step 10: Give `deduce.ts` the numbers the solver now requires**
 
 `Shape` gained a `numbers` field, and the arithmetic predicates read it. Without
 it the deduction gate silently degrades: `solvableFor` throws, the `catch` returns
@@ -327,7 +327,7 @@ it the deduction gate silently degrades: `solvableFor` throws, the `catch` retur
       },
 ```
 
-- [ ] **Step 11: Fix the remaining typecheck errors**
+- [x] **Step 11: Fix the remaining typecheck errors**
 
 Run: `npx tsc --noEmit`
 
@@ -403,13 +403,13 @@ The errors, and what each wants:
   difficulty options are scoped to the current source. They assert a distinction
   that no longer exists, so there is nothing to salvage.
 
-- [ ] **Step 12: Run the whole suite**
+- [x] **Step 12: Run the whole suite**
 
 Run: `npx tsc --noEmit && npm test`
 Expected: PASS, clean typecheck. Delete, don't weaken, any test that asserted
 something the fork removed (a face, a variant label).
 
-- [ ] **Step 13: Look at it**
+- [x] **Step 13: Look at it**
 
 ```bash
 npm run generate -- 2026-09-10 && npm run manifest && npm run dev
@@ -419,7 +419,7 @@ unstyled cards showing numbers, clickable, and a guess modal with two buttons.
 It will look wrong. Confirm it *works* — a correct call flips a card and reveals
 its clue text.
 
-- [ ] **Step 14: Commit**
+- [x] **Step 14: Commit**
 
 ```bash
 git add -A

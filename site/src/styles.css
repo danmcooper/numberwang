@@ -1,0 +1,786 @@
+/* Palette and metrics lifted from cluesbysam.com (dark theme). */
+:root {
+  --bg: #1a1d24;
+  --card-bg: #322f3b;
+  --background-highlight: #0000002c;
+  --modal-bg: #242830;
+  --text: #f3f3f3;
+  --text-muted: #a6acb8;
+  --border-neutral: #4a4b55;
+  --innocent: #58a284;
+  --criminal: #c66464;
+  --background-innocent: rgb(38, 77, 59);
+  --background-highlight-innocent: rgb(29, 64, 48);
+  --border-innocent: rgb(46, 102, 76);
+  --background-criminal: #5c2235;
+  --background-highlight-criminal: #501d2e;
+  --border-criminal: #8b2a53;
+  --overlay: rgba(26, 29, 36, 0.5);
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid var(--border-neutral);
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+a {
+  color: var(--text-muted);
+}
+
+/* Sized to whatever board it holds, then centred. A flat 420px was right while
+   every board was the source site's 4x5; a 7-wide board is 639px and simply
+   overflowed it, off to one side, because `text-align: center` centres an
+   inline-block only while it fits — past that it starts at the line's left edge
+   and spills right. `useFitBoard` keeps the board itself inside the viewport,
+   so sizing to it here cannot push anything off the screen. Everything else on
+   the screen lives inside `.board-wrap`, so nothing stretches with it. */
+.game {
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 0 1rem 1rem;
+  text-align: center;
+}
+/* Reserves the room a fitted board actually takes up on screen. `.board-wrap`
+   is scaled with a transform, which paints it smaller without shrinking its
+   box, so `useFitBoard` sets the painted size here instead — on a separate
+   element, because everything inside `.board-wrap` (the pause dim, the mark
+   pickers) is positioned against the board at its natural size. Unsized on
+   every board that is not being fitted, where it shrink-wraps and centres like
+   the wrapper it holds. */
+.board-fit {
+  width: fit-content;
+  margin: 0 auto;
+}
+/* Shrinks to the grid's width so children can align to the grid edges.
+   Top margin and small-screen scaling match the real site's breakpoints. */
+.board-wrap {
+  display: inline-block;
+  text-align: center;
+  margin-top: 4px;
+  /* Containing block for the pause dim, which covers this box rather than the
+     viewport so that the two scale together and stay in one stacking context. */
+  position: relative;
+}
+@media (min-width: 768px) {
+  .board-wrap {
+    margin-top: 50px;
+  }
+}
+/* The source site's own narrow breakpoints. Zoom is right here where it is
+   wrong in `useFitBoard`: these barely scale at all, so the smallest text on a
+   card — the 10px grid reference — still lands at 9px and clears WebKit's floor
+   for drawing text, which is the thing that rules zoom out on a board scaled to
+   two-fifths. A board wide enough for `useFitBoard` has already been fitted to
+   the viewport and overrides these from its inline style. */
+@media (max-width: 369px) {
+  .board-wrap {
+    zoom: 0.95;
+  }
+}
+@media (max-width: 344px) {
+  .board-wrap {
+    zoom: 0.9;
+  }
+}
+.archive-link {
+  text-align: left;
+  margin: 1rem 0 0;
+}
+/* Shrinks to the button row's width so the date line aligns to its edges. */
+.controls {
+  display: inline-flex;
+  flex-direction: column;
+}
+.button-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+  position: relative;
+  z-index: 16; /* stays clickable above the pause dim */
+}
+.button-row button {
+  width: 88px;
+  height: 35px;
+  padding: 5px;
+  font-family: "Chalkboard SE", "Comic Sans MS", "Comic Sans", sans-serif;
+  font-size: 0.95em;
+}
+/* Narrow square pause button; the drawn icon keeps rendering consistent
+   across platforms (emoji fonts vary, e.g. on Android). */
+.button-row .btn-pause {
+  width: 40px;
+  flex: none;
+  padding: 0;
+}
+.button-row .btn-pause svg {
+  display: block;
+  margin: 0 auto;
+}
+/* "💡Show hint" is the longest label; give it the leftover room. */
+.button-row .btn-hint {
+  width: 112px;
+}
+.date-line {
+  display: flex;
+  justify-content: space-between;
+  font-family: "Chalkboard SE", "Comic Sans MS", "Comic Sans", sans-serif;
+  font-weight: 700;
+  font-size: 1.05em;
+  margin: 0.9rem 0 0.25rem;
+}
+.timer {
+  cursor: pointer;
+  user-select: none;
+}
+.pause-overlay {
+  /* Absolute, not fixed: a scaled ancestor becomes the containing block for
+     fixed descendants too, so `fixed` would size this to a zoomed `.board-wrap`
+     on wide boards and to the viewport on narrow ones. Absolute covers the
+     wrapper either way. `.button-row` sits above it on z-index. */
+  position: absolute;
+  inset: 0;
+  /* Heavy dim: the board should be barely visible while paused. */
+  background: rgba(26, 29, 36, 0.93);
+  z-index: 15;
+}
+.reset-modal {
+  padding: 18px 0;
+}
+.reset-question {
+  font-weight: 700;
+  font-size: 1.1em;
+  margin: 6px 0;
+}
+
+.grid {
+  display: grid;
+  gap: 5px;
+  justify-content: center;
+  padding-top: 2px; /* Added by Dan */
+}
+
+.card {
+  box-sizing: border-box;
+  width: 87px;
+  height: 118px;
+  background: var(--card-bg);
+  border: 2px solid var(--border-neutral);
+  border-radius: 6px;
+  box-shadow: 0 1px 6px #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  --band: var(--background-highlight);
+  --tag-neutral: #3b3943;
+  transition: transform 0.05s linear;
+  font-family: "Chalkboard SE", "Comic Sans MS", "Comic Sans", sans-serif;
+}
+/* No mobile tap-highlight flash on cards (matches the real site). */
+.card,
+.card *,
+.timer {
+  -webkit-tap-highlight-color: transparent;
+}
+@media (hover: hover) {
+  .card:not(.flipped):hover {
+    transform: scale(0.98);
+  }
+}
+/* Corner tag: click to cycle none -> yellow -> red -> green -> none.
+   Visible triangle matches the real site (22px legs); hitbox is larger. */
+.tag {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 30px;
+  height: 30px;
+  z-index: 2;
+  cursor: pointer;
+}
+.tag::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(calc(100% - 22px) 0, 100% 0, 100% 22px);
+  /* Untagged shade follows the card state (gray/green/red on the real site). */
+  background: var(--tag-neutral);
+}
+.tag.tag-yellow::before {
+  background: #ffff54;
+}
+.tag.tag-red::before {
+  background: #ea3323;
+}
+.tag.tag-green::before {
+  background: #75fb4d;
+}
+
+/* Bottom-right corner mark: long-press opens the color picker.
+   Invisible until a color is chosen (unlike the top-right tag). */
+.mark {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 30px;
+  height: 30px;
+  z-index: 2;
+  cursor: pointer;
+}
+.mark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(calc(100% - 22px) 100%, 100% calc(100% - 22px), 100% 100%);
+}
+.mark.mark-yellow::before {
+  background: #ffff54;
+}
+.mark.mark-red::before {
+  background: #ea3323;
+}
+.mark.mark-green::before {
+  background: #75fb4d;
+}
+.mark.mark-orange::before {
+  background: #ef8e34;
+}
+.mark.mark-magenta::before {
+  background: #ea33f7;
+}
+.mark.mark-cyan::before {
+  background: #75fbfd;
+}
+
+/* Mark color picker (real site's color strip, tap-to-pick). */
+.card-container {
+  position: relative;
+}
+.tag-picker {
+  position: absolute;
+  top: 50%;
+  right: -12px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgb(51, 50, 56);
+  border: 1px solid #fff;
+  border-radius: 6px;
+  padding: 4px;
+  z-index: 30;
+  box-shadow: 0 2px 8px #000a;
+}
+.tag-swatch {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.tag-swatch.active {
+  outline: 2px solid #fff;
+}
+.tag-swatch.swatch-none {
+  background: #333238;
+}
+.tag-swatch.swatch-yellow {
+  background: #ffff54;
+}
+.tag-swatch.swatch-red {
+  background: #ea3323;
+}
+.tag-swatch.swatch-green {
+  background: #75fb4d;
+}
+.tag-swatch.swatch-orange {
+  background: #ef8e34;
+}
+.tag-swatch.swatch-magenta {
+  background: #ea33f7;
+}
+.tag-swatch.swatch-cyan {
+  background: #75fbfd;
+}
+.card.flipped {
+  cursor: default;
+  justify-content: flex-start;
+  padding-top: 5px;
+  border-width: 1px;
+  box-shadow: 0 1px 2px #000;
+}
+.card.innocent {
+  background: var(--background-innocent);
+  border-color: var(--border-innocent);
+  --band: var(--background-highlight-innocent);
+  --tag-neutral: #395446;
+  color: #fff;
+}
+.card.criminal {
+  background: var(--background-criminal);
+  border-color: var(--border-criminal);
+  --band: var(--background-highlight-criminal);
+  --tag-neutral: #5c303e;
+  color: #fff;
+}
+.card.rejected {
+  animation: shake 0.3s;
+}
+.card-pos {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  color: var(--text-muted);
+  font-size: 10px;
+  line-height: 10px;
+}
+.card-face {
+  font-size: 30px;
+  line-height: 30px;
+  margin-bottom: 3px;
+  text-shadow: 0 0 10px #aeaeae4c;
+}
+.card.flipped .card-face {
+  font-size: 17px;
+  line-height: 17px;
+  margin-bottom: 2px;
+}
+.card-name {
+  background: var(--band);
+  width: 100%;
+  padding: 0 0 3px;
+  font-size: 16px;
+  line-height: 16px;
+  font-weight: 700;
+  text-transform: capitalize;
+  opacity: 0.9;
+}
+.card.flipped .card-name {
+  font-size: 14px;
+  line-height: 14px;
+}
+.card-prof {
+  font-size: 11px;
+  line-height: 11px;
+  opacity: 0.7;
+  /* margin-top: 3px; */
+}
+.card-clue {
+  font-size: 11px;
+  line-height: 0.9;
+  opacity: 0.87;
+  padding: 0 2px;
+  margin: auto 0;
+  cursor: pointer;
+  transition: opacity 0.1s ease-in-out;
+}
+.card.consumed .card-clue {
+  opacity: 0.2;
+}
+/* Cards mentioned by an active clue get the real site's emphasis. The bounce
+   itself only plays when a clue newly reveals the reference (see .bounce). */
+.card-name.referenced {
+  opacity: 1;
+}
+.card-prof.referenced {
+  opacity: 0.95;
+  font-weight: 700;
+}
+.card-name.bounce,
+.card-prof.bounce {
+  animation: bounce-ref 0.27s ease-in-out;
+}
+@keyframes bounce-ref {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-1px) scale(1.35);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+/* Completion: the board settles with the real site's gentle scale-down while
+   the results popup waits out its 2.7s delay. */
+.grid.completed {
+  transform: scale(0.98);
+  transition: all 0.7s ease-in-out;
+  transition-delay: 0.25s;
+}
+/* Active hint: solid outline on the clue card(s); once the player asks for
+   more, a dotted outline marks the cards that clue pins down. */
+.card.hint-clue {
+  outline: 2px solid white;
+  z-index: 1;
+}
+.card.hint-card {
+  outline: 2px dotted white;
+  z-index: 1;
+}
+/* Wrong-guess popup: real site's "Not enough evidence!" modal. */
+.evidence-modal {
+  padding: 0 0 20px;
+  font-family: "Chalkboard SE", "Comic Sans MS", "Comic Sans", sans-serif;
+}
+.evidence-title {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 20px 12px;
+  background: #2d3038;
+  border-radius: 6px 6px 0 0;
+  font-size: 1.3em;
+}
+.evidence-text {
+  margin: 14px 0 0;
+  padding: 0 22px;
+  line-height: 1.6;
+}
+.evidence-text .suspect {
+  text-transform: capitalize;
+}
+.btn-continue {
+  border: 2px solid #b59430;
+  color: #b59430;
+  margin-top: 22px;
+}
+.completed {
+  color: var(--innocent);
+  font-weight: 700;
+}
+
+/* Height rather than `inset: 0`, because on a phone `bottom: 0` on a fixed box
+   is the bottom of the *large* viewport — behind the browser's own bottom bar.
+   The modal then centres against a taller box than the one you can see and sits
+   low on the screen. `dvh` is the visible height, with `vh` behind it for
+   anything that does not know the unit. */
+.overlay {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+.modal {
+  width: 300px;
+  max-width: 85vw;
+  background: var(--modal-bg);
+  border: 4px solid var(--border-neutral);
+  border-radius: 10px;
+  padding: 10px 0 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+  box-shadow: 0 6px 12px #0000001a;
+}
+.modal-face {
+  font-size: 52px;
+  line-height: 1.1;
+  margin: 2px;
+  text-shadow: 0 0 10px #aeaeae4c;
+}
+.modal-name {
+  font-size: 1.17em;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+.modal-prof {
+  opacity: 0.8;
+}
+.modal-choices {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+.modal-choices button {
+  margin-top: 0;
+}
+.modal button {
+  background: transparent;
+  font-weight: 700;
+  min-width: 100px;
+}
+.btn-innocent {
+  border-color: var(--innocent);
+  color: var(--innocent);
+}
+.btn-criminal {
+  border-color: var(--criminal);
+  color: var(--criminal);
+}
+/* Popup buttons fill with their color on hover, like the real site. */
+.btn-innocent,
+.btn-criminal,
+.btn-continue {
+  transition: background-color 0.15s, color 0.15s;
+}
+.btn-innocent:hover:not(:disabled) {
+  background: var(--innocent);
+  color: #fff;
+}
+.btn-criminal:hover:not(:disabled) {
+  background: var(--criminal);
+  color: #fff;
+}
+.btn-continue:hover {
+  background: #b59430;
+  color: var(--modal-bg);
+}
+.btn-close {
+  transition: background-color 0.15s;
+}
+.btn-close:hover {
+  background: #7f818c;
+}
+/* A rejected verdict stays disabled until the next suspect is revealed. */
+.modal button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.btn-close {
+  border: 1px solid #7f818c;
+  color: var(--text);
+  font-weight: 500;
+  margin-top: 12px;
+  min-width: 110px;
+}
+.start-modal {
+  padding: 20px 0 24px;
+  gap: 6px;
+  font-family: "Chalkboard SE", "Comic Sans MS", "Comic Sans", sans-serif;
+}
+.start-title {
+  margin: 6px 0 2px;
+  font-size: 1.25em;
+}
+.start-date {
+  font-weight: 700;
+  font-size: 1.1em;
+  margin: 0 0 10px;
+}
+.start-difficulty {
+  margin: 6px 0;
+}
+/* .modal button sets transparent backgrounds; out-specify it for the filled Start. */
+.modal button.btn-start {
+  background: var(--innocent);
+  border-color: var(--innocent);
+  color: #fff;
+  font-weight: 700;
+  font-family: inherit;
+  width: 130px;
+  margin-top: 12px;
+}
+.btn-copy {
+  border: 1px solid var(--innocent);
+  color: var(--innocent);
+  margin-top: 10px;
+  width: 230px;
+  max-width: 80%;
+}
+.btn-results {
+  font-size: 0.8em;
+  padding: 0.2em 0.8em;
+  margin-left: 6px;
+}
+.results-title {
+  margin: 8px 0 4px;
+  font-size: 1.2em;
+}
+.solved-in {
+  font-weight: 700;
+  font-size: 1.1em;
+  margin: 6px 0 2px;
+}
+.share-grid {
+  margin: 6px 0;
+  filter: drop-shadow(0 0 2px #000);
+}
+.share-row {
+  line-height: 0;
+}
+.share-cell {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin: 1px;
+  border-radius: 3px;
+  background-color: #6a6a6a;
+}
+.share-cell.share-green {
+  background-color: #5ac110;
+}
+.share-cell.share-yellow {
+  background-color: #ffee00;
+}
+/* Hinted flips are circles: yellow for a plain hint, orange for its reveal level. */
+.share-cell.share-hint {
+  background-color: #ffee00;
+  border-radius: 100%;
+}
+.share-cell.share-second-hint {
+  background-color: #f89315;
+  border-radius: 100%;
+}
+
+.archive {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+.archive h1 {
+  font-size: 1.3rem;
+  text-align: center;
+}
+.archive h2 {
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+.archive-filters {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+}
+.archive-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  color: var(--text-muted);
+}
+.archive-filters select {
+  border: 1px solid var(--border-neutral);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: inherit;
+  padding: 0.3rem 0.4rem;
+  font-size: 0.85rem;
+}
+.archive summary {
+  font-size: 1.05rem;
+  font-weight: 600;
+  padding: 0.4rem 0;
+  cursor: pointer;
+}
+.archive ul {
+  list-style: none;
+  padding: 0;
+}
+.archive li a {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid var(--border-neutral);
+  border-radius: 6px;
+  margin-bottom: 0.4rem;
+  background: var(--card-bg);
+  font-size: 0.9rem;
+}
+.archive li a:hover {
+  border-color: var(--text-muted);
+}
+.arch-title {
+  flex: 1;
+}
+/* Only rendered under Source: Both, where two rows per date would otherwise
+   be indistinguishable at a glance. */
+.arch-source {
+  align-self: center;
+  padding: 0.05rem 0.35rem;
+  border: 1px solid var(--border-neutral);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.arch-status.status-done {
+  color: var(--innocent);
+}
+.arch-status.status-in-progress {
+  color: #bc9300;
+}
+.arch-status.status-unplayed {
+  color: var(--text-muted);
+}
+
+/* "Correct!" bubble, verbatim from the real stylesheet (dark theme values). */
+.speech-bubble {
+  position: absolute;
+  top: 23px;
+  left: 50%;
+  transform: translate(-50%);
+  background: #262626;
+  border: 2px solid rgb(172, 172, 172);
+  color: rgb(221, 221, 221);
+  padding: 0.3em 0.6em;
+  border-radius: 1rem;
+  font-weight: 700;
+  box-shadow: 0 0 5px #0003;
+  animation: pop-fade 1.2s ease-out;
+  animation-fill-mode: forwards;
+  pointer-events: none;
+  z-index: 10;
+}
+@keyframes pop-fade {
+  0% {
+    opacity: 0.5;
+    transform: translate(-50%) translateY(0) scale(0.8);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%) translateY(-5px) scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: translate(-50%) translateY(-5px) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%) translateY(-10px) scale(0.9);
+  }
+}
+@keyframes shake {
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
