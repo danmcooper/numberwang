@@ -1,3 +1,15 @@
+/**
+ * Difficulty as a measurement and a name for it: `measure` reads metrics off a
+ * finished puzzle, `buildBands` fits per-label ranges, and `classify` names the
+ * label a puzzle's metrics fall in.
+ *
+ * These bands are inherited, not earned. They were fitted to human labels on
+ * cbs2's 4x5 archive, and two of their fields count clue cards, so `bandsFor`
+ * refits those for a board of a different size. Numberwang has no labelled
+ * corpus at all, and the eight arithmetic predicates appear in the calibration
+ * nowhere — so this module reports a label and generation never aims at one. A
+ * reported label is an opinion; an aimed one would be a claim.
+ */
 import type { Shape } from './enumerate';
 import { type Clues, solveChain } from './solve';
 
@@ -182,6 +194,16 @@ export function buildBands(
   return bands;
 }
 
+/**
+ * Whether a puzzle's metrics fall inside a band's gated ranges.
+ *
+ * The acceptance predicate generation used to steer by, and nothing in this
+ * repo steers by it: `buildPuzzle` and `check-generation.mts` both pass
+ * `labelOf`, which switches band rejection off and takes the label the finished
+ * puzzle earns. It stays exported because `generate.ts` still honours the aimed
+ * mode when no `labelOf` is given, and because the contrast between the two is
+ * what `generate.test.ts` uses to prove which path the pipeline is on.
+ */
 export function gatesPass(band: LabelBand, m: Metrics): boolean {
   return GATED.every((key) => m[key] >= band[key].min && m[key] <= band[key].max);
 }

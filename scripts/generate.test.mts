@@ -3,13 +3,15 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import bandsData from '../config/difficulty.json' with { type: 'json' };
-import { validatePuzzle } from '../shared/puzzle.ts';
+import { type Puzzle, validatePuzzle } from '../shared/puzzle.ts';
 import { loadBands } from '../shared/solver/difficulty.ts';
+import { PALETTE } from '../shared/solver/vocab.ts';
 import { auditAll } from './audit.mts';
 import {
   LOOKAHEAD_DAYS,
   SIZE,
   TIMEZONE_SLACK_DAYS,
+  buildPuzzle,
   defaultDates,
   runGenerate,
   seedFor,
@@ -110,6 +112,55 @@ describe('unionNumberwangs', () => {
     }
     expect(union.max).toBeGreaterThan(union.min);
   });
+});
+
+describe('buildPuzzle', () => {
+  let puzzle: Puzzle;
+
+  beforeAll(() => {
+    puzzle = buildPuzzle(DATE);
+  }, 300_000);
+
+  it('is a valid 4x5 puzzle', () => {
+    expect(() => validatePuzzle(puzzle)).not.toThrow();
+    expect(puzzle.width).toBe(4);
+    expect(puzzle.height).toBe(5);
+    expect(puzzle.people).toHaveLength(SIZE);
+  });
+
+  it('carries no variant field — a date names one puzzle on one board', () => {
+    expect('variant' in puzzle).toBe(false);
+  });
+
+  it('reports a difficulty rather than having been aimed at one', () => {
+    // `buildPuzzle` passes `labelOf`, so no attempt is thrown away for its
+    // metrics: the label is whatever the finished puzzle turns out to earn. It
+    // still has to be a label the calibration knows, because that is what the
+    // site groups by and what `audit.mts` re-derives.
+    expect(typeof puzzle.difficulty).toBe('string');
+    expect(loadBands(bandsData)[puzzle.difficulty]).toBeDefined();
+  });
+
+  it('deals every number from 1 to 20 exactly once', () => {
+    expect(puzzle.people.map((p) => p.number).sort((a, b) => a - b)).toEqual(
+      Array.from({ length: SIZE }, (_, i) => i + 1),
+    );
+  });
+
+  it('uses eight colours or fewer, all from the palette', () => {
+    const used = new Set(puzzle.people.map((p) => p.colour));
+    expect(used.size).toBeLessThanOrEqual(8);
+    for (const colour of used) expect(PALETTE).toContain(colour);
+  });
+
+  it(
+    'is reproducible from its date, and different for another one',
+    () => {
+      expect(buildPuzzle(DATE)).toEqual(puzzle);
+      expect(buildPuzzle('2026-01-02')).not.toEqual(puzzle);
+    },
+    300_000,
+  );
 });
 
 describe('runGenerate', () => {

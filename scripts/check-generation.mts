@@ -10,8 +10,8 @@
  * Opt-in (`npm run test:generate`), and worth a minute before regenerating the
  * archive with `npm run generate`.
  *
- *   npm run test:generate              # aims at Medium, seed 1, on the 4x5 board
- *   npm run test:generate Brutal 7     # aims at a given label and seed
+ *   npm run test:generate              # shaped by Medium, seed 1, on the 4x5 board
+ *   npm run test:generate Brutal 7     # another shaping band and seed
  *   npm run test:generate Medium 1 5x6 # on a board other than the shipped one
  */
 import { readFile } from 'node:fs/promises';
@@ -156,7 +156,7 @@ for (const person of puzzle.people) {
 
 console.log(
   [
-    `aimed at ${label}, seed ${seed}, ${boardArg} — generated in ${seconds.toFixed(1)}s`,
+    `shaped by ${label}, seed ${seed}, ${boardArg} — generated in ${seconds.toFixed(1)}s`,
     `labelled ${puzzle.difficulty}: ${metrics.numberwangs} numberwangs, ${metrics.clueCards} clues, ` +
       `chain ${metrics.chainLength}, abstract share ${metrics.abstractShare.toFixed(2)}`,
     `cast [${castShape}], ${preds.size} distinct predicates, worst repeat ${Math.max(...preds.values())}`,

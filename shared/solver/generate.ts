@@ -313,7 +313,7 @@ const REPEAT_CAP = 2;
  */
 export const MAX_EXACT_SUMS = 1;
 
-const EXACT_SUM = 'sum_of_trait_in_unit';
+export const EXACT_SUM = 'sum_of_trait_in_unit';
 
 interface ChainBuild {
   clues: Clues;

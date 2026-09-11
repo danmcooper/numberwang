@@ -30,6 +30,7 @@ import {
   parseClues,
   solveChain,
 } from '../shared/solver/solve.ts';
+import { EXACT_SUM, MAX_EXACT_SUMS } from '../shared/solver/generate.ts';
 import { buildPuzzle } from './generate.mts';
 
 /** Only dated files are puzzles; there are no variants and no one-offs. */
@@ -221,6 +222,15 @@ export function auditPuzzle(l: Loaded, bands: Bands, shapes: Set<string>): strin
     if (n > cap) {
       bad.push(`uses ${pred} ${n} of ${clued} clues — no real puzzle leans past ${cap} here`);
     }
+  }
+
+  // At most one exact sum on a board. `ARITH_RATE` already makes them rare, but
+  // a share is a preference and this is a limit: two "the Numberwang cards in
+  // row 2 add to 47" clues on one puzzle turn it into arithmetic homework.
+  // Generation filters for it; this is the backstop.
+  const exactSums = clues.filter((h) => h?.pred === EXACT_SUM).length;
+  if (exactSums > MAX_EXACT_SUMS) {
+    bad.push(`carries ${exactSums} exact-sum clues, and ${MAX_EXACT_SUMS} is the limit`);
   }
 
   // The stored difficulty must be the one the puzzle's own metrics earn.

@@ -7,7 +7,7 @@
  *
  * Run: npm run generate [YYYY-MM-DD ...] [--force] [--days=N]
  */
-import { readdir, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import bandData from '../config/difficulty.json' with { type: 'json' };
@@ -148,6 +148,8 @@ export interface GenerateRunResult {
 export async function runGenerate(opts: GenerateRunOptions = {}): Promise<GenerateRunResult> {
   const dir = opts.dir ?? path.join(process.cwd(), 'puzzles');
   const dates = (opts.dates ?? defaultDates(new Date())).slice().sort();
+  // A fresh clone has no `puzzles/` until the first night writes one.
+  await mkdir(dir, { recursive: true });
   const existing = new Set(await readdir(dir));
   const result: GenerateRunResult = { written: [], skipped: [], failed: [] };
   const report = (event: GenerateProgress) => opts.onProgress?.(event);
