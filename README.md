@@ -3,7 +3,7 @@
 A daily logic puzzle in the shape of Clues by Sam, with three things swapped and
 one thing added. Every card carries a **number** instead of a name and a
 **colour** instead of a profession, and the hidden verdict on each card is
-**Numberwang** or **Not Numberwang**. Because the cards carry numbers, the clues
+**Numberwang** or **Wangernumb**. Because the cards carry numbers, the clues
 can do arithmetic: totals, differences, comparisons, parity, and counts of the
 cards whose own number is prime, even, odd, or divisible by something.
 
@@ -13,10 +13,9 @@ text alone with nothing revealed up front, and every card has a stored path
 proving it can be deduced rather than guessed — `npm run audit` re-proves both
 from the file.
 
-The design is `docs/superpowers/specs/2026-09-10-numberwang-design.md`. **The
-playable site is not in this repo yet**; it is the subject of
-`docs/superpowers/plans/2026-09-10-numberwang-app.md`. What lives here is the
-generator and the archive it writes.
+The design is `docs/superpowers/specs/2026-09-10-numberwang-design.md`. This repo
+holds all three parts of it: the generator, the archive it writes, and the app
+that plays them.
 
 ## Commands
 
@@ -35,12 +34,47 @@ generator and the archive it writes.
 - `npm run audit` — re-derive every committed puzzle from its filename alone and
   re-check it. `--recent=N` for the live window, `--no-rederive` for the fast
   structural pass.
+- `npm run dev` — the app, at `/numberwang/`, reading `puzzles/` live.
+- `npm run build` — the production bundle into `site/dist`. It is not the whole
+  artifact on its own; see below.
 
 A night of generation is `generate`, `manifest`, `audit --recent=10`, commit —
 see `.github/workflows/generate.yml`, which runs at 03:17 UTC and pushes what
 changed. It keeps a week in hand deliberately: a 4x5 board is a second or two of
 SAT solving on a good seed and a quarter-minute on a bad one, so several failed
 nights in a row should still cost nobody their puzzle.
+
+## The app
+
+Vite and React, rooted at `site/`, served at `/numberwang/` — a literal base in
+`vite.config.ts`, not a UUID and not a config file. Routing is by hash
+(`#/play/2026-09-11`), so Pages needs no rewrite rules and a deep link survives a
+reload.
+
+`puzzles/` is read over HTTP at `<base>puzzles/`, which is served two different
+ways. In dev the `servePuzzles` plugin in `vite.config.ts` streams it out of the
+repo root. In production nothing does, so `.github/workflows/pages.yml` copies
+`puzzles/*.json` into `site/dist/puzzles/` before uploading the artifact. That
+copy is the step to get right: leave it out and the site builds, deploys, and
+then fails to load a single board. `npm run build` alone does not make a
+servable tree — rehearse a deploy with
+
+    npm run build && mkdir -p site/dist/puzzles && cp puzzles/*.json site/dist/puzzles/ && npx vite preview
+
+A card has three states, and the solved two own the whole card:
+
+| State | Look |
+|---|---|
+| Unsolved | Dark slate ground, the clue text on it |
+| Numberwang | Green ground (`#5cbd84`), dark number, faint confetti |
+| Wangernumb | Deep pinkish red ground (`#9e2547`), pale number |
+
+Because the solved states take the background, a card's colour lives in a plain
+band across the top, present in all three states. The band carries no text by
+choice: eight colours is past what colour alone reliably carries, and the design
+records a named band as the first thing to add back if identifying colours turns
+out to be a friction in play — `docs/superpowers/specs/2026-09-10-numberwang-design.md`,
+"The card".
 
 ## Everything a date's puzzle is comes from the date
 
@@ -75,8 +109,8 @@ There is no script that generates it; the file is the measurement.
 share, so a predicate the archive never contained has share zero and is
 generated *never*. Every arithmetic predicate is in exactly that position. Their
 shares are therefore written by hand in `ARITH_RATE` in `shared/solver/mix.ts`,
-totalling 23%, and `withArithBudgets` rescales the attested shares into the
-remaining 77%. The budget is a judgement about how much arithmetic a puzzle
+totalling 37.5%, and `withArithBudgets` rescales the attested shares into the
+remaining 62.5%. The budget is a judgement about how much arithmetic a puzzle
 should ask for, not a measurement of anything — the only honest way to say it is
 in a table with the number in it.
 
@@ -85,8 +119,8 @@ Numberwang cards in row 2 add to 47" clues on one board turn the puzzle into
 arithmetic homework. `MAX_EXACT_SUMS` is one per puzzle, enforced as a filter
 during generation and re-checked by the audit.
 
-Measured over the first week generated: 22 of 91 clues arithmetic (24%), all
-eight families present, one puzzle in eight carrying an exact sum.
+Measured over the first week generated: 44 of 124 clues arithmetic (35%), all
+eight families present, two puzzles in eight carrying an exact sum.
 
 ## Colours
 
@@ -106,7 +140,7 @@ archive has 44 such groups.
 and `#BETWEEN:` tokens and leaves the expansion to the app, which has the board
 in front of it. So a stored clue reads
 
-    2 of the Not Numberwang cards neighboring #NAME:6 are even
+    2 of the Wangernumb cards neighboring #NAME:6 are even
 
 and the player sees the number on card 6. Generation also renders with
 `colourTotals` on, which writes "Exactly 1 of 3 reds has …" where a bare

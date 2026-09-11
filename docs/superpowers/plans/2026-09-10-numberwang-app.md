@@ -1690,7 +1690,8 @@ it would have filed this game's traffic under that one."
 - Consumes: `npm run build`; `puzzles/` and `puzzles/index.json`
 - Produces: a Pages deploy serving the app at `/numberwang/` with its puzzles alongside
 
-- [ ] **Step 1: Confirm the production build works and is correctly based**
+- [x] **Step 1: Confirm the production build works and is correctly based**  *(Done:
+`/numberwang/assets/index-kL0YWo25.js` and the matching css.)*
 
 ```bash
 npm run build
@@ -1699,7 +1700,10 @@ grep -o '/numberwang/assets/[^"]*' site/dist/index.html | head
 Expected: asset paths under `/numberwang/`. A path starting `/assets/` means the
 base did not apply and every asset will 404 on Pages.
 
-- [ ] **Step 2: Write the workflow**
+- [x] **Step 2: Write the workflow**  *(Done: node-version 24, to match
+`generate.yml`. The artifact is `site/dist` with `puzzles/*.json` copied in,
+rather than cbsbd3d's separate `artifact/` tree — there is no UUID base here, so
+the build directory already has the shape Pages serves.)*
 
 Take `/Users/dan/code/cbsbd3d/.github/workflows/pages.yml` as the base. It must:
 checkout, set up Node, `npm ci`, `npm run build`, **copy `puzzles/` into
@@ -1710,7 +1714,9 @@ That copy step is the one to get right. In dev the `servePuzzles` plugin serves
 place the files at the same path the app fetches — `<base>puzzles/`. Miss it and
 the app builds, deploys, and every board fails to load.
 
-- [ ] **Step 3: Verify the workflow parses and its build output is complete**
+- [x] **Step 3: Verify the workflow parses and its build output is complete**
+*(Done: `build-deploy`, 7 steps. Rehearsed the artifact and served it at
+`/numberwang/`: the archive lists all eight puzzles and 2026-09-11 plays.)*
 
 ```bash
 node --input-type=module -e "
@@ -1732,7 +1738,10 @@ Open the previewed URL at `/numberwang/`. Expected: the archive lists puzzles an
 a board opens and plays. This catches the missing-puzzles mistake before a deploy
 does.
 
-- [ ] **Step 4: Update the README**
+- [x] **Step 4: Update the README**  *(Done: a "The app" section with the base,
+the hash routing, the two ways `puzzles/` is served and the card states. Also
+fixed three things the app made stale: "Not Numberwang" is Wangernumb, the
+arithmetic budget is 37.5% not 23%, and the measured share is now 44 of 124.)*
 
 Add to what the generator plan's README already says: `npm run dev` for the app,
 `npm run build` for the artifact, that the app reads `puzzles/` through a
