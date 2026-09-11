@@ -1763,7 +1763,10 @@ directory from the repo root and in production nothing does, so without the copy
 the site builds and deploys clean and then fails to load a single board."
 ```
 
-- [ ] **Step 6: Push, and check the deployed site**
+- [ ] **Step 6: Push, and check the deployed site**  *(Blocked: this repo has no
+git remote, so there is nowhere to push and no Pages site to open yet. The
+workflow is committed and will run on the first push to `main` of a repo with
+Pages enabled. Everything it does was rehearsed locally in Step 3.)*
 
 ```bash
 git push
