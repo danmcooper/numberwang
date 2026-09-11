@@ -72,10 +72,7 @@ export default function Grid({
   }, [state.flipped, state.consumed]);
 
   return (
-    <div
-      className={state.completed ? "grid completed" : "grid"}
-      style={{ gridTemplateColumns: `repeat(${puzzle.width}, auto)` }}
-    >
+    <div className={state.completed ? "grid completed" : "grid"}>
       {puzzle.people.map((person, i) => (
         <Card
           key={i}

@@ -49,80 +49,18 @@ function fakeTimersUser() {
 }
 const finishDelay = () => act(() => void vi.advanceTimersByTime(2700));
 
-describe('board width', () => {
-  const wrap = () => document.querySelector('.board-wrap') as HTMLElement;
-
-  // Cards are a fixed 87px, so a fifth column is 92px the stylesheet's own
-  // breakpoints know nothing about — on a phone the board would run off the
-  // side of the page. Five columns is 5*87 + 4*5 gaps = 455px.
-  const wide = () => ({
-    ...puzzle,
-    width: 5,
-    height: 1,
-    initialReveals: [0],
-    people: [1, 2, 3, 4, 5].map((number, i) => ({
-      ...puzzle.people[0], number, numberwang: i % 2 === 1, paths: i === 0 ? [] : [[0]],
-    })),
-  });
-
-  const serve = (p: unknown) =>
-    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify(p), { status: 200 })));
-  const windowWidth = (px: number) => vi.stubGlobal('innerWidth', px);
-
-  const scaleOf = (el: HTMLElement) =>
-    Number(/^scale\(([\d.]+)\)$/.exec(el.style.transform)?.[1]);
-
-  it('leaves a board no wider than the source site\'s four columns alone', async () => {
-    windowWidth(320); // narrower than the board: the stylesheet handles this one
-    await renderGame();
-    expect(wrap().style.transform).toBe('');
-  });
-
-  it('scales a wider board down to the room it has', async () => {
-    serve(wide());
-    windowWidth(400); // 400 less `.game`'s 2rem of padding = 368px of room
-    await renderGame();
-
-    expect(scaleOf(wrap())).toBeCloseTo(368 / 455, 5);
-  });
-
-  // A transform paints the board smaller but leaves its box the full 455px, so
-  // something else has to reserve the painted size or the page keeps room for a
-  // board it is not drawing — which is what put a wide board off-centre before.
-  // The height is measured from a laid-out board and so is only ever right in a
-  // real browser; the width is arithmetic and holds anywhere.
-  it('reserves only the width the painted board takes up', async () => {
-    serve(wide());
-    windowWidth(400);
-    await renderGame();
-
-    expect((document.querySelector('.board-fit') as HTMLElement).style.width).toBe('368px');
-  });
-
-  // Scaling with `zoom` is what the stylesheet's own narrow breakpoints do, and
-  // they are written for four columns. Left to apply they would compound with a
-  // ratio already fitted to the viewport, so the fitted board opts out.
-  it('opts a fitted board out of the stylesheet\'s narrow breakpoints', async () => {
-    serve(wide());
-    windowWidth(400);
-    await renderGame();
-
-    expect(wrap().style.zoom).toBe('1');
-  });
-
-  it('leaves a wider board that already fits at full size', async () => {
-    serve(wide());
-    windowWidth(1200);
-    await renderGame();
-
-    // Not `scale(1)` but no transform at all — scaling up would be worse than
-    // the overflow it exists to prevent, and this is the desktop case.
-    expect(wrap().style.transform).toBe('');
-    expect(wrap().style.zoom).toBe('');
-  });
-});
-
 describe('Game', () => {
+  // The board is 4 wide, always. `cbsbd` measured and scaled any wider one; the
+  // stylesheet's own narrow breakpoints were written for this board and are in
+  // sole charge of it.
+  it('renders the board at its natural size, with no fitting wrapper', async () => {
+    await renderGame();
+    expect(document.querySelector('.board-fit')).toBeNull();
+    const wrap = document.querySelector('.board-wrap') as HTMLElement;
+    expect(wrap.style.transform).toBe('');
+    expect(wrap.style.zoom).toBe('');
+  });
+
   it('loads the puzzle and renders the grid with initial reveals flipped, clue on the card', async () => {
     await renderGame();
     const cards = screen.getAllByRole('group');

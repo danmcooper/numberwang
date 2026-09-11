@@ -26,12 +26,16 @@
   --colour-pink: #db6fa4;
 
   /* The three card states. */
-  --card-unsolved: #f4f1ec;
-  --card-unsolved-text: #2a2724;
-  --card-unsolved-border: #ddd6cc;
+  /* The same gray the archive's rows are drawn on. An unsolved card is the
+     absence of a verdict, and a near-white one read as a third verdict next to
+     the peach; against the gray the group colour on the number is the only
+     thing on the card with any colour in it, which is the point of it. */
+  --card-unsolved: #322f3b;
+  --card-unsolved-text: #f3f3f3;
+  --card-unsolved-border: #4a4b55;
   --card-numberwang: #ffd9b8;
   --card-numberwang-text: #3a2a1c;
-  --card-wangernumb: #111;
+  --card-wangernumb: #14305e;
   --card-wangernumb-text: #fff;
   --confetti-blue: #7fb2e5;
   --confetti-pink: #f2a6c4;
@@ -80,17 +84,6 @@ a {
   padding: 0 1rem 1rem;
   text-align: center;
 }
-/* Reserves the room a fitted board actually takes up on screen. `.board-wrap`
-   is scaled with a transform, which paints it smaller without shrinking its
-   box, so `useFitBoard` sets the painted size here instead — on a separate
-   element, because everything inside `.board-wrap` (the pause dim, the mark
-   pickers) is positioned against the board at its natural size. Unsized on
-   every board that is not being fitted, where it shrink-wraps and centres like
-   the wrapper it holds. */
-.board-fit {
-  width: fit-content;
-  margin: 0 auto;
-}
 /* Shrinks to the grid's width so children can align to the grid edges.
    Top margin and small-screen scaling match the real site's breakpoints. */
 .board-wrap {
@@ -112,14 +105,32 @@ a {
    for drawing text, which is the thing that rules zoom out on a board scaled to
    two-fifths. A board wide enough for `useFitBoard` has already been fitted to
    the viewport and overrides these from its inline style. */
-@media (max-width: 369px) {
+/* The board is 363px across (4 cards of 87px, 3 gaps of 5px) and `.game` adds a
+   1rem gutter either side, so it wants 395px and a phone has less. These steps
+   are that arithmetic: 363 * zoom + 32 <= the width each one covers. Inherited
+   at two steps, 369px and 344px, which left 370-394px unscaled — the board ran
+   about 4px off the right of a 375px phone, taking the right-hand column's mark
+   picker with it. Zoom rather than transform: it scales the layout, so the page
+   reserves what it draws, and everything inside the wrapper (the pause dim, the
+   pickers) keeps its position against the board. */
+@media (max-width: 394px) {
   .board-wrap {
     zoom: 0.95;
   }
 }
-@media (max-width: 344px) {
+@media (max-width: 376px) {
   .board-wrap {
     zoom: 0.9;
+  }
+}
+@media (max-width: 358px) {
+  .board-wrap {
+    zoom: 0.85;
+  }
+}
+@media (max-width: 340px) {
+  .board-wrap {
+    zoom: 0.8;
   }
 }
 .archive-link {
@@ -195,6 +206,9 @@ a {
 
 .grid {
   display: grid;
+  /* The board is 4 wide, always, so the column count is the stylesheet's rather
+     than a prop read off the puzzle. */
+  grid-template-columns: repeat(4, auto);
   gap: 5px;
   justify-content: center;
   padding-top: 2px; /* Added by Dan */
@@ -218,7 +232,8 @@ a {
   position: relative;
   overflow: hidden;
   text-align: center;
-  --tag-neutral: #e2dcd2;
+  /* Untagged, on the unsolved gray: a shade up from the card, not a mark. */
+  --tag-neutral: #4a4655;
   transition: transform 0.05s linear;
   font-family: "Chalkboard SE", "Comic Sans MS", "Comic Sans", sans-serif;
 }
@@ -233,9 +248,10 @@ a {
     transform: scale(0.98);
   }
 }
-/* Corner tag: click to cycle none -> yellow -> red -> green -> none.
-   A small square in the bottom-left, where it is out of the way of the number,
-   the band and the clue. The hitbox around it stays finger-sized. */
+/* Corner tag: click to cycle none -> yellow -> red -> green -> none. The
+   source site's wedge at the source site's size (22px legs), moved to the
+   bottom-left, where it is out of the way of the number, the band and the clue.
+   The hitbox around it stays finger-sized. */
 .tag {
   position: absolute;
   bottom: 0;
@@ -248,12 +264,8 @@ a {
 .tag::before {
   content: "";
   position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 13px;
-  height: 13px;
-  /* Flush into the corner, where the card's own rounding trims it — the same
-     way the bottom-right mark meets the edge. */
+  inset: 0;
+  clip-path: polygon(0 100%, 22px 100%, 0 calc(100% - 22px));
   /* Untagged shade follows the card state (gray/green/red on the real site). */
   background: var(--tag-neutral);
 }
@@ -370,10 +382,10 @@ a {
 .card.wangernumb {
   background: var(--card-wangernumb);
   color: var(--card-wangernumb-text);
-  /* The page ground is #1a1d24, so a #111 card needs an edge or it dissolves
-     into the gap between cards. */
-  border-color: #3a3a3a;
-  --tag-neutral: #2e2e2e;
+  /* The page ground is #1a1d24, so the card needs an edge or it dissolves into
+     the gap between cards. */
+  border-color: #3d5a8a;
+  --tag-neutral: #2b456e;
 }
 
 /* Confetti: six gradient dots rather than six elements, offset per card by
@@ -458,10 +470,15 @@ a {
   margin-top: 12px;
   margin-bottom: 2px;
 }
-/* The group colours were picked to sit on a dark band, so on the black
-   Wangernumb card the darker four of them need lifting to stay legible. */
+/* The group colours were picked to sit on a dark band as a 14px strip, not to
+   be read as ink on one. On the two dark card states the darker half of them
+   need lifting; the blue group on the blue card needs it most. */
+.card.wangernumb .card-number,
+.card:not(.flipped) .card-number {
+  filter: brightness(1.35);
+}
 .card.wangernumb .card-number {
-  filter: brightness(1.45);
+  filter: brightness(1.5);
 }
 /* The bar a clue draws after a colour word. Sized in em so it tracks whatever
    text it sits in — 11px on a card, larger in the hint modal. */
