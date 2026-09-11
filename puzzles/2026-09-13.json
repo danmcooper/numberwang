@@ -30,7 +30,7 @@
       "number": 1,
       "colour": "blue",
       "numberwang": false,
-      "clue": "#NAME:12 is one of 10 Not Numberwang cards on the edges",
+      "clue": "#NAME:12 is one of 10 Wangernumb cards on the edges",
       "origHint": "is_one_of_n_traits_in_unit(unit(edge,void),12,not_numberwang,10)",
       "paths": [
         [
@@ -110,7 +110,7 @@
       "number": 9,
       "colour": "orange",
       "numberwang": false,
-      "clue": "Two Not Numberwang cards in row 5 subtract to 7",
+      "clue": "Two Wangernumb cards in row 5 subtract to 7",
       "origHint": "diff_of_two_traits_in_unit(unit(row,5),not_numberwang,7)",
       "paths": [
         [
@@ -122,7 +122,7 @@
       "number": 16,
       "colour": "blue",
       "numberwang": false,
-      "clue": "There are exactly 3 Not Numberwang cards #BETWEEN:pair(1,13)",
+      "clue": "There are exactly 3 Wangernumb cards #BETWEEN:pair(1,13)",
       "origHint": "number_of_traits_in_unit(unit(between,pair(1,13)),not_numberwang,3)",
       "paths": [
         [
@@ -146,7 +146,7 @@
       "number": 8,
       "colour": "teal",
       "numberwang": true,
-      "clue": "Only 1 of the 2 Not Numberwang cards #BETWEEN:pair(2,18) is in row 2",
+      "clue": "Only 1 of the 2 Wangernumb cards #BETWEEN:pair(2,18) is in row 2",
       "origHint": "unit_shares_n_out_of_n_traits_with_unit(unit(between,pair(2,18)),unit(row,2),not_numberwang,1,2)",
       "paths": []
     },
@@ -234,7 +234,7 @@
       "number": 20,
       "colour": "orange",
       "numberwang": true,
-      "clue": "There's an odd number of Not Numberwang cards neighboring #NAME:17",
+      "clue": "There's an odd number of Wangernumb cards neighboring #NAME:17",
       "origHint": "odd_number_of_traits_in_unit(unit(neighbor,17),not_numberwang)",
       "paths": [
         [
@@ -266,7 +266,7 @@
       "number": 17,
       "colour": "yellow",
       "numberwang": false,
-      "clue": "There are exactly 4 Not Numberwang cards in row 2",
+      "clue": "There are exactly 4 Wangernumb cards in row 2",
       "origHint": "number_of_traits_in_unit(unit(row,2),not_numberwang,4)",
       "paths": [
         [
@@ -290,7 +290,7 @@
       "number": 7,
       "colour": "teal",
       "numberwang": true,
-      "clue": "#NAME:19 is one of 3 Not Numberwang cards in row 5",
+      "clue": "#NAME:19 is one of 3 Wangernumb cards in row 5",
       "origHint": "is_one_of_n_traits_in_unit(unit(row,5),19,not_numberwang,3)",
       "paths": [
         [
@@ -305,7 +305,7 @@
       "number": 10,
       "colour": "purple",
       "numberwang": false,
-      "clue": "There are as many Numberwang cards as Not Numberwang cards #BETWEEN:pair(12,15)",
+      "clue": "There are as many Numberwang cards as Wangernumb cards #BETWEEN:pair(12,15)",
       "origHint": "equal_traits_and_traits_in_unit(unit(between,pair(12,15)),numberwang,not_numberwang)",
       "paths": [
         [

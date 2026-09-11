@@ -127,7 +127,7 @@
       "number": 13,
       "colour": "pink",
       "numberwang": false,
-      "clue": "There are exactly 3 Not Numberwang cards #BETWEEN:pair(0,12)",
+      "clue": "There are exactly 3 Wangernumb cards #BETWEEN:pair(0,12)",
       "origHint": "number_of_traits_in_unit(unit(between,pair(0,12)),not_numberwang,3)",
       "paths": [
         [
@@ -167,7 +167,7 @@
       "number": 14,
       "colour": "orange",
       "numberwang": true,
-      "clue": "Exactly one of the Not Numberwang cards in the corners is odd",
+      "clue": "Exactly one of the Wangernumb cards in the corners is odd",
       "origHint": "n_traits_in_unit_are_odd(unit(corner,void),not_numberwang,1)",
       "paths": [
         [
@@ -185,7 +185,7 @@
       "number": 2,
       "colour": "purple",
       "numberwang": false,
-      "clue": "#NAME:14 is one of 3 Not Numberwang cards #BETWEEN:pair(2,14)",
+      "clue": "#NAME:14 is one of 3 Wangernumb cards #BETWEEN:pair(2,14)",
       "origHint": "is_one_of_n_traits_in_unit(unit(between,pair(2,14)),14,not_numberwang,3)",
       "paths": []
     },
@@ -249,7 +249,7 @@
       "number": 16,
       "colour": "green",
       "numberwang": true,
-      "clue": "Both Not Numberwang cards #BETWEEN:pair(4,16) are connected",
+      "clue": "Both Wangernumb cards #BETWEEN:pair(4,16) are connected",
       "origHint": "both_traits_are_neighbors_in_unit(unit(between,pair(4,16)),not_numberwang)",
       "paths": [
         [
@@ -261,7 +261,7 @@
       "number": 18,
       "colour": "purple",
       "numberwang": true,
-      "clue": "#NAME:2 is one of 2 Not Numberwang cards #BETWEEN:pair(0,3)",
+      "clue": "#NAME:2 is one of 2 Wangernumb cards #BETWEEN:pair(0,3)",
       "origHint": "is_one_of_n_traits_in_unit(unit(between,pair(0,3)),2,not_numberwang,2)",
       "paths": [
         [
@@ -273,7 +273,7 @@
       "number": 19,
       "colour": "orange",
       "numberwang": true,
-      "clue": "Only 1 of the 3 Not Numberwang cards neighboring #NAME:10 is #NAMES:5 neighbor",
+      "clue": "Only 1 of the 3 Wangernumb cards neighboring #NAME:10 is #NAMES:5 neighbor",
       "origHint": "unit_shares_n_out_of_n_traits_with_unit(unit(neighbor,10),unit(neighbor,5),not_numberwang,1,3)",
       "paths": [
         [

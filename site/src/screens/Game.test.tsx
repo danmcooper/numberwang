@@ -160,7 +160,7 @@ describe('Game', () => {
     const user = userEvent.setup();
     await renderGame();
     await user.click(screen.getByText('1'));
-    await user.click(screen.getByRole('button', { name: 'NotNumberwang' })); // wrong trait
+    await user.click(screen.getByRole('button', { name: 'Wangernumb' })); // wrong trait
     let dialog = screen.getByRole('dialog');
     expect(dialog.textContent).toContain('Not enough evidence!');
     expect(dialog.textContent).toContain("1 can't be logically identified as not_numberwang");
@@ -179,14 +179,14 @@ describe('Game', () => {
     const user = userEvent.setup();
     await renderGame();
     await user.click(screen.getByText('1'));
-    await user.click(screen.getByRole('button', { name: 'NotNumberwang' })); // wrong trait
+    await user.click(screen.getByRole('button', { name: 'Wangernumb' })); // wrong trait
     await user.click(screen.getByRole('button', { name: 'Continue' }));
     await user.click(screen.getByText('1'));
-    expect(screen.getByRole('button', { name: 'NotNumberwang' })).toHaveProperty('disabled', true);
+    expect(screen.getByRole('button', { name: 'Wangernumb' })).toHaveProperty('disabled', true);
     expect(screen.getByRole('button', { name: 'Numberwang' })).toHaveProperty('disabled', false);
     await user.click(screen.getByRole('button', { name: 'Numberwang' })); // reveals card 1
     await user.click(screen.getByText('2'));
-    expect(screen.getByRole('button', { name: 'NotNumberwang' })).toHaveProperty('disabled', false);
+    expect(screen.getByRole('button', { name: 'Wangernumb' })).toHaveProperty('disabled', false);
     await user.click(screen.getByRole('button', { name: 'Close' }));
   });
 
@@ -194,7 +194,7 @@ describe('Game', () => {
     const user = fakeTimersUser();
     await renderGame(user);
     expect(document.querySelector('.grid')?.className).not.toContain('completed');
-    for (const [number, verdict] of [['1', 'Numberwang'], ['4', 'NotNumberwang'], ['2', 'Numberwang']] as const) {
+    for (const [number, verdict] of [['1', 'Numberwang'], ['4', 'Wangernumb'], ['2', 'Numberwang']] as const) {
       await user.click(screen.getByText(number));
       await user.click(screen.getByRole('button', { name: verdict }));
     }
@@ -242,7 +242,7 @@ describe('results popup', () => {
     await user.click(screen.getByRole('button', { name: 'Numberwang' })); // wrong: card 4 is not_numberwang
     await user.click(screen.getByRole('button', { name: 'Continue' })); // dismiss the evidence popup
     await user.click(screen.getByText('4'));
-    await user.click(screen.getByRole('button', { name: 'NotNumberwang' }));
+    await user.click(screen.getByRole('button', { name: 'Wangernumb' }));
     await user.click(screen.getByText('2'));
     await user.click(screen.getByRole('button', { name: 'Numberwang' }));
     finishDelay();
@@ -368,7 +368,7 @@ describe('timer display', () => {
     const user = fakeTimersUser();
     await renderGame(user);
     act(() => void vi.advanceTimersByTime(9_000));
-    for (const [number, verdict] of [['1', 'Numberwang'], ['4', 'NotNumberwang'], ['2', 'Numberwang']] as const) {
+    for (const [number, verdict] of [['1', 'Numberwang'], ['4', 'Wangernumb'], ['2', 'Numberwang']] as const) {
       await user.click(screen.getByText(number));
       await user.click(screen.getByRole('button', { name: verdict }));
     }
@@ -590,7 +590,7 @@ describe('hint button', () => {
   });
 
   async function solveRest(user: ReturnType<typeof userEvent.setup>) {
-    for (const [number, verdict] of [['1', 'Numberwang'], ['4', 'NotNumberwang'], ['2', 'Numberwang']] as const) {
+    for (const [number, verdict] of [['1', 'Numberwang'], ['4', 'Wangernumb'], ['2', 'Numberwang']] as const) {
       await user.click(screen.getByText(number));
       await user.click(screen.getByRole('button', { name: verdict }));
     }
@@ -616,7 +616,7 @@ describe('hint button', () => {
     await user.click(screen.getByRole('button', { name: /show hint/i }));
     await user.click(screen.getByRole('button', { name: /show more/i }));
     await user.click(screen.getByText('1'));
-    await user.click(screen.getByRole('button', { name: 'NotNumberwang' })); // wrong first
+    await user.click(screen.getByRole('button', { name: 'Wangernumb' })); // wrong first
     await user.click(screen.getByRole('button', { name: 'Continue' }));
     await solveRest(user);
     finishDelay();
@@ -831,7 +831,7 @@ describe('pause persistence', () => {
     const user = fakeTimersUser();
     await renderGame(user);
     expect(screen.getByRole('button', { name: 'Pause' })).toHaveProperty('disabled', false);
-    for (const [number, verdict] of [['1', 'Numberwang'], ['4', 'NotNumberwang'], ['2', 'Numberwang']] as const) {
+    for (const [number, verdict] of [['1', 'Numberwang'], ['4', 'Wangernumb'], ['2', 'Numberwang']] as const) {
       await user.click(screen.getByText(number));
       await user.click(screen.getByRole('button', { name: verdict }));
     }

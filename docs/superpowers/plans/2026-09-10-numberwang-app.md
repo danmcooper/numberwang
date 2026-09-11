@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** The playable Numberwang — a 4x5 board of numbered cards in eight colour groups, where clicking a card calls it Numberwang or Not Numberwang, a correct call reveals its clue, and the archive lists every day so far — deployed to GitHub Pages at `/numberwang/`.
+**Goal:** The playable Numberwang — a 4x5 board of numbered cards in eight colour groups, where clicking a card calls it Numberwang or Wangernumb, a correct call reveals its clue, and the archive lists every day so far — deployed to GitHub Pages at `/numberwang/`.
 
 **Architecture:** Fork `cbsbd`'s `site/` and adapt it. The play mechanic is unchanged — same reducer, same deduction gate, same hint ladder, same local-storage progress, same archive — so this plan is a rename through the game layer plus a genuinely new card, a new clue tokenizer contract, and a set of deletions that a fixed 4-wide board of numbers makes possible. React 19 with no router library (hash routing in 71 lines), no state library (one `useReducer`), no CSS framework (one stylesheet).
 
@@ -18,9 +18,9 @@
 - **Card states are exactly three**, and their colours are the approved mockup's, verbatim:
   - Unsolved — `#f4f1ec` ground, `#2a2724` number, `1px solid #ddd6cc` border
   - Numberwang — `#FFD9B8` peach ground, `#3a2a1c` number, subtle confetti in `#7FB2E5` (blue) and `#F2A6C4` (pink) at 0.5 opacity
-  - Not Numberwang — `#111` ground, `#fff` number
+  - Wangernumb — `#111` ground, `#fff` number
 - **The colour band is a plain strip across the top of the card and carries no text.** It is present in all three states and the card background never touches it.
-- **The trait is spoken as "Numberwang" and "Not Numberwang"** in every player-facing string. Never "numberwangs", never "criminal".
+- **The trait is spoken as "Numberwang" and "Wangernumb"** in every player-facing string. Never "numberwangs", never "criminal". Wangernumb is the show's own reversed round, and the nearest thing it has to an opposite; Numberwang is only ever declared, never denied. Renamed after Task 3, so Tasks 1-3 below still say "Not Numberwang" and `not-numberwang` where the code now says Wangernumb and `wangernumb` — they record what was done at the time. The DSL trait token stays `not_numberwang` everywhere: in hints, in puzzle JSON, and in `Guess`.
 - **No analytics.** `cbsbd`'s `index.html` carries a umami script with cbsbd's own website id; it does not come along.
 - **Deploy base path is `/numberwang/`**, with no UUID and no `config/site.json`.
 - **Local-storage keys are namespaced `nw:`**, so a browser that has played `cbsbd` on the same host cannot collide.
@@ -1162,7 +1162,7 @@ more at home in this game than in the one it came from."
 
 **Interfaces:**
 - Consumes: `Guess` from `game/reducer.ts`; the palette custom properties from Task 2
-- Produces: CSS classes `.btn-numberwang`, `.btn-not-numberwang`, `.modal-number`, `.modal-colour`
+- Produces: CSS classes `.btn-numberwang`, `.btn-wangernumb`, `.modal-number`, `.modal-colour`
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -1187,23 +1187,18 @@ describe('the guess modal', () => {
     await renderGame(user);
     await user.click(screen.getAllByRole('group')[2]);
     expect(screen.getByRole('button', { name: 'Numberwang' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Not Numberwang' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Wangernumb' })).toBeTruthy();
   });
 });
 ```
 
 `getByRole('button', { name: 'Numberwang' })` matches the accessible name in
-full, so it will not also match "Not Numberwang" — but a `/numberwang/i` regex
-would. Use the exact string in every one of these.
+full, and "Wangernumb" does not contain it — but a `/numberwang/i` regex would
+match both. Use the exact string in every one of these.
 
-Then relabel the tests this file already has. They click `{ name: 'Criminal' }`
-and `{ name: 'Innocent' }` in about twenty places, which Task 1's sed turned into
-`Numberwang` and `NotNumberwang`:
-
-```bash
-sed -i '' "s/'NotNumberwang'/'Not Numberwang'/g" site/src/screens/Game.test.tsx
-grep -n 'NotNumberwang' site/src/screens/Game.test.tsx
-```
+The tests this file already has were relabelled when the verdict was renamed
+(see "Numberwang or Wangernumb" below), so they already click
+`{ name: 'Wangernumb' }`.
 
 The blocked-verdict test this file already has — a rejected verdict is disabled
 until the next reveal — is the coverage this task needs for `blocked`, so it wants
@@ -1213,7 +1208,7 @@ the relabelling and nothing more.
 
 Run: `npx vitest run site/src/screens/Game.test.tsx`
 Expected: FAIL — the modal has no `.modal-colour`, its `aria-label` is a number
-rather than a string, and its buttons still read `NotNumberwang`.
+rather than a string.
 
 - [ ] **Step 3: Rebuild the modal body**
 
@@ -1295,15 +1290,15 @@ In `styles.css`, replace the `.modal-face` / `.modal-name` / `.modal-prof` and
   color: var(--card-numberwang-text);
   border-color: #e8bd93;
 }
-.btn-not-numberwang {
-  background: var(--card-not);
-  color: var(--card-not-text);
+.btn-wangernumb {
+  background: var(--card-wangernumb);
+  color: var(--card-wangernumb-text);
   border-color: #3a3a3a;
 }
 .btn-numberwang:hover:not(:disabled) {
   border-color: #fff;
 }
-.btn-not-numberwang:hover:not(:disabled) {
+.btn-wangernumb:hover:not(:disabled) {
   border-color: #fff;
 }
 ```
@@ -1313,11 +1308,11 @@ and its consequence look the same — which the two buttons in `cbsbd` also do.
 
 - [ ] **Step 5: Fix the player-facing copy**
 
-`NotNumberwang` — the sed's output for `Innocent` — must not survive anywhere a
-player can see it, and the rest of the sed's output needs reading as English:
+The verdict copy is already right; what is left is the rest of the sed's output
+from Task 1, which needs reading as English:
 
 ```bash
-grep -rn 'NotNumberwang' site/src && echo 'FIX THESE' || echo 'clean'
+grep -rn 'NotNumberwang\|Not Numberwang' site/src && echo 'FIX THESE' || echo 'clean'
 grep -in 'suspect\|evidence\|caught\|mystery\|crime' site/src/screens/Game.tsx
 ```
 
@@ -1347,11 +1342,11 @@ share text all read as this game.
 
 ```bash
 git add -A
-git commit -m "Call it Numberwang or Not Numberwang
+git commit -m "Call it Numberwang or Wangernumb
 
 Each verdict button wears the colour of the card it produces, and the two stack
-rather than sitting side by side — \"Not Numberwang\" is two words and does not
-fit beside \"Numberwang\" on a phone.
+rather than sitting side by side, which leaves each of them a full row to be
+read in.
 
 The modal repeats the card's colour band. It covers the board while it is open,
 so without it a clue about a colour group cannot be checked against the card you

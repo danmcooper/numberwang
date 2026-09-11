@@ -27,7 +27,7 @@
       "number": 3,
       "colour": "purple",
       "numberwang": false,
-      "clue": "Only one card neighboring #NAME:12 has exactly 6 Not Numberwang neighbors",
+      "clue": "Only one card neighboring #NAME:12 has exactly 6 Wangernumb neighbors",
       "origHint": "only_one_person_in_unit_has_exactly_n_trait_neighbors(unit(neighbor,12),not_numberwang,6)",
       "paths": [
         [
@@ -98,7 +98,7 @@
       "number": 4,
       "colour": "teal",
       "numberwang": true,
-      "clue": "Exactly 3 Not Numberwang cards in row 4 have a Not Numberwang card directly to the left of them",
+      "clue": "Exactly 3 Wangernumb cards in row 4 have a Wangernumb card directly to the left of them",
       "origHint": "n_t_in_unit_have_trait_in_dir(unit(row,4),not_numberwang,not_numberwang,-1,0,3)",
       "paths": [
         [
@@ -112,7 +112,7 @@
       "number": 12,
       "colour": "teal",
       "numberwang": false,
-      "clue": "Exactly 1 of #COLOURN:blue has a Not Numberwang card directly to the right of them",
+      "clue": "Exactly 1 of #COLOURN:blue has a Wangernumb card directly to the right of them",
       "origHint": "n_colours_have_trait_in_dir(blue,not_numberwang,1,0,1)",
       "paths": [
         [
@@ -137,7 +137,7 @@
       "number": 11,
       "colour": "orange",
       "numberwang": false,
-      "clue": "#NAME:7 is one of 4 Not Numberwang cards #BETWEEN:pair(3,19)",
+      "clue": "#NAME:7 is one of 4 Wangernumb cards #BETWEEN:pair(3,19)",
       "origHint": "is_one_of_n_traits_in_unit(unit(between,pair(3,19)),7,not_numberwang,4)",
       "paths": [
         [
@@ -170,7 +170,7 @@
       "number": 18,
       "colour": "purple",
       "numberwang": false,
-      "clue": "The Not Numberwang cards in column #C:1 add to 39",
+      "clue": "The Wangernumb cards in column #C:1 add to 39",
       "origHint": "sum_of_trait_in_unit(unit(col,1),not_numberwang,39)",
       "paths": [
         [
@@ -195,7 +195,7 @@
       "number": 8,
       "colour": "teal",
       "numberwang": false,
-      "clue": "2 of the Not Numberwang cards neighboring #NAME:6 are even",
+      "clue": "2 of the Wangernumb cards neighboring #NAME:6 are even",
       "origHint": "n_traits_in_unit_are_even(unit(neighbor,6),not_numberwang,2)",
       "paths": [
         [

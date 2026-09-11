@@ -146,7 +146,7 @@ function encodeHint(cnf: Cnf, board: Board, shape: Shape, vars: number[], hint: 
 
   const a = hint.args;
   const grid = shape.grid;
-  // A Not Numberwang card is the same variable read the other way up, so a trait
+  // A Wangernumb card is the same variable read the other way up, so a trait
   // is a choice of polarity rather than a second set of variables.
   const lit = (i: number, t: Trait) => (t === 'numberwang' ? vars[i] : -vars[i]);
   const litsOf = (members: number[], t: Trait) => members.map((i) => lit(i, t));

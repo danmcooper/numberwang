@@ -13,7 +13,7 @@ const r = (s: string) => render(parseHint(s));
 
 describe('counting clue templates', () => {
   it('has_trait', () => {
-    expect(r('has_trait(11,not_numberwang)')).toBe('#NAME:11 is Not Numberwang');
+    expect(r('has_trait(11,not_numberwang)')).toBe('#NAME:11 is Wangernumb');
     expect(r('has_trait(11,numberwang)')).toBe('#NAME:11 is Numberwang');
   });
   it('number_of_traits', () => {
@@ -21,10 +21,10 @@ describe('counting clue templates', () => {
   });
   it('number_of_traits_in_unit over a between segment', () => {
     expect(r('number_of_traits_in_unit(unit(between,pair(4,7)),not_numberwang,1)')).toBe(
-      'There is only one Not Numberwang card #BETWEEN:pair(4,7)',
+      'There is only one Wangernumb card #BETWEEN:pair(4,7)',
     );
     expect(r('number_of_traits_in_unit(unit(between,pair(4,7)),not_numberwang,3)')).toBe(
-      'There are exactly 3 Not Numberwang cards #BETWEEN:pair(4,7)',
+      'There are exactly 3 Wangernumb cards #BETWEEN:pair(4,7)',
     );
     expect(r('number_of_traits_in_unit(unit(between,pair(4,7)),numberwang,0)')).toBe(
       'There are no Numberwang cards #BETWEEN:pair(4,7)',
@@ -35,39 +35,39 @@ describe('counting clue templates', () => {
       '#NAME:5 has exactly 2 Numberwang neighbors',
     );
     expect(r('number_of_traits_in_unit(unit(neighbor,5),not_numberwang,1)')).toBe(
-      '#NAME:5 has only one Not Numberwang neighbor',
+      '#NAME:5 has only one Wangernumb neighbor',
     );
     expect(r('number_of_traits_in_unit(unit(neighbor,5),numberwang,0)')).toBe(
       '#NAME:5 has no Numberwang neighbors',
     );
     expect(r('number_of_traits_in_unit(unit(row,3),not_numberwang,2)')).toBe(
-      'There are exactly 2 Not Numberwang cards in row 3',
+      'There are exactly 2 Wangernumb cards in row 3',
     );
     expect(r('number_of_traits_in_unit(unit(col,2),numberwang,1)')).toBe(
       'There is only one Numberwang card in column #C:2',
     );
     // Ground truth (docs/superpowers/specs/2026-08-29-clue-templates.txt, "number_of_traits_in_unit"
-    // section) attests only the bare-number phrasing for the edge unit ("There are N Not Numberwang cards on
+    // section) attests only the bare-number phrasing for the edge unit ("There are N Wangernumb cards on
     // the edges" / "There are N Numberwang cards on the edges") — never "exactly N ... on the edges".
     // The brief's step-1 test used "exactly 7"; ground truth wins per task instructions.
     expect(r('number_of_traits_in_unit(unit(edge,void),not_numberwang,7)')).toBe(
-      'There are 7 Not Numberwang cards on the edges',
+      'There are 7 Wangernumb cards on the edges',
     );
     expect(r('number_of_traits_in_unit(unit(corner,void),not_numberwang,3)')).toBe(
-      'There are exactly 3 Not Numberwang cards in the corners',
+      'There are exactly 3 Wangernumb cards in the corners',
     );
   });
   it('min_number_of_traits_in_unit', () => {
     expect(r('min_number_of_traits_in_unit(unit(col,2),not_numberwang,3)')).toBe(
-      'There are at least 3 Not Numberwang cards in column #C:2',
+      'There are at least 3 Wangernumb cards in column #C:2',
     );
     expect(r('min_number_of_traits_in_unit(unit(between,pair(0,3)),not_numberwang,1)')).toBe(
-      'There is at least one Not Numberwang card #BETWEEN:pair(0,3)',
+      'There is at least one Wangernumb card #BETWEEN:pair(0,3)',
     );
   });
   it('odd_number_of_traits_in_unit', () => {
     expect(r('odd_number_of_traits_in_unit(unit(neighbor,12),not_numberwang)')).toBe(
-      "There's an odd number of Not Numberwang cards neighboring #NAME:12",
+      "There's an odd number of Wangernumb cards neighboring #NAME:12",
     );
     expect(r('odd_number_of_traits_in_unit(unit(col,3),numberwang)')).toBe(
       "There's an odd number of Numberwang cards in column #C:3",
@@ -78,26 +78,26 @@ describe('counting clue templates', () => {
   });
   it('is_one_of_n_traits_in_unit', () => {
     expect(r('is_one_of_n_traits_in_unit(unit(neighbor,9),4,not_numberwang,3)')).toBe(
-      '#NAME:4 is one of #NAMES:9 3 Not Numberwang neighbors',
+      '#NAME:4 is one of #NAMES:9 3 Wangernumb neighbors',
     );
     expect(r('is_one_of_n_traits_in_unit(unit(between,pair(0,3)),1,numberwang,2)')).toBe(
       '#NAME:1 is one of 2 Numberwang cards #BETWEEN:pair(0,3)',
     );
     expect(r('is_one_of_n_traits_in_unit(unit(edge,void),7,not_numberwang,5)')).toBe(
-      '#NAME:7 is one of 5 Not Numberwang cards on the edges',
+      '#NAME:7 is one of 5 Wangernumb cards on the edges',
     );
   });
   it('is_not_only_trait_in_unit', () => {
     expect(r('is_not_only_trait_in_unit(unit(row,2),5,not_numberwang)')).toBe(
-      '#NAME:5 is one of two or more Not Numberwang cards in row 2',
+      '#NAME:5 is one of two or more Wangernumb cards in row 2',
     );
   });
   it('all_units_have_at_least_n_traits', () => {
     expect(r('all_units_have_at_least_n_traits(col,not_numberwang,2)')).toBe(
-      'Each column has at least 2 Not Numberwang cards',
+      'Each column has at least 2 Wangernumb cards',
     );
     expect(r('all_units_have_at_least_n_traits(row,not_numberwang,1)')).toBe(
-      'Each row has at least one Not Numberwang card',
+      'Each row has at least one Wangernumb card',
     );
     expect(r('all_units_have_at_least_n_traits(colour,numberwang,1)')).toBe(
       'There is at least one Numberwang card among all colours',
@@ -111,7 +111,7 @@ describe('counting clue templates', () => {
       'Only one row has exactly 2 Numberwang cards',
     );
     expect(r('only_one_unit_has_exactly_n_traits(col,not_numberwang,1)')).toBe(
-      'Only one column has exactly one Not Numberwang card',
+      'Only one column has exactly one Wangernumb card',
     );
     expect(r('only_one_unit_has_exactly_n_traits(col,numberwang,0)')).toBe(
       'Only one column has no Numberwang cards',
@@ -125,7 +125,7 @@ describe('comparison clue templates', () => {
       '#NAME:3 has more Numberwang neighbors than #NAME:9',
     );
     expect(r('more_traits_in_unit_than_unit(unit(row,1),unit(row,4),not_numberwang)')).toBe(
-      'There are more Not Numberwang cards in row 1 than row 4',
+      'There are more Wangernumb cards in row 1 than row 4',
     );
     expect(r('more_traits_in_unit_than_unit(unit(col,1),unit(col,3),numberwang)')).toBe(
       'There are more Numberwang cards in column #C:1 than column #C:3',
@@ -139,73 +139,73 @@ describe('comparison clue templates', () => {
       '#NAME:3 and #NAME:9 have an equal number of Numberwang neighbors',
     );
     expect(r('equal_number_of_traits_in_units(unit(row,1),unit(row,4),not_numberwang)')).toBe(
-      "There's an equal number of Not Numberwang cards in rows 1 and 4",
+      "There's an equal number of Wangernumb cards in rows 1 and 4",
     );
     expect(r('equal_number_of_traits_in_units(unit(col,1),unit(col,3),numberwang)')).toBe(
       "There's an equal number of Numberwang cards in columns #C:1 and #C:3",
     );
     expect(
       r('equal_number_of_traits_in_units(unit(colour,cook),unit(colour,cop),not_numberwang)'),
-    ).toBe('There are as many Not Numberwang #COLOURS:cook as there are Not Numberwang #COLOURS:cop');
+    ).toBe('There are as many Wangernumb #COLOURS:cook as there are Wangernumb #COLOURS:cop');
   });
   it('more_traits_than_traits_in_unit', () => {
     expect(r('more_traits_than_traits_in_unit(unit(between,pair(0,3)),not_numberwang,numberwang)')).toBe(
-      'There are more Not Numberwang cards than Numberwang cards #BETWEEN:pair(0,3)',
+      'There are more Wangernumb cards than Numberwang cards #BETWEEN:pair(0,3)',
     );
     expect(r('more_traits_than_traits_in_unit(unit(neighbor,5),numberwang,not_numberwang)')).toBe(
-      '#NAME:5 has more Numberwang than Not Numberwang neighbors',
+      '#NAME:5 has more Numberwang than Wangernumb neighbors',
     );
   });
   it('equal_traits_and_traits_in_unit', () => {
     expect(r('equal_traits_and_traits_in_unit(unit(between,pair(0,3)),numberwang,not_numberwang)')).toBe(
-      'There are as many Numberwang cards as Not Numberwang cards #BETWEEN:pair(0,3)',
+      'There are as many Numberwang cards as Wangernumb cards #BETWEEN:pair(0,3)',
     );
     expect(r('equal_traits_and_traits_in_unit(unit(colour,cop),not_numberwang,numberwang)')).toBe(
-      "There's an equal number of Not Numberwang and Numberwang #COLOURS:cop",
+      "There's an equal number of Wangernumb and Numberwang #COLOURS:cop",
     );
   });
   it('more_traits_in_unit_than_traits_in_unit', () => {
     expect(
       r('more_traits_in_unit_than_traits_in_unit(unit(neighbor,3),numberwang,unit(neighbor,9),not_numberwang)'),
-    ).toBe('#NAME:3 has more Numberwang neighbors than #NAME:9 has Not Numberwang ones');
+    ).toBe('#NAME:3 has more Numberwang neighbors than #NAME:9 has Wangernumb ones');
     expect(r('more_traits_in_unit_than_traits_in_unit(unit(row,1),not_numberwang,unit(row,4),numberwang)')).toBe(
-      'There are more Not Numberwang cards in row 1 than Numberwang cards in row 4',
+      'There are more Wangernumb cards in row 1 than Numberwang cards in row 4',
     );
     expect(r('more_traits_in_unit_than_traits_in_unit(unit(col,1),numberwang,unit(col,3),not_numberwang)')).toBe(
-      'There are more Numberwang cards in column #C:1 than Not Numberwang cards in column #C:3',
+      'There are more Numberwang cards in column #C:1 than Wangernumb cards in column #C:3',
     );
     expect(
       r('more_traits_in_unit_than_traits_in_unit(unit(colour,cook),not_numberwang,unit(colour,cop),numberwang)'),
-    ).toBe('There are more Not Numberwang #COLOURS:cook than Numberwang #COLOURS:cop');
+    ).toBe('There are more Wangernumb #COLOURS:cook than Numberwang #COLOURS:cop');
   });
   it('equal_traits_in_unit_and_traits_in_unit', () => {
     expect(
       r('equal_traits_in_unit_and_traits_in_unit(unit(neighbor,3),numberwang,unit(neighbor,9),not_numberwang)'),
-    ).toBe('#NAME:3 has as many Numberwang neighbors as #NAME:9 has Not Numberwang ones');
+    ).toBe('#NAME:3 has as many Numberwang neighbors as #NAME:9 has Wangernumb ones');
     expect(r('equal_traits_in_unit_and_traits_in_unit(unit(row,1),not_numberwang,unit(row,4),numberwang)')).toBe(
-      'There are as many Not Numberwang cards in row 1 as Numberwang cards in row 4',
+      'There are as many Wangernumb cards in row 1 as Numberwang cards in row 4',
     );
     expect(r('equal_traits_in_unit_and_traits_in_unit(unit(col,1),numberwang,unit(col,3),not_numberwang)')).toBe(
-      'There are as many Numberwang cards in column #C:1 as Not Numberwang cards in column #C:3',
+      'There are as many Numberwang cards in column #C:1 as Wangernumb cards in column #C:3',
     );
     expect(
       r('equal_traits_in_unit_and_traits_in_unit(unit(colour,cook),not_numberwang,unit(colour,cop),numberwang)'),
-    ).toBe('There are as many Not Numberwang #COLOURS:cook as there are Numberwang #COLOURS:cop');
+    ).toBe('There are as many Wangernumb #COLOURS:cook as there are Numberwang #COLOURS:cop');
   });
   it('has_most_traits', () => {
     expect(r('has_most_traits(unit(col,2),numberwang)')).toBe(
       'Column #C:2 has more Numberwang cards than any other column',
     );
     expect(r('has_most_traits(unit(row,3),not_numberwang)')).toBe(
-      'Row 3 has more Not Numberwang cards than any other row',
+      'Row 3 has more Wangernumb cards than any other row',
     );
     expect(r('has_most_traits(unit(neighbor,7),not_numberwang)')).toBe(
-      '#NAME:7 has the most Not Numberwang neighbors',
+      '#NAME:7 has the most Wangernumb neighbors',
     );
   });
   it('only_unit_has_exactly_n_traits', () => {
     expect(r('only_unit_has_exactly_n_traits(unit(row,2),not_numberwang,3)')).toBe(
-      'Row 2 is the only row with exactly 3 Not Numberwang cards',
+      'Row 2 is the only row with exactly 3 Wangernumb cards',
     );
     expect(r('only_unit_has_exactly_n_traits(unit(col,4),numberwang,1)')).toBe(
       'Column #C:4 is the only column with exactly one Numberwang card',
@@ -220,10 +220,10 @@ describe('comparison clue templates', () => {
   });
   it('units_share_n_traits', () => {
     expect(r('units_share_n_traits(unit(neighbor,3),unit(neighbor,9),not_numberwang,1)')).toBe(
-      '#NAME:3 and #NAME:9 have only one Not Numberwang neighbor in common',
+      '#NAME:3 and #NAME:9 have only one Wangernumb neighbor in common',
     );
     expect(r('units_share_n_traits(unit(neighbor,3),unit(neighbor,9),not_numberwang,2)')).toBe(
-      '#NAME:3 and #NAME:9 have 2 Not Numberwang neighbors in common',
+      '#NAME:3 and #NAME:9 have 2 Wangernumb neighbors in common',
     );
     // "have 0 Numberwang neighbors in common" is not English the source would write,
     // and every other zero-count branch of this predicate spells the zero as a word.
@@ -231,20 +231,20 @@ describe('comparison clue templates', () => {
       '#NAME:3 and #NAME:9 have no Numberwang neighbors in common',
     );
     expect(r('units_share_n_traits(unit(between,pair(0,3)),unit(neighbor,9),not_numberwang,1)')).toBe(
-      'Exactly 1 Not Numberwang card #BETWEEN:pair(0,3) is neighboring #NAME:9',
+      'Exactly 1 Wangernumb card #BETWEEN:pair(0,3) is neighboring #NAME:9',
     );
     expect(r('units_share_n_traits(unit(between,pair(0,3)),unit(neighbor,9),not_numberwang,2)')).toBe(
-      'Exactly 2 Not Numberwang cards #BETWEEN:pair(0,3) are neighboring #NAME:9',
+      'Exactly 2 Wangernumb cards #BETWEEN:pair(0,3) are neighboring #NAME:9',
     );
     expect(r('units_share_n_traits(unit(between,pair(0,3)),unit(row,2),not_numberwang,0)')).toBe(
-      'No Not Numberwang card #BETWEEN:pair(0,3) is in row 2',
+      'No Wangernumb card #BETWEEN:pair(0,3) is in row 2',
     );
     // Ground truth (units_share_n_traits, line 60) attests a distinct zero-count phrasing for
-    // a neighbor target: "There are no Not Numberwang cards BTW who neighbor NAME" — not the generic
+    // a neighbor target: "There are no Wangernumb cards BTW who neighbor NAME" — not the generic
     // "No X ... is neighboring NAME" the row/col branch above uses. Added beyond the brief's
     // step-1 test to cover this deviation.
     expect(r('units_share_n_traits(unit(between,pair(0,3)),unit(neighbor,9),not_numberwang,0)')).toBe(
-      'There are no Not Numberwang cards #BETWEEN:pair(0,3) who neighbor #NAME:9',
+      'There are no Wangernumb cards #BETWEEN:pair(0,3) who neighbor #NAME:9',
     );
     // Fix round 1, Finding 1: neighbor-unit-first paired with a non-neighbor unit has at
     // least 3 mutually incompatible real sentence shapes in the archive (see fix report) —
@@ -255,10 +255,10 @@ describe('comparison clue templates', () => {
   });
   it('units_share_odd_n_traits', () => {
     expect(r('units_share_odd_n_traits(unit(between,pair(0,3)),unit(neighbor,9),not_numberwang)')).toBe(
-      'An odd number of Not Numberwang cards #BETWEEN:pair(0,3) neighbor #NAME:9',
+      'An odd number of Wangernumb cards #BETWEEN:pair(0,3) neighbor #NAME:9',
     );
     expect(r('units_share_odd_n_traits(unit(neighbor,9),unit(row,2),not_numberwang)')).toBe(
-      'An odd number of Not Numberwang cards in row 2 neighbor #NAME:9',
+      'An odd number of Wangernumb cards in row 2 neighbor #NAME:9',
     );
     expect(() => r('units_share_odd_n_traits(unit(row,1),unit(row,2),not_numberwang)')).toThrow(
       UnsupportedShapeError,
@@ -293,10 +293,10 @@ describe('adjacency and direction clue templates', () => {
   });
   it('max_number_of_traits_in_neighbors_in_unit', () => {
     expect(r('max_number_of_traits_in_neighbors_in_unit(unit(row,2),not_numberwang,3)')).toBe(
-      'No one in row 2 has more than 3 Not Numberwang neighbors',
+      'No one in row 2 has more than 3 Wangernumb neighbors',
     );
     expect(r('max_number_of_traits_in_neighbors_in_unit(unit(corner,void),not_numberwang,1)')).toBe(
-      'No one in the corners has more than one Not Numberwang neighbor',
+      'No one in the corners has more than one Wangernumb neighbor',
     );
   });
   it('both_traits_in_unit_are_in_unit', () => {
@@ -305,7 +305,7 @@ describe('adjacency and direction clue templates', () => {
     ).toBe('Both Numberwang cards #BETWEEN:pair(0,3) are #NAMES:9 neighbors');
     expect(
       r('both_traits_in_unit_are_in_unit(unit(neighbor,5),unit(neighbor,9),not_numberwang)'),
-    ).toBe('Both Not Numberwang cards neighboring #NAME:5 are #NAMES:9 neighbors');
+    ).toBe('Both Wangernumb cards neighboring #NAME:5 are #NAMES:9 neighbors');
   });
   it('only_trait_in_unit_is_in_unit', () => {
     expect(r('only_trait_in_unit_is_in_unit(unit(row,2),unit(neighbor,9),numberwang)')).toBe(
@@ -317,7 +317,7 @@ describe('adjacency and direction clue templates', () => {
   });
   it('both_traits_are_neighbors_in_unit and all_traits_are_neighbors_in_unit', () => {
     expect(r('both_traits_are_neighbors_in_unit(unit(between,pair(0,3)),not_numberwang)')).toBe(
-      'Both Not Numberwang cards #BETWEEN:pair(0,3) are connected',
+      'Both Wangernumb cards #BETWEEN:pair(0,3) are connected',
     );
     expect(r('all_traits_are_neighbors_in_unit(unit(between,pair(0,3)),numberwang)')).toBe(
       'All Numberwang cards #BETWEEN:pair(0,3) are connected',
@@ -325,7 +325,7 @@ describe('adjacency and direction clue templates', () => {
   });
   it('only_one_person_in_unit_has_exactly_n_trait_neighbors', () => {
     expect(r('only_one_person_in_unit_has_exactly_n_trait_neighbors(unit(row,2),not_numberwang,3)')).toBe(
-      'Only one card in row 2 has exactly 3 Not Numberwang neighbors',
+      'Only one card in row 2 has exactly 3 Wangernumb neighbors',
     );
     expect(
       r('only_one_person_in_unit_has_exactly_n_trait_neighbors(unit(corner,void),numberwang,0)'),
@@ -345,7 +345,7 @@ describe('adjacency and direction clue templates', () => {
       '3 cards on the edges have a Numberwang card directly above them',
     );
     expect(r('n_in_unit_have_trait_in_dir(unit(colour,builder),not_numberwang,0,-1,2)')).toBe(
-      '2 #COLOURS:builder have a Not Numberwang card directly above them',
+      '2 #COLOURS:builder have a Wangernumb card directly above them',
     );
   });
   it('n_t_in_unit_have_trait_in_dir', () => {
@@ -361,18 +361,18 @@ describe('adjacency and direction clue templates', () => {
     // minority variant); ground truth's dominant phrasing — also the convention used
     // everywhere else in this file for n=1 subjects — wins per task instructions.
     expect(r('n_t_in_unit_have_trait_in_dir(unit(row,2),numberwang,not_numberwang,1,0,1)')).toBe(
-      'Only one Numberwang card in row 2 has a Not Numberwang card directly to the right of them',
+      'Only one Numberwang card in row 2 has a Wangernumb card directly to the right of them',
     );
   });
   it('n_colours_have_trait_in_dir', () => {
     expect(r('n_colours_have_trait_in_dir(painter,not_numberwang,1,0,2)')).toBe(
-      '2 #COLOURS:painter have a Not Numberwang card directly to the right of them',
+      '2 #COLOURS:painter have a Wangernumb card directly to the right of them',
     );
     expect(r('n_colours_have_trait_in_dir(cook,not_numberwang,-1,0,1)')).toBe(
-      'Exactly 1 #COLOUR:cook has a Not Numberwang card directly to the left of them',
+      'Exactly 1 #COLOUR:cook has a Wangernumb card directly to the left of them',
     );
     expect(r('n_colours_have_trait_in_dir(singer,not_numberwang,-1,0,0)')).toBe(
-      'No #COLOUR:singer has a Not Numberwang card directly to the left of them',
+      'No #COLOUR:singer has a Wangernumb card directly to the left of them',
     );
   });
 });
@@ -387,24 +387,24 @@ describe('colour totals', () => {
 
   it('says how many there are in total, in each shape that counts a colour', () => {
     expect(rt('n_colours_have_trait_in_dir(painter,not_numberwang,1,0,2)')).toBe(
-      'Exactly 2 of #COLOURN:painter have a Not Numberwang card directly to the right of them',
+      'Exactly 2 of #COLOURN:painter have a Wangernumb card directly to the right of them',
     );
     expect(rt('n_colours_have_trait_in_dir(cook,not_numberwang,-1,0,1)')).toBe(
-      'Exactly 1 of #COLOURN:cook has a Not Numberwang card directly to the left of them',
+      'Exactly 1 of #COLOURN:cook has a Wangernumb card directly to the left of them',
     );
     expect(rt('n_in_unit_have_trait_in_dir(unit(colour,cook),not_numberwang,0,1,1)')).toBe(
-      'Exactly 1 of #COLOURN:cook has a Not Numberwang card directly below them',
+      'Exactly 1 of #COLOURN:cook has a Wangernumb card directly below them',
     );
     expect(
       rt('only_one_person_in_unit_has_exactly_n_trait_neighbors(unit(colour,cook),not_numberwang,2)'),
-    ).toBe('Exactly 1 of #COLOURN:cook has exactly 2 Not Numberwang neighbors');
+    ).toBe('Exactly 1 of #COLOURN:cook has exactly 2 Wangernumb neighbors');
   });
 
   // Zero of them is a "None of …" rather than an "Exactly 0 of …", matching the
   // archive's own habit of writing "No cook has …" instead of "0 cooks have …".
   it('says none rather than exactly zero', () => {
     expect(rt('n_colours_have_trait_in_dir(singer,not_numberwang,-1,0,0)')).toBe(
-      'None of #COLOURN:singer has a Not Numberwang card directly to the left of them',
+      'None of #COLOURN:singer has a Wangernumb card directly to the left of them',
     );
   });
 
@@ -443,8 +443,8 @@ describe('trait nouns', () => {
   it('never says "numberwangs"', () => {
     expect(plural('numberwang', 1)).toBe('Numberwang card');
     expect(plural('numberwang', 3)).toBe('Numberwang cards');
-    expect(plural('not_numberwang', 1)).toBe('Not Numberwang card');
-    expect(plural('not_numberwang', 3)).toBe('Not Numberwang cards');
+    expect(plural('not_numberwang', 1)).toBe('Wangernumb card');
+    expect(plural('not_numberwang', 3)).toBe('Wangernumb cards');
   });
 });
 
@@ -488,7 +488,7 @@ describe('arithmetic clue text', () => {
 
   it('renders odd parity, and the other trait', () => {
     expect(say('sum_parity_in_unit(unit(col,2),not_numberwang,1)')).toBe(
-      `The Not Numberwang cards in column${NBSP}#C:2 add to an odd number`,
+      `The Wangernumb cards in column${NBSP}#C:2 add to an odd number`,
     );
   });
 
@@ -512,13 +512,13 @@ describe('arithmetic clue text', () => {
       `3 of the Numberwang cards in column${NBSP}#C:2 are even`,
     );
     expect(say('n_traits_in_unit_are_odd(unit(edge,void),not_numberwang,4)')).toBe(
-      '4 of the Not Numberwang cards on the edges are odd',
+      '4 of the Wangernumb cards on the edges are odd',
     );
   });
 
   it('names the divisor, and the colour group as a token', () => {
     expect(say('n_traits_in_unit_are_divisible(unit(colour,teal),not_numberwang,3,2)')).toBe(
-      '2 of the Not Numberwang cards among the #COLOURS:teal are divisible by 3',
+      '2 of the Wangernumb cards among the #COLOURS:teal are divisible by 3',
     );
   });
 

@@ -153,7 +153,7 @@
       "number": 1,
       "colour": "green",
       "numberwang": false,
-      "clue": "#NAME:13 and #NAME:5 have only one Not Numberwang neighbor in common",
+      "clue": "#NAME:13 and #NAME:5 have only one Wangernumb neighbor in common",
       "origHint": "units_share_n_traits(unit(neighbor,13),unit(neighbor,5),not_numberwang,1)",
       "paths": [
         [
@@ -166,7 +166,7 @@
       "number": 9,
       "colour": "blue",
       "numberwang": true,
-      "clue": "#NAME:13 is the only one with exactly 5 Not Numberwang neighbor",
+      "clue": "#NAME:13 is the only one with exactly 5 Wangernumb neighbor",
       "origHint": "only_unit_has_exactly_n_traits(unit(neighbor,13),not_numberwang,5)",
       "paths": [
         [
@@ -178,7 +178,7 @@
       "number": 5,
       "colour": "green",
       "numberwang": true,
-      "clue": "#NAME:17 is one of 2 Not Numberwang cards #BETWEEN:pair(17,19)",
+      "clue": "#NAME:17 is one of 2 Wangernumb cards #BETWEEN:pair(17,19)",
       "origHint": "is_one_of_n_traits_in_unit(unit(between,pair(17,19)),17,not_numberwang,2)",
       "paths": []
     },
@@ -258,7 +258,7 @@
       "number": 6,
       "colour": "orange",
       "numberwang": false,
-      "clue": "There are exactly 2 Not Numberwang cards #BETWEEN:pair(12,13)",
+      "clue": "There are exactly 2 Wangernumb cards #BETWEEN:pair(12,13)",
       "origHint": "number_of_traits_in_unit(unit(between,pair(12,13)),not_numberwang,2)",
       "paths": [
         [
@@ -285,7 +285,7 @@
       "number": 13,
       "colour": "blue",
       "numberwang": true,
-      "clue": "#NAME:5 and #NAME:14 have an equal number of Not Numberwang neighbors",
+      "clue": "#NAME:5 and #NAME:14 have an equal number of Wangernumb neighbors",
       "origHint": "equal_number_of_traits_in_units(unit(neighbor,5),unit(neighbor,14),not_numberwang)",
       "paths": [
         [

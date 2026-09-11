@@ -44,11 +44,11 @@ describe('sum_of_trait_in_unit', () => {
     expect(ev('sum_of_trait_in_unit(unit(row,1),not_numberwang,27)')).toBe(true);
   });
   it('sums a colour group as readily as a row', () => {
-    // Blue is cards 2 and 3 — 23 Not Numberwang, 8 Numberwang.
+    // Blue is cards 2 and 3 — 23 Wangernumb, 8 Numberwang.
     expect(ev('sum_of_trait_in_unit(unit(colour,blue),numberwang,8)')).toBe(true);
   });
   it('is true at 0 for a unit with none of the trait', () => {
-    // Cards 1 and 2 are both Not Numberwang.
+    // Cards 1 and 2 are both Wangernumb.
     expect(ev('sum_of_trait_in_unit(unit(between,pair(1,2)),numberwang,0)')).toBe(true);
   });
 });
@@ -90,7 +90,7 @@ describe('sum_parity_in_unit', () => {
     expect(ev('sum_parity_in_unit(unit(row,1),numberwang,0)')).toBe(false);
   });
   it('reads the other trait as readily', () => {
-    // Blue's one Not Numberwang card is 23, an odd sum.
+    // Blue's one Wangernumb card is 23, an odd sum.
     expect(ev('sum_parity_in_unit(unit(colour,blue),not_numberwang,1)')).toBe(true);
   });
   it('treats an empty sum of 0 as even', () => {
@@ -180,7 +180,7 @@ describe('counting by a property of the number', () => {
   it('counts evens and odds separately, and only among the trait', () => {
     expect(ev('n_traits_in_unit_are_even(unit(edge,void),numberwang,2)')).toBe(true);
     expect(ev('n_traits_in_unit_are_odd(unit(edge,void),numberwang,2)')).toBe(true);
-    // Row 1's Not Numberwang cards are 4 and 23 — one of each.
+    // Row 1's Wangernumb cards are 4 and 23 — one of each.
     expect(ev('n_traits_in_unit_are_even(unit(row,1),not_numberwang,1)')).toBe(true);
     expect(ev('n_traits_in_unit_are_odd(unit(row,1),not_numberwang,1)')).toBe(true);
   });

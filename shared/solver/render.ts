@@ -16,7 +16,7 @@ const colourN = (c: string) => `#COLOURN:${c}`;
 /**
  * How much the renderer says beyond what the source site says.
  *
- * `colourTotals` turns "Exactly 1 teal card has a Not Numberwang card below it"
+ * `colourTotals` turns "Exactly 1 teal card has a Wangernumb card below it"
  * into "Exactly 1 of 3 teal cards has …". The source never states the total, which is
  * fine on its 4x5 board where you can count five cooks at a glance and less fine
  * on a 7x7 with twenty-one colours. Off by default so that `render` stays a
@@ -47,9 +47,17 @@ const between = (a: number, b: number) => `#BETWEEN:pair(${a},${b})`;
  */
 const NBSP = ' ';
 
+/**
+ * The two verdicts as a player reads them. "Wangernumb" is the show's own
+ * reversed round, and the nearest thing it has to an opposite — Numberwang is
+ * only ever declared, never denied. It is also one word where "Not Numberwang"
+ * was two, which a clue repeats four times a board and a button has to fit.
+ * The DSL keeps calling the trait `not_numberwang`; this is the only place the
+ * two names meet.
+ */
 const NOUN: Record<Trait, [string, string]> = {
   numberwang: ['Numberwang card', 'Numberwang cards'],
-  not_numberwang: ['Not Numberwang card', 'Not Numberwang cards'],
+  not_numberwang: ['Wangernumb card', 'Wangernumb cards'],
 };
 
 /** The noun a clue uses for a trait. Never "numberwangs": the trait is a
@@ -61,7 +69,7 @@ export function plural(t: Trait, n: number): string {
 
 const ADJ: Record<Trait, string> = {
   numberwang: 'Numberwang',
-  not_numberwang: 'Not Numberwang',
+  not_numberwang: 'Wangernumb',
 };
 
 /**

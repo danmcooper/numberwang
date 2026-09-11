@@ -113,7 +113,7 @@
       "number": 16,
       "colour": "yellow",
       "numberwang": true,
-      "clue": "Two Not Numberwang cards #BETWEEN:pair(5,17) subtract to 8",
+      "clue": "Two Wangernumb cards #BETWEEN:pair(5,17) subtract to 8",
       "origHint": "diff_of_two_traits_in_unit(unit(between,pair(5,17)),not_numberwang,8)",
       "paths": [
         [
@@ -125,7 +125,7 @@
       "number": 10,
       "colour": "green",
       "numberwang": true,
-      "clue": "#NAME:19 is Not Numberwang",
+      "clue": "#NAME:19 is Wangernumb",
       "origHint": "has_trait(19,not_numberwang)",
       "paths": [
         [
@@ -161,7 +161,7 @@
       "number": 1,
       "colour": "purple",
       "numberwang": true,
-      "clue": "#NAME:17 is one of #NAMES:12 3 Not Numberwang neighbors",
+      "clue": "#NAME:17 is one of #NAMES:12 3 Wangernumb neighbors",
       "origHint": "is_one_of_n_traits_in_unit(unit(neighbor,12),17,not_numberwang,3)",
       "paths": [
         [
@@ -196,7 +196,7 @@
       "number": 5,
       "colour": "yellow",
       "numberwang": true,
-      "clue": "There are more Numberwang cards than Not Numberwang cards #BETWEEN:pair(3,19)",
+      "clue": "There are more Numberwang cards than Wangernumb cards #BETWEEN:pair(3,19)",
       "origHint": "more_traits_than_traits_in_unit(unit(between,pair(3,19)),numberwang,not_numberwang)",
       "paths": [
         [
@@ -243,7 +243,7 @@
       "number": 3,
       "colour": "pink",
       "numberwang": false,
-      "clue": "Only 1 of the 4 Not Numberwang cards neighboring #NAME:1 is in column #C:3",
+      "clue": "Only 1 of the 4 Wangernumb cards neighboring #NAME:1 is in column #C:3",
       "origHint": "unit_shares_n_out_of_n_traits_with_unit(unit(neighbor,1),unit(col,3),not_numberwang,1,4)",
       "paths": [
         [

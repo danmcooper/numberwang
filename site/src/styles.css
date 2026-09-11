@@ -29,8 +29,8 @@
   --card-unsolved-border: #ddd6cc;
   --card-numberwang: #ffd9b8;
   --card-numberwang-text: #3a2a1c;
-  --card-not: #111;
-  --card-not-text: #fff;
+  --card-wangernumb: #111;
+  --card-wangernumb-text: #fff;
   --confetti-blue: #7fb2e5;
   --confetti-pink: #f2a6c4;
 
@@ -360,9 +360,9 @@ a {
   border-color: #e8bd93;
   --tag-neutral: #f0c9a6;
 }
-.card.not-numberwang {
-  background: var(--card-not);
-  color: var(--card-not-text);
+.card.wangernumb {
+  background: var(--card-wangernumb);
+  color: var(--card-wangernumb-text);
   /* The page ground is #1a1d24, so a #111 card needs an edge or it dissolves
      into the gap between cards. */
   border-color: #3a3a3a;

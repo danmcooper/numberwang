@@ -120,7 +120,7 @@
       "number": 3,
       "colour": "green",
       "numberwang": true,
-      "clue": "#NAME:1 is one of 2 Not Numberwang cards #BETWEEN:pair(0,3)",
+      "clue": "#NAME:1 is one of 2 Wangernumb cards #BETWEEN:pair(0,3)",
       "origHint": "is_one_of_n_traits_in_unit(unit(between,pair(0,3)),1,not_numberwang,2)",
       "paths": [
         [
@@ -132,7 +132,7 @@
       "number": 17,
       "colour": "red",
       "numberwang": true,
-      "clue": "There's an odd number of Not Numberwang cards in the corners",
+      "clue": "There's an odd number of Wangernumb cards in the corners",
       "origHint": "odd_number_of_traits_in_unit(unit(corner,void),not_numberwang)",
       "paths": [
         [
@@ -194,7 +194,7 @@
       "number": 9,
       "colour": "green",
       "numberwang": false,
-      "clue": "Only one card neighboring #NAME:7 has exactly 4 Not Numberwang neighbors",
+      "clue": "Only one card neighboring #NAME:7 has exactly 4 Wangernumb neighbors",
       "origHint": "only_one_person_in_unit_has_exactly_n_trait_neighbors(unit(neighbor,7),not_numberwang,4)",
       "paths": [
         [
@@ -221,7 +221,7 @@
       "number": 5,
       "colour": "pink",
       "numberwang": true,
-      "clue": "Exactly 2 of the 6 Not Numberwang cards on the edges are #BETWEEN:pair(1,17)",
+      "clue": "Exactly 2 of the 6 Wangernumb cards on the edges are #BETWEEN:pair(1,17)",
       "origHint": "unit_shares_n_out_of_n_traits_with_unit(unit(edge,void),unit(between,pair(1,17)),not_numberwang,2,6)",
       "paths": [
         [

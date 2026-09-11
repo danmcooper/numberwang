@@ -81,10 +81,11 @@ export default function Card({
   const classes = [
     "card",
     flipped ? "flipped" : "",
-    // `not-numberwang` with a hyphen, not the DSL's underscore: this is a class
-    // name for a state, not a trait token. `numberwang` is a substring of
-    // `not-numberwang`, so read the specific class rather than the whole string.
-    flipped ? (person.numberwang ? "numberwang" : "not-numberwang") : "",
+    // The card's own word for the trait the DSL calls `not_numberwang`, which
+    // keeps its underscored name in hints and puzzle data. Tests still read
+    // this with classList.contains rather than a substring check: the two words
+    // no longer overlap, but the next state class added here might.
+    flipped ? (person.numberwang ? "numberwang" : "wangernumb") : "",
     rejected ? "rejected" : "",
     consumed ? "consumed" : "",
     hintClue ? "hint-clue" : "",

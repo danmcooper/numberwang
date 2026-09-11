@@ -15,7 +15,7 @@
       "number": 12,
       "colour": "purple",
       "numberwang": true,
-      "clue": "Only one column has exactly 2 Not Numberwang cards",
+      "clue": "Only one column has exactly 2 Wangernumb cards",
       "origHint": "only_one_unit_has_exactly_n_traits(col,not_numberwang,2)",
       "paths": [
         [
@@ -49,7 +49,7 @@
       "number": 19,
       "colour": "green",
       "numberwang": true,
-      "clue": "Both Not Numberwang cards #BETWEEN:pair(4,7) are #NAMES:10 neighbors",
+      "clue": "Both Wangernumb cards #BETWEEN:pair(4,7) are #NAMES:10 neighbors",
       "origHint": "both_traits_in_unit_are_in_unit(unit(between,pair(4,7)),unit(neighbor,10),not_numberwang)",
       "paths": [
         [
@@ -195,7 +195,7 @@
       "number": 7,
       "colour": "pink",
       "numberwang": true,
-      "clue": "#NAME:10 has the most Not Numberwang neighbors",
+      "clue": "#NAME:10 has the most Wangernumb neighbors",
       "origHint": "has_most_traits(unit(neighbor,10),not_numberwang)",
       "paths": [
         [
@@ -229,7 +229,7 @@
       "number": 5,
       "colour": "purple",
       "numberwang": true,
-      "clue": "There are exactly 2 Not Numberwang cards in column #C:3",
+      "clue": "There are exactly 2 Wangernumb cards in column #C:3",
       "origHint": "number_of_traits_in_unit(unit(col,3),not_numberwang,2)",
       "paths": [
         [
@@ -317,7 +317,7 @@
       "number": 14,
       "colour": "pink",
       "numberwang": true,
-      "clue": "None of the Not Numberwang cards on the edges is divisible by 6",
+      "clue": "None of the Wangernumb cards on the edges is divisible by 6",
       "origHint": "n_traits_in_unit_are_divisible(unit(edge,void),not_numberwang,6,0)",
       "paths": [
         [

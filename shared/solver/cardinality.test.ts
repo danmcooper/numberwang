@@ -179,7 +179,7 @@ describe('counter comparisons', () => {
 
 describe('encodings over negative literals', () => {
   it('counts a negated literal as true when its variable is false', () => {
-    // Not Numberwang cards enter the encoding as -v, so this is the common case, not
+    // Wangernumb cards enter the encoding as -v, so this is the common case, not
     // an edge case.
     const cnf = new Cnf();
     const vars = [cnf.newVar(), cnf.newVar(), cnf.newVar()];

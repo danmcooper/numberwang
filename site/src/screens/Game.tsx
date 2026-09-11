@@ -340,11 +340,11 @@ function GuessModal({
         <div className="modal-prof">{person.colour}</div>
         <div className="modal-choices">
           <button
-            className="btn-not_numberwang"
+            className="btn-wangernumb"
             disabled={blocked.includes("not_numberwang")}
             onClick={() => onGuess("not_numberwang")}
           >
-            NotNumberwang
+            Wangernumb
           </button>
           <button
             className="btn-numberwang"

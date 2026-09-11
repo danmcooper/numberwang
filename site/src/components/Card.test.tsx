@@ -69,12 +69,12 @@ describe('Card', () => {
   it('marks a flipped Numberwang card', () => {
     render(<Card {...base} flipped person={person(17, 'teal', true)} />);
     expect(cardEl().classList.contains('numberwang')).toBe(true);
-    expect(cardEl().classList.contains('not-numberwang')).toBe(false);
+    expect(cardEl().classList.contains('wangernumb')).toBe(false);
   });
 
-  it('marks a flipped Not Numberwang card', () => {
+  it('marks a flipped Wangernumb card', () => {
     render(<Card {...base} flipped person={person(17, 'teal', false)} />);
-    expect(cardEl().classList.contains('not-numberwang')).toBe(true);
+    expect(cardEl().classList.contains('wangernumb')).toBe(true);
     expect(cardEl().classList.contains('numberwang')).toBe(false);
   });
 
@@ -83,7 +83,7 @@ describe('Card', () => {
     expect(screen.getByText("That's Numberwang!")).toBeTruthy();
   });
 
-  it('does not say the catchphrase for a Not Numberwang card', () => {
+  it('does not say the catchphrase for a Wangernumb card', () => {
     render(<Card {...base} flipped justFlipped person={person(17, 'teal', false)} />);
     expect(screen.queryByText("That's Numberwang!")).toBeNull();
     expect(screen.getByText('Correct!')).toBeTruthy();
