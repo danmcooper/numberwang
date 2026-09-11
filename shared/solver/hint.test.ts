@@ -66,9 +66,11 @@ describe('formatHint', () => {
 
 describe('ARG_KINDS', () => {
   // 27 the archive uses, plus the two cross-trait comparisons it never does —
-  // see CROSS_TRAIT in corpus.ts — plus the four arithmetic ones, which no
-  // archive puzzle could have contained because they read the cards' numbers.
-  it('covers all 33 predicates', () => {
-    expect(Object.keys(ARG_KINDS)).toHaveLength(33);
+  // see CROSS_TRAIT in corpus.ts — plus the eight arithmetic ones, which no
+  // archive puzzle could have contained because they read the cards' numbers:
+  // four over a unit's total and four counting cards by a property of their own
+  // number. See ARITH_PREDS in arith.ts.
+  it('covers all 37 predicates', () => {
+    expect(Object.keys(ARG_KINDS)).toHaveLength(37);
   });
 });

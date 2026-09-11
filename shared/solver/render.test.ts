@@ -492,12 +492,46 @@ describe('arithmetic clue text', () => {
     );
   });
 
+  it('renders a count of primes', () => {
+    expect(say('n_traits_in_unit_are_prime(unit(row,2),numberwang,2)')).toBe(
+      `2 of the Numberwang cards in row${NBSP}2 are prime`,
+    );
+  });
+
+  it('spells one and none rather than printing them', () => {
+    expect(say('n_traits_in_unit_are_prime(unit(row,2),numberwang,1)')).toBe(
+      `Exactly one of the Numberwang cards in row${NBSP}2 is prime`,
+    );
+    expect(say('n_traits_in_unit_are_prime(unit(row,2),numberwang,0)')).toBe(
+      `None of the Numberwang cards in row${NBSP}2 is prime`,
+    );
+  });
+
+  it('renders even and odd counts, and keeps the #C token in a column', () => {
+    expect(say('n_traits_in_unit_are_even(unit(col,2),numberwang,3)')).toBe(
+      `3 of the Numberwang cards in column${NBSP}#C:2 are even`,
+    );
+    expect(say('n_traits_in_unit_are_odd(unit(edge,void),not_numberwang,4)')).toBe(
+      '4 of the Not Numberwang cards on the edges are odd',
+    );
+  });
+
+  it('names the divisor, and the colour group as a token', () => {
+    expect(say('n_traits_in_unit_are_divisible(unit(colour,teal),not_numberwang,3,2)')).toBe(
+      '2 of the Not Numberwang cards among #COLOURS:teal are divisible by 3',
+    );
+  });
+
   it('can render every arithmetic predicate', () => {
     for (const src of [
       'sum_of_trait_in_unit(unit(row,1),numberwang,25)',
       'diff_of_two_traits_in_unit(unit(row,1),numberwang,9)',
       'more_sum_in_unit_than_unit(unit(row,1),unit(row,3),numberwang)',
       'sum_parity_in_unit(unit(row,1),numberwang,1)',
+      'n_traits_in_unit_are_prime(unit(row,1),numberwang,2)',
+      'n_traits_in_unit_are_even(unit(row,1),numberwang,2)',
+      'n_traits_in_unit_are_odd(unit(row,1),numberwang,2)',
+      'n_traits_in_unit_are_divisible(unit(row,1),numberwang,3,1)',
     ]) {
       expect(canRender(parseHint(src)), src).toBe(true);
     }

@@ -65,11 +65,19 @@ export const ARG_KINDS: Record<string, ArgKind[]> = {
   n_t_in_unit_have_trait_in_dir: [U, T, T, N, N, N],
   n_colours_have_trait_in_dir: [P, T, N, N, N],
 
-  // The four that read the numbers as values. See `arith.ts`.
+  // The ones that read the numbers as values rather than as labels. See
+  // `arith.ts`. The first four do arithmetic over a unit's total; the rest
+  // count the cards in a unit whose own number has some property.
   sum_of_trait_in_unit: [U, T, N],
   diff_of_two_traits_in_unit: [U, T, N],
   more_sum_in_unit_than_unit: [U, U, T],
   sum_parity_in_unit: [U, T, N],
+  n_traits_in_unit_are_prime: [U, T, N],
+  n_traits_in_unit_are_even: [U, T, N],
+  n_traits_in_unit_are_odd: [U, T, N],
+  // Divisor first, then the count: `(unit(row,1),numberwang,3,2)` is "2 of the
+  // Numberwang cards in row 1 are divisible by 3".
+  n_traits_in_unit_are_divisible: [U, T, N, N],
 };
 
 /** Split on top-level commas, ignoring commas nested inside parentheses. */

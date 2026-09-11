@@ -7,14 +7,14 @@
  * each clue becomes a constraint over one Boolean per card, and the board stops
  * being the thing that sets the cost.
  *
- * Thirty-three predicates, but not thirty-three encodings: measured over the 685
+ * Thirty-seven predicates, but not thirty-seven encodings: measured over the 685
  * clues in the real archive they fall into six shapes. A count over one fixed
  * set of cards is 39% of them, two counts compared is 14%, a count with a
  * literal attached 11%, two counts conjoined 12%, a reified count fed into a
  * second count 13%, and the small structural clues the remaining 9%. A
  * totalizer, a parity chain and Tseitin reification carry all but the last.
  *
- * The four arithmetic predicates are the exception and live in `arith.ts`,
+ * The eight arithmetic predicates are the exception and live in `arith.ts`,
  * which blocks their rejected assignments outright rather than counting
  * anything. `encodeHint` hands them straight over.
  */
@@ -75,6 +75,10 @@ export const SUPPORTED: ReadonlySet<string> = new Set([
   'diff_of_two_traits_in_unit',
   'more_sum_in_unit_than_unit',
   'sum_parity_in_unit',
+  'n_traits_in_unit_are_prime',
+  'n_traits_in_unit_are_even',
+  'n_traits_in_unit_are_odd',
+  'n_traits_in_unit_are_divisible',
 ]);
 
 export function supports(hint: Hint): boolean {

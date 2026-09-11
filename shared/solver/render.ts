@@ -200,6 +200,22 @@ function dirSubject(u: Unit, n: number, o: RenderOptions): string {
   return n === 1 ? `Only one person ${wherePerson(u)}` : `${n} persons ${wherePerson(u)}`;
 }
 
+/**
+ * "2 of the Numberwang cards in row 2 are prime."
+ *
+ * Shared by the four counting predicates in `arith.ts`, which differ only in the
+ * property they name. Zero takes "None … is" and one takes "Exactly one … is",
+ * following the archive's own habit of spelling small counts rather than
+ * printing them — see `n_colours_have_trait_in_dir`.
+ */
+function propertyCount(a: HintArg[], countAt: number, property: string): string {
+  const cards = `${plural(argTrait(a, 1), 2)} ${unitPhrase(argUnit(a, 0))}`;
+  const n = argNum(a, countAt);
+  if (n === 0) return `None of the ${cards} is ${property}`;
+  if (n === 1) return `Exactly one of the ${cards} is ${property}`;
+  return `${n} of the ${cards} are ${property}`;
+}
+
 export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => string> = {
   has_trait: (a) => {
     const t = argTrait(a, 1);
@@ -575,6 +591,11 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     const parity = argNum(a, 2) === 0 ? 'even' : 'odd';
     return `The ${plural(argTrait(a, 1), 2)} ${unitPhrase(argUnit(a, 0))} add to an ${parity} number`;
   },
+
+  n_traits_in_unit_are_prime: (a) => propertyCount(a, 2, 'prime'),
+  n_traits_in_unit_are_even: (a) => propertyCount(a, 2, 'even'),
+  n_traits_in_unit_are_odd: (a) => propertyCount(a, 2, 'odd'),
+  n_traits_in_unit_are_divisible: (a) => propertyCount(a, 3, `divisible by ${argNum(a, 2)}`),
 };
 
 export function render(h: Hint, options: RenderOptions = NO_EXTRAS): string {

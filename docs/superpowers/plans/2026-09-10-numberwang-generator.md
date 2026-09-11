@@ -1667,6 +1667,45 @@ locative for the obvious reason — a colour group is not anywhere."
 
 ---
 
+### Task 9b: Number properties — prime, even, odd, divisible by n
+
+Added mid-execution, at the user's request, after Task 9 and before Task 10 so
+that the budgets in Task 10 are written once for all eight predicates rather
+than twice.
+
+Four counting predicates, all `[U, T, N]` but for the divisor that
+`n_traits_in_unit_are_divisible` carries ahead of its count:
+
+- `n_traits_in_unit_are_prime`
+- `n_traits_in_unit_are_even`
+- `n_traits_in_unit_are_odd`
+- `n_traits_in_unit_are_divisible`
+
+They live in `arith.ts` beside the four sum predicates and reuse every piece of
+machinery Tasks 6–9 built: `encodeArith` encodes them unchanged, because
+blocking clauses do not care what Boolean function they are blocking;
+`arithCandidates` proposes the count the board has; `propertyCount` in
+`render.ts` says all four.
+
+Three judgements worth keeping:
+
+- **The divisor floor is 3.** "Divisible by 1" is every card and "divisible by
+  2" is `n_traits_in_unit_are_even` in worse English, so `MIN_DIVISOR` refuses
+  both rather than leaving the generator to write a clue the player already has.
+- **Candidates only propose a count that could have differed.** If no member of
+  the unit has the property, the count is 0 under every assignment and the clue
+  is a tautology — the same failure `sum_parity_in_unit` had over a unit of
+  all-even numbers.
+- **Divisors are drawn from what actually divides something in the unit**, and
+  never above the unit's largest number: "divisible by 19" over a unit whose
+  biggest card is 12 is a roundabout way of saying none of them are.
+
+`ARITH_PREDS` is now `SUM_PREDS` plus `PROP_PREDS`, so everything keyed off it —
+`IS_ARITH`, `SUPPORTED`, the differential test, Task 10's budgets — picks the
+new four up without a second list to keep in step.
+
+---
+
 ### Task 10: Clue-mix budgets and the one-per-puzzle cap
 
 Without this the four predicates are generated never: `clue-mix.json` comes from an archive that never wrote them, so their share is 0, and `orderPool` multiplies by share.

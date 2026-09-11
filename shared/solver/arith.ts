@@ -2,8 +2,14 @@
  * The four clue families that do arithmetic on the cards' numbers.
  *
  * Everything Clues by Sam wrote is a function of the hidden verdict alone —
- * counting cards, comparing counts, checking adjacency. These four read the
- * numbers as values, which is the one thing a name could never do.
+ * counting cards, comparing counts, checking adjacency. These read the numbers
+ * as values, which is the one thing a name could never do.
+ *
+ * Two groups. Four do arithmetic over a unit's total — its sum, a gap between
+ * two of its cards, a comparison against another unit, the sum's parity. Four
+ * more count the cards in a unit whose own number is prime, even, odd, or
+ * divisible by something. Both groups encode identically, because both are
+ * arbitrary Boolean functions of one small set of cards.
  *
  * Semantics, candidate enumeration and CNF encoding all live here rather than
  * in the three modules that would otherwise own a third each. They have to
@@ -17,15 +23,77 @@ import { type Board, MAX_ENUMERATED_UNIT, hasTrait, unitMembers } from './board'
 
 export class ArithError extends Error {}
 
-/** The four, in the order this file defines them. */
-export const ARITH_PREDS = [
+/** The four that work on a unit's total. */
+export const SUM_PREDS = [
   'sum_of_trait_in_unit',
   'diff_of_two_traits_in_unit',
   'more_sum_in_unit_than_unit',
   'sum_parity_in_unit',
 ] as const;
 
-export const IS_ARITH: ReadonlySet<string> = new Set(ARITH_PREDS);
+/** The four that count cards by a property of their own number. */
+export const PROP_PREDS = [
+  'n_traits_in_unit_are_prime',
+  'n_traits_in_unit_are_even',
+  'n_traits_in_unit_are_odd',
+  'n_traits_in_unit_are_divisible',
+] as const;
+
+/** Both groups, in the order this file defines them. */
+export const ARITH_PREDS = [...SUM_PREDS, ...PROP_PREDS] as const;
+
+export const IS_ARITH: ReadonlySet<string> = new Set<string>(ARITH_PREDS);
+
+/**
+ * Whether `x` is prime. Numbers on a board run 1..size, so trial division to
+ * the square root is not merely adequate, it is over-engineering.
+ */
+export function isPrime(x: number): boolean {
+  if (x < 2) return false;
+  for (let d = 2; d * d <= x; d++) if (x % d === 0) return false;
+  return true;
+}
+
+/**
+ * The smallest divisor a divisibility clue may name.
+ *
+ * Three. "Divisible by 1" is every card and "divisible by 2" is
+ * `n_traits_in_unit_are_even` in worse English, so both are excluded rather than
+ * left to produce a clue the player has already been given.
+ */
+export const MIN_DIVISOR = 3;
+
+/** Count of the members holding `t` whose number satisfies `ok`. */
+function countWhere(
+  b: Board,
+  members: number[],
+  t: Trait,
+  ok: (x: number) => boolean,
+): number {
+  let n = 0;
+  for (const i of members) if (hasTrait(b, i, t) && ok(b.numbers[i])) n++;
+  return n;
+}
+
+/** The property each counting predicate tests, given its arguments. */
+const PROPERTY: Record<string, (a: HintArg[]) => (x: number) => boolean> = {
+  n_traits_in_unit_are_prime: () => isPrime,
+  n_traits_in_unit_are_even: () => (x) => x % 2 === 0,
+  n_traits_in_unit_are_odd: () => (x) => x % 2 === 1,
+  n_traits_in_unit_are_divisible: (a) => {
+    const d = argNum(a, 2);
+    if (d < MIN_DIVISOR) throw new ArithError(`divisor must be at least ${MIN_DIVISOR}, got ${d}`);
+    return (x) => x % d === 0;
+  },
+};
+
+/** Where each counting predicate keeps the count it asserts. */
+const COUNT_AT: Record<string, number> = {
+  n_traits_in_unit_are_prime: 2,
+  n_traits_in_unit_are_even: 2,
+  n_traits_in_unit_are_odd: 2,
+  n_traits_in_unit_are_divisible: 3,
+};
 
 /** Sum of the numbers on the members that hold `t`. Empty sums to 0. */
 export function traitSum(b: Board, members: number[], t: Trait): number {
@@ -82,6 +150,17 @@ export const ARITH_EVALUATORS: Record<string, (b: Board, a: HintArg[]) => boolea
     if (want !== 0 && want !== 1) throw new ArithError(`parity must be 0 or 1, got ${want}`);
     return traitSum(b, unitMembers(b, argUnit(a, 0)), argTrait(a, 1)) % 2 === want;
   },
+
+  // All four counting predicates are the same evaluator over a different
+  // property, so they share one rather than repeating it with the test swapped.
+  ...Object.fromEntries(
+    PROP_PREDS.map((pred) => [
+      pred,
+      (b: Board, a: HintArg[]) =>
+        countWhere(b, unitMembers(b, argUnit(a, 0)), argTrait(a, 1), PROPERTY[pred](a)) ===
+        argNum(a, COUNT_AT[pred]),
+    ]),
+  ),
 };
 
 /**
@@ -176,6 +255,32 @@ export function arithCandidates(b: Board, units: Unit[]): Hint[] {
       }
       for (const gap of [...gaps].sort((p, q) => p - q)) {
         out.push({ pred: 'diff_of_two_traits_in_unit', args: [u(unit), t(trait), n(gap)] });
+      }
+    }
+
+    // The counting predicates. Each proposes the count the board actually has,
+    // but only where that count could have come out differently: if no member of
+    // the unit has the property at all, the count is 0 under every assignment
+    // and the clue is a tautology dressed as arithmetic.
+    for (const unit of units) {
+      const mem = membersOf(unit);
+      if (mem.length > MAX_ENUMERATED_UNIT) continue;
+
+      const propose = (pred: string, ok: (x: number) => boolean, extra: HintArg[]) => {
+        if (!mem.some((i) => ok(b.numbers[i]))) return;
+        const count = mem.filter((i) => hasTrait(b, i, trait) && ok(b.numbers[i])).length;
+        out.push({ pred, args: [u(unit), t(trait), ...extra, n(count)] });
+      };
+
+      propose('n_traits_in_unit_are_prime', isPrime, []);
+      propose('n_traits_in_unit_are_even', (x) => x % 2 === 0, []);
+      propose('n_traits_in_unit_are_odd', (x) => x % 2 === 1, []);
+      // Only divisors that actually divide something here, and only up to the
+      // unit's own largest number — "divisible by 19" over a unit whose biggest
+      // card is 12 is a roundabout way of saying none of them are.
+      const largest = Math.max(0, ...mem.map((i) => b.numbers[i]));
+      for (let d = MIN_DIVISOR; d <= largest; d++) {
+        propose('n_traits_in_unit_are_divisible', (x) => x % d === 0, [n(d)]);
       }
     }
 

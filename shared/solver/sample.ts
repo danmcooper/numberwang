@@ -17,7 +17,7 @@ import type { Shape } from './enumerate';
 import { isConnected, neighbors, offsetIndex } from './grid';
 import type { Hint, Trait, Unit, UnitKind } from './hint';
 import { type Board, MAX_ENUMERATED_UNIT, unitMembers, unitsOfKind } from './board';
-import { traitSum } from './arith';
+import { MIN_DIVISOR, isPrime, traitSum } from './arith';
 
 const num = (n: number) => ({ t: 'num' as const, n });
 const unit = (u: Unit) => ({ t: 'unit' as const, unit: u });
@@ -74,6 +74,29 @@ export function randomUnit(rng: () => number, shape: Shape, colours: string[]): 
  */
 function withinCeiling(c: SampleCtx, us: Unit[]): boolean {
   return new Set(us.flatMap((u) => c.members(u))).size <= MAX_ENUMERATED_UNIT;
+}
+
+/**
+ * A counting-by-property clue over `u`, at the count the board actually has.
+ *
+ * `suffix` names which of the four is being built; the count always comes last,
+ * after whatever the predicate carries in between — the divisor, for the one
+ * that has one.
+ */
+function propertyCount(
+  c: SampleCtx,
+  t: Trait,
+  u: Unit,
+  suffix: string,
+  ok: (x: number) => boolean,
+  extra: ReturnType<typeof num>[],
+): Hint | null {
+  if (!withinCeiling(c, [u])) return null;
+  const n = c.carriers(u, t).filter((i) => ok(c.board.numbers[i])).length;
+  return {
+    pred: `n_traits_in_unit_are_${suffix}`,
+    args: [unit(u), trait(t), ...extra, num(n)],
+  };
 }
 
 /** The value that occurs exactly once in `counts`, or null if there is none. */
@@ -394,6 +417,20 @@ export const CLUE_BUILDERS: Record<string, ClueBuilder> = {
       pred: 'sum_parity_in_unit',
       args: [unit(u), trait(t), num(traitSum(c.board, c.members(u), t) % 2)],
     };
+  },
+
+  n_traits_in_unit_are_prime: (c, t, u) => propertyCount(c, t, u, 'prime', isPrime, []),
+  n_traits_in_unit_are_even: (c, t, u) =>
+    propertyCount(c, t, u, 'even', (x) => x % 2 === 0, []),
+  n_traits_in_unit_are_odd: (c, t, u) => propertyCount(c, t, u, 'odd', (x) => x % 2 === 1, []),
+  n_traits_in_unit_are_divisible: (c, t, u) => {
+    const mem = c.members(u);
+    const largest = Math.max(0, ...mem.map((i) => c.board.numbers[i]));
+    const divisors = [];
+    for (let d = MIN_DIVISOR; d <= largest; d++) divisors.push(d);
+    const d = c.pick(divisors);
+    if (d === null) return null;
+    return propertyCount(c, t, u, 'divisible', (x) => x % d === 0, [num(d)]);
   },
 };
 

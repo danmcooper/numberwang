@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { type Unit, formatHint, parseHint } from './hint';
 import { makeGrid } from './grid';
 import { makeBoard } from './predicates';
-import { ARITH_EVALUATORS, arithCandidates, traitSum } from './arith';
+import { ARITH_EVALUATORS, ArithError, arithCandidates, isPrime, traitSum } from './arith';
 
 // A 4x2 board. Row 1 is cards 0..3, row 2 is cards 4..7.
 //   numbers  17  4  23   8        (row 1)
@@ -153,5 +153,94 @@ describe('arithCandidates', () => {
     // A sum of 0 tells a player the unit is empty of the trait, which the
     // counting predicates already say better.
     expect(srcs()).not.toContain('sum_of_trait_in_unit(unit(colour,red),numberwang,0)');
+  });
+});
+
+describe('isPrime', () => {
+  it('rejects 0 and 1, which divide nothing usefully', () => {
+    expect(isPrime(0)).toBe(false);
+    expect(isPrime(1)).toBe(false);
+  });
+  it('accepts 2 and the odd primes', () => {
+    expect([2, 3, 17, 31].map(isPrime)).toEqual([true, true, true, true]);
+  });
+  it('rejects composites, including odd ones', () => {
+    expect([4, 9, 12, 26].map(isPrime)).toEqual([false, false, false, false]);
+  });
+});
+
+describe('counting by a property of the number', () => {
+  it('counts primes among the trait', () => {
+    // The whole board is its own edge at 4x2. Numberwang holds 17, 8, 31, 12.
+    expect(ev('n_traits_in_unit_are_prime(unit(edge,void),numberwang,2)')).toBe(true);
+    expect(ev('n_traits_in_unit_are_prime(unit(row,1),numberwang,1)')).toBe(true);
+    expect(ev('n_traits_in_unit_are_prime(unit(row,1),numberwang,2)')).toBe(false);
+  });
+
+  it('counts evens and odds separately, and only among the trait', () => {
+    expect(ev('n_traits_in_unit_are_even(unit(edge,void),numberwang,2)')).toBe(true);
+    expect(ev('n_traits_in_unit_are_odd(unit(edge,void),numberwang,2)')).toBe(true);
+    // Row 1's Not Numberwang cards are 4 and 23 — one of each.
+    expect(ev('n_traits_in_unit_are_even(unit(row,1),not_numberwang,1)')).toBe(true);
+    expect(ev('n_traits_in_unit_are_odd(unit(row,1),not_numberwang,1)')).toBe(true);
+  });
+
+  it('counts multiples of the divisor it names', () => {
+    // Row 2's Numberwang cards are 31 and 12.
+    expect(ev('n_traits_in_unit_are_divisible(unit(row,2),numberwang,3,1)')).toBe(true);
+    expect(ev('n_traits_in_unit_are_divisible(unit(row,2),numberwang,4,1)')).toBe(true);
+    expect(ev('n_traits_in_unit_are_divisible(unit(row,2),numberwang,5,0)')).toBe(true);
+    expect(ev('n_traits_in_unit_are_divisible(unit(row,2),numberwang,3,2)')).toBe(false);
+  });
+
+  it('refuses a divisor that says nothing new', () => {
+    // 1 is every card and 2 is n_traits_in_unit_are_even in worse English.
+    expect(() => ev('n_traits_in_unit_are_divisible(unit(row,2),numberwang,2,1)')).toThrow(
+      ArithError,
+    );
+    expect(() => ev('n_traits_in_unit_are_divisible(unit(row,2),numberwang,1,2)')).toThrow(
+      ArithError,
+    );
+  });
+});
+
+describe('arithCandidates over number properties', () => {
+  const srcsOver = (units: Unit[]) => arithCandidates(board(), units).map(formatHint);
+
+  it('proposes the count the board actually has', () => {
+    const srcs = srcsOver([{ kind: 'row', n: 2 }]);
+    expect(srcs).toContain('n_traits_in_unit_are_prime(unit(row,2),numberwang,1)');
+    expect(srcs).toContain('n_traits_in_unit_are_divisible(unit(row,2),numberwang,3,1)');
+    expect(srcs).not.toContain('n_traits_in_unit_are_prime(unit(row,2),numberwang,2)');
+  });
+
+  it('proposes nothing whose count could not have differed', () => {
+    // Pink is 12 and 26: no prime and no odd number among them, so both counts
+    // are 0 under every assignment and neither clue could ever be wrong.
+    const srcs = srcsOver([{ kind: 'colour', name: 'pink' }]);
+    expect(srcs.filter((x) => x.startsWith('n_traits_in_unit_are_prime'))).toEqual([]);
+    expect(srcs.filter((x) => x.startsWith('n_traits_in_unit_are_odd'))).toEqual([]);
+    expect(srcs).toContain('n_traits_in_unit_are_even(unit(colour,pink),numberwang,1)');
+  });
+
+  it('never names a divisor below the floor, or one that divides nothing here', () => {
+    const divisors = srcsOver([{ kind: 'colour', name: 'pink' }])
+      .filter((x) => x.startsWith('n_traits_in_unit_are_divisible'))
+      .map((x) => Number(/,(\d+),\d+\)$/.exec(x)![1]));
+    // Pink holds 12 and 26; 3, 4, 6 and 12 divide the first, 13 and 26 the second.
+    expect([...new Set(divisors)].sort((a, b) => a - b)).toEqual([3, 4, 6, 12, 13, 26]);
+  });
+
+  it('proposes only clues that are true of the board', () => {
+    const b = board();
+    const units: Unit[] = [
+      { kind: 'row', n: 1 },
+      { kind: 'row', n: 2 },
+      { kind: 'colour', name: 'pink' },
+      { kind: 'edge' },
+    ];
+    for (const h of arithCandidates(b, units)) {
+      expect(ARITH_EVALUATORS[h.pred](b, h.args), formatHint(h)).toBe(true);
+    }
   });
 });

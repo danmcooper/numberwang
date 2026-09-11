@@ -56,6 +56,16 @@ function everyHint(): string[] {
         out.push(`diff_of_two_traits_in_unit(${u},${t},${n})`);
       }
       for (const p of [0, 1]) out.push(`sum_parity_in_unit(${u},${t},${p})`);
+      // Counts from 0 to 3: a 4x5 row holds four cards, so 0 and the reachable
+      // counts are covered, and the unreachable ones prove the clauses reject.
+      for (const k of [0, 1, 2, 3]) {
+        out.push(`n_traits_in_unit_are_prime(${u},${t},${k})`);
+        out.push(`n_traits_in_unit_are_even(${u},${t},${k})`);
+        out.push(`n_traits_in_unit_are_odd(${u},${t},${k})`);
+        for (const d of [3, 4, 5]) {
+          out.push(`n_traits_in_unit_are_divisible(${u},${t},${d},${k})`);
+        }
+      }
     }
     out.push(`more_sum_in_unit_than_unit(unit(row,1),unit(row,3),${t})`);
     out.push(`more_sum_in_unit_than_unit(unit(col,2),unit(col,4),${t})`);
