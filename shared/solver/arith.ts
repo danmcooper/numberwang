@@ -11,8 +11,9 @@
  * produces a puzzle that is unsolvable or multiply-solvable, silently — and the
  * differential test that proves they agree reads better when it can see both.
  */
-import type { HintArg, Trait, Unit } from './hint';
-import { type Board, hasTrait, unitMembers } from './predicates';
+import type { Cnf } from './sat';
+import type { Hint, HintArg, Trait, Unit } from './hint';
+import { type Board, MAX_ENUMERATED_UNIT, hasTrait, unitMembers } from './board';
 
 export class ArithError extends Error {}
 
@@ -82,3 +83,48 @@ export const ARITH_EVALUATORS: Record<string, (b: Board, a: HintArg[]) => boolea
     return traitSum(b, unitMembers(b, argUnit(a, 0)), argTrait(a, 1)) % 2 === want;
   },
 };
+
+/**
+ * Encode an arithmetic clue as blocking clauses over the cards it names.
+ *
+ * There is no pseudo-Boolean encoder here and there does not need to be. A
+ * weighted sum over an arbitrary set of cards would want one, but every clue in
+ * this file is scoped to one unit — or, for the comparison, two — and units on a
+ * 4x5 board are small: a column is five cards, a row four, a colour group two or
+ * three. So walk the scope's assignments, ask the semantics about each, and
+ * forbid the ones it rejects. A five-card unit costs at most 32 clauses of five
+ * literals; the widest comparison, a row against a column, costs at most 256 of
+ * eight.
+ *
+ * This is the same idiom `encode.ts` already uses for
+ * `all_traits_are_neighbors_in_unit`, for the same reason and under the same
+ * ceiling.
+ */
+export function encodeArith(cnf: Cnf, board: Board, vars: number[], hint: Hint): void {
+  if (!IS_ARITH.has(hint.pred)) throw new ArithError(`not an arithmetic predicate: ${hint.pred}`);
+
+  const scope = [
+    ...new Set(hint.args.flatMap((a) => (a.t === 'unit' ? unitMembers(board, a.unit) : []))),
+  ].sort((x, y) => x - y);
+
+  if (scope.length > MAX_ENUMERATED_UNIT) {
+    throw new ArithError(
+      `${hint.pred} over ${scope.length} cards exceeds the ${MAX_ENUMERATED_UNIT}-card ceiling`,
+    );
+  }
+
+  const evaluator = ARITH_EVALUATORS[hint.pred];
+  // One scratch board, rewritten per assignment. It spreads `board`, carrying
+  // its membership cache along — deliberately, since membership cannot change
+  // and re-deriving it 2^n times would dominate the cost.
+  const scratch: Board = { ...board, numberwang: [...board.numberwang] };
+
+  for (let combo = 0; combo < 1 << scope.length; combo++) {
+    scope.forEach((card, k) => {
+      scratch.numberwang[card] = ((combo >> k) & 1) === 1;
+    });
+    if (evaluator(scratch, hint.args)) continue;
+    // Forbid exactly this assignment: at least one of its cards must differ.
+    cnf.add(scope.map((card, k) => (((combo >> k) & 1) === 1 ? -vars[card] : vars[card])));
+  }
+}

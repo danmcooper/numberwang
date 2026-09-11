@@ -79,7 +79,10 @@ describe('SAT engine against the enumerator', () => {
     const rng = mulberry32(20260901);
     const seen = new Map<string, number>();
     let checked = 0;
-    for (let trial = 0; trial < 60; trial++) {
+    // Eighty trials, not sixty: the four arithmetic predicates dilute the draw,
+    // and the thinnest family — units_share_odd_n_traits, which needs two units
+    // sharing an odd number of carriers — fell under the coverage floor at sixty.
+    for (let trial = 0; trial < 80; trial++) {
       const { shape, clues, truth } = randomCase(rng, 4, 4, seen);
       const size = shape.grid.size;
       for (let round = 0; round < 6; round++) {
@@ -90,7 +93,7 @@ describe('SAT engine against the enumerator', () => {
         checked++;
       }
     }
-    expect(checked).toBe(360);
+    expect(checked).toBe(480);
     // Agreement is only worth as much as the clues it ran on. A family that
     // stopped being generated would quietly stop being compared, so the loop
     // asserts its own coverage rather than trusting it.

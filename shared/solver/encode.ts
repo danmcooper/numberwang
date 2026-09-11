@@ -7,12 +7,16 @@
  * each clue becomes a constraint over one Boolean per card, and the board stops
  * being the thing that sets the cost.
  *
- * Twenty-nine predicates, but not twenty-nine encodings: measured over the 685
+ * Thirty-three predicates, but not thirty-three encodings: measured over the 685
  * clues in the real archive they fall into six shapes. A count over one fixed
  * set of cards is 39% of them, two counts compared is 14%, a count with a
  * literal attached 11%, two counts conjoined 12%, a reified count fed into a
  * second count 13%, and the small structural clues the remaining 9%. A
  * totalizer, a parity chain and Tseitin reification carry all but the last.
+ *
+ * The four arithmetic predicates are the exception and live in `arith.ts`,
+ * which blocks their rejected assignments outright rather than counting
+ * anything. `encodeHint` hands them straight over.
  */
 import { type Known, type Shape } from './enumerate';
 import {
@@ -25,22 +29,17 @@ import {
   parityOdd,
   reifyExactly,
 } from './cardinality';
+import { IS_ARITH, encodeArith } from './arith';
 import { isConnected, neighbors, offsetIndex } from './grid';
 import type { Hint, HintArg, Trait, Unit, UnitKind } from './hint';
-import { type Board, makeBoard, unitMembers, unitsOfKind } from './predicates';
+import { type Board, MAX_ENUMERATED_UNIT, makeBoard, unitMembers, unitsOfKind } from './board';
 import { Cnf } from './sat';
 
 export class UnsupportedPredicateError extends Error {}
 
-/**
- * Structural clues are encoded by walking their unit's own subsets, which is
- * exponential in the unit and so needs a ceiling. In the real archive the
- * largest unit any of them lands on is eight cards, and rows and columns of a
- * 5x6 board are five and six; the ceiling exists for the units that are not
- * shaped like that — a 5x6 board's edge is eighteen cards — so that an
- * unencodable clue is refused rather than silently mis-encoded.
- */
-export const MAX_ENUMERATED_UNIT = 16;
+// Defined in `board.ts`, where `arith.ts` can reach it without importing this
+// module; re-exported because this is where the ceiling has always been read from.
+export { MAX_ENUMERATED_UNIT } from './board';
 
 export const SUPPORTED: ReadonlySet<string> = new Set([
   'has_trait',
@@ -72,6 +71,10 @@ export const SUPPORTED: ReadonlySet<string> = new Set([
   'only_trait_in_unit_is_in_unit',
   'both_traits_are_neighbors_in_unit',
   'all_traits_are_neighbors_in_unit',
+  'sum_of_trait_in_unit',
+  'diff_of_two_traits_in_unit',
+  'more_sum_in_unit_than_unit',
+  'sum_parity_in_unit',
 ]);
 
 export function supports(hint: Hint): boolean {
@@ -132,10 +135,15 @@ export function encode(shape: Shape, hints: Hint[], known: Known): Encoded {
 }
 
 function encodeHint(cnf: Cnf, board: Board, shape: Shape, vars: number[], hint: Hint): void {
+  if (IS_ARITH.has(hint.pred)) {
+    encodeArith(cnf, board, vars, hint);
+    return;
+  }
+
   const a = hint.args;
   const grid = shape.grid;
-  // An not_numberwang card is the same variable read the other way up, so a trait is a
-  // choice of polarity rather than a second set of variables.
+  // A Not Numberwang card is the same variable read the other way up, so a trait
+  // is a choice of polarity rather than a second set of variables.
   const lit = (i: number, t: Trait) => (t === 'numberwang' ? vars[i] : -vars[i]);
   const litsOf = (members: number[], t: Trait) => members.map((i) => lit(i, t));
   const members = (u: Unit) => unitMembers(board, u);

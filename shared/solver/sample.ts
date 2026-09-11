@@ -16,7 +16,8 @@
 import type { Shape } from './enumerate';
 import { isConnected, neighbors, offsetIndex } from './grid';
 import type { Hint, Trait, Unit, UnitKind } from './hint';
-import { type Board, unitMembers, unitsOfKind } from './predicates';
+import { type Board, MAX_ENUMERATED_UNIT, unitMembers, unitsOfKind } from './board';
+import { traitSum } from './arith';
 
 const num = (n: number) => ({ t: 'num' as const, n });
 const unit = (u: Unit) => ({ t: 'unit' as const, unit: u });
@@ -64,6 +65,15 @@ export function randomUnit(rng: () => number, shape: Shape, colours: string[]): 
     return { kind: 'colour', name: colours[Math.floor(rng() * colours.length)] };
   if (pick === 5) return { kind: 'edge' };
   return { kind: 'corner' };
+}
+
+/**
+ * Whether `arith.ts` will agree to encode a clue over these units. Its encoding
+ * walks the union's assignments, so a builder that hands it the edge of a 4x5
+ * board plus an interior column writes a clue the encoder then refuses.
+ */
+function withinCeiling(c: SampleCtx, us: Unit[]): boolean {
+  return new Set(us.flatMap((u) => c.members(u))).size <= MAX_ENUMERATED_UNIT;
 }
 
 /** The value that occurs exactly once in `counts`, or null if there is none. */
@@ -342,6 +352,47 @@ export const CLUE_BUILDERS: Record<string, ClueBuilder> = {
     return {
       pred: 'n_colours_have_trait_in_dir',
       args: [colour(name), trait(t), num(d[0]), num(d[1]), num(c.count(seen, t))],
+    };
+  },
+
+  // The four arithmetic builders all read the truth's own totals back out, so
+  // they are true by construction rather than by search. The ceiling check is
+  // the only thing that can turn them down.
+  sum_of_trait_in_unit: (c, t, u) => {
+    if (!withinCeiling(c, [u])) return null;
+    return {
+      pred: 'sum_of_trait_in_unit',
+      args: [unit(u), trait(t), num(traitSum(c.board, c.members(u), t))],
+    };
+  },
+
+  diff_of_two_traits_in_unit: (c, t, u) => {
+    if (!withinCeiling(c, [u])) return null;
+    const nums = c.carriers(u, t).map((i) => c.board.numbers[i]);
+    const diffs: number[] = [];
+    for (let x = 0; x < nums.length; x++) {
+      for (let y = x + 1; y < nums.length; y++) diffs.push(Math.abs(nums[x] - nums[y]));
+    }
+    const d = c.pick(diffs);
+    if (d === null) return null;
+    return { pred: 'diff_of_two_traits_in_unit', args: [unit(u), trait(t), num(d)] };
+  },
+
+  more_sum_in_unit_than_unit: (c, t, u) => {
+    const hi = traitSum(c.board, c.members(u), t);
+    // Strictly less, so `u` can never be chosen against itself.
+    const v = c.findUnit(
+      (w) => traitSum(c.board, c.members(w), t) < hi && withinCeiling(c, [u, w]),
+    );
+    if (!v) return null;
+    return { pred: 'more_sum_in_unit_than_unit', args: [unit(u), unit(v), trait(t)] };
+  },
+
+  sum_parity_in_unit: (c, t, u) => {
+    if (!withinCeiling(c, [u])) return null;
+    return {
+      pred: 'sum_parity_in_unit',
+      args: [unit(u), trait(t), num(traitSum(c.board, c.members(u), t) % 2)],
     };
   },
 };
