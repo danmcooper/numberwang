@@ -66,8 +66,8 @@ A card has three states, and the solved two own the whole card:
 | State | Look |
 |---|---|
 | Unsolved | Dark slate ground, the clue text on it |
-| Numberwang | Green ground (`#5cbd84`), dark number, faint confetti |
-| Wangernumb | Deep pinkish red ground (`#9e2547`), pale number |
+| Numberwang | Clues by Sam's green (`#264d3b`), white number, faint confetti |
+| Wangernumb | Clues by Sam's red (`#5c2235`), white number |
 
 Because the solved states take the background, a card's colour lives in a plain
 band across the top, present in all three states. The band carries no text by

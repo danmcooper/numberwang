@@ -30,12 +30,14 @@
   group draws a small bar of it after the word (eight groups is more than a
   player can hold by name), and a card whose text is a fact rather than a clue
   sets that text in italic.
-- **The two verdict colours are aqua green and pinkish red** — Numberwang
-  `#5cbd84` with `#08301c` ink, Wangernumb `#9e2547` with `#ffe6ec`. Asked for
-  after Task 5, and it supersedes the peach and the black in the card-state
+- **The two verdict colours are Clues by Sam's own green and red** — Numberwang
+  `#264d3b` edged `#2e664c`, Wangernumb `#5c2235` edged `#8b2a53`, both in white
+  ink, with `#58a284` and `#c66464` as the accents the verdict buttons outline
+  themselves in. Asked for after Task 7, replacing a round of light green and
+  pinkish red, and it supersedes the peach and the black in the card-state
   constraint above; the confetti stays blue and pink, and the gray unsolved
-  ground stays. One light and one dark on purpose, so the verdict on a card is
-  legible across the board and not only to someone who can separate the hues.
+  ground stays. Three dark grounds means the hue carries the verdict on its own,
+  so the group-colour numbers are lifted on every state, not only on two.
 - **Most of a board carries a clue, not a fact.** Generator-side, and recorded
   here because it was asked for while this plan was being executed: the chain
   now prefers a clue that flips a single card, which took a twenty-card board

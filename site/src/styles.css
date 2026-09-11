@@ -34,18 +34,20 @@
   --card-unsolved: #322f3b;
   --card-unsolved-text: #f3f3f3;
   --card-unsolved-border: #4a4b55;
-  /* The two verdicts: aqua green for Numberwang, pinkish red for Wangernumb.
-     One is light and one is dark, so which verdict a card carries is legible
-     across a board at arm's length and not only to someone who can tell the two
-     hues apart. The `-edge` tokens are each verdict at the contrast the dark
-     page and the dark modal need — a card's border against the ground, and the
-     outline on the verdict buttons, which are not filled. */
-  --card-numberwang: #5cbd84;
-  --card-numberwang-text: #08301c;
-  --card-numberwang-edge: #3f9a68;
-  --card-wangernumb: #9e2547;
-  --card-wangernumb-text: #ffe6ec;
-  --card-wangernumb-edge: #e0728f;
+  /* The two verdicts, in Clues by Sam's own green and red. Both are dark
+     grounds carrying white text, as there: the hue is what says which verdict a
+     card holds, and the board stays one weight of ink throughout. `-edge` is the
+     card's border against the page ground, which is nearly as dark as the card;
+     `-accent` is the same verdict lifted to where it can be ink — the outline
+     and the label on the verdict buttons, which are not filled until pressed. */
+  --card-numberwang: #264d3b;
+  --card-numberwang-text: #fff;
+  --card-numberwang-edge: #2e664c;
+  --card-numberwang-accent: #58a284;
+  --card-wangernumb: #5c2235;
+  --card-wangernumb-text: #fff;
+  --card-wangernumb-edge: #8b2a53;
+  --card-wangernumb-accent: #c66464;
   --confetti-blue: #7fb2e5;
   --confetti-pink: #f2a6c4;
 
@@ -386,15 +388,15 @@ a {
   background: var(--card-numberwang);
   color: var(--card-numberwang-text);
   border-color: var(--card-numberwang-edge);
-  --tag-neutral: #49ab77;
+  --tag-neutral: #395446;
 }
 .card.wangernumb {
   background: var(--card-wangernumb);
   color: var(--card-wangernumb-text);
   /* The page ground is #1a1d24, so the card needs an edge or it dissolves into
      the gap between cards. */
-  border-color: #c05070;
-  --tag-neutral: #7d1c38;
+  border-color: var(--card-wangernumb-edge);
+  --tag-neutral: #5c303e;
 }
 
 /* Confetti: six gradient dots rather than six elements, offset per card by
@@ -494,10 +496,10 @@ a {
   margin-bottom: 2px;
 }
 /* The group colours were picked to sit on a dark band as a 14px strip, not to
-   be read as ink on one. On the two dark card states the darker half of them
-   need lifting; on the red card the red and pink groups need it most. */
-.card.wangernumb .card-number,
-.card:not(.flipped) .card-number {
+   be read as ink on one. Every card state is a dark ground, so the darker half
+   of them need lifting on all three; on the red card the red and pink groups
+   need it most. */
+.card-number {
   filter: brightness(1.35);
 }
 .card.wangernumb .card-number {
@@ -666,21 +668,20 @@ a {
 }
 /* The two verdicts are cued by their border, not by a fill: two solid buttons
    either side of the card's own number read as two cards rather than as two
-   choices about one. The border is the colour the card will become, at the
-   `-edge` contrast: the green is light enough to outline a button on this modal
-   as it is, the red is not. */
+   choices about one. The border is the verdict at its `-accent` lift, since the
+   card grounds themselves are too near the modal's own to outline anything. */
 .btn-numberwang,
 .btn-wangernumb {
   border-width: 2px;
   transition: background-color 0.15s, color 0.15s;
 }
 .btn-numberwang {
-  color: var(--card-numberwang);
-  border-color: var(--card-numberwang);
+  color: var(--card-numberwang-accent);
+  border-color: var(--card-numberwang-accent);
 }
 .btn-wangernumb {
-  color: var(--card-wangernumb-edge);
-  border-color: var(--card-wangernumb-edge);
+  color: var(--card-wangernumb-accent);
+  border-color: var(--card-wangernumb-accent);
 }
 /* Popup buttons fill with their color on hover, like the real site, and on
    press as well: a phone has no hover, so without the `:active` half of this
@@ -688,13 +689,13 @@ a {
    the fill is what reads as the press. */
 .btn-numberwang:hover:not(:disabled),
 .btn-numberwang:active:not(:disabled) {
-  background: var(--card-numberwang);
-  color: var(--card-numberwang-text);
+  background: var(--card-numberwang-accent);
+  color: #fff;
 }
 .btn-wangernumb:hover:not(:disabled),
 .btn-wangernumb:active:not(:disabled) {
-  background: var(--card-wangernumb);
-  color: var(--card-wangernumb-text);
+  background: var(--card-wangernumb-accent);
+  color: #fff;
 }
 .btn-numberwang:active:not(:disabled),
 .btn-wangernumb:active:not(:disabled) {
