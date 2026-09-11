@@ -876,6 +876,44 @@ describe('reference bounce animation', () => {
   });
 });
 
+describe('colour group ring', () => {
+  // Card 1 is an initial reveal, so its clue is live from the first frame;
+  // card 2's clue arrives later and names a different group.
+  const colourPuzzle = {
+    ...puzzle,
+    people: puzzle.people.map((p, i) => {
+      if (i === 0) return { ...p, clue: 'The #COLOUR:blue card is Numberwang' };
+      if (i === 1) return { ...p, clue: 'The #COLOUR:red card is Wangernumb' };
+      return p;
+    }),
+  };
+
+  beforeEach(() => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(JSON.stringify(colourPuzzle), { status: 200 })),
+    );
+  });
+
+  const ringed = () =>
+    screen
+      .getAllByRole('group')
+      .flatMap((card, i) => (card.className.includes('colour-ref') ? [i] : []));
+
+  it('rings one group at a time: the newest clue, and the one before it on a dim', async () => {
+    const user = userEvent.setup();
+    await renderGame(user);
+    expect(ringed()).toEqual([3]); // the blue group, from the clue on the board
+    await user.click(screen.getByText('1'));
+    await user.click(screen.getByRole('button', { name: 'Numberwang' }));
+    expect(ringed()).toEqual([0, 2]); // the newer clue's red group, alone
+    await user.click(document.querySelectorAll('.card-clue')[1] as HTMLElement);
+    expect(ringed()).toEqual([3]); // dimmed: the ring goes back, it does not vanish
+    await user.click(document.querySelectorAll('.card-clue')[1] as HTMLElement);
+    expect(ringed()).toEqual([0, 2]); // un-dimming is a reveal, so it is newest again
+  });
+});
+
 describe('mark color picker', () => {
   const longPress = async (user: ReturnType<typeof userEvent.setup>, el: HTMLElement) => {
     await user.pointer({ keys: '[MouseLeft>]', target: el });

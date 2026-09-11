@@ -30,14 +30,15 @@ export default function Grid({
   onToggleClue,
 }: GridProps) {
   // Every active (flipped, unconsumed) clue emphasizes its own card's number
-  // plus the numbers/colours it mentions.
+  // plus the numbers it mentions.
   const numberRefs = new Set<number>();
-  const colourRefs = new Set<number>();
   // Subset of the above excluding the clue's own card: only these are
   // eligible for the reveal bounce (the card a player just clicked doesn't
   // need to bounce at itself).
   const otherNumberRefs = new Set<number>();
-  const otherColourRefs = new Set<number>();
+  // Colour clues are collected per clue rather than merged: only one of them
+  // rings its group at a time (see below).
+  const colourClues = new Map<number, number[]>();
   puzzle.people.forEach((person, i) => {
     if (!person.clue || !state.flipped.includes(i) || state.consumed.includes(i)) return;
     numberRefs.add(i);
@@ -46,11 +47,26 @@ export default function Grid({
       numberRefs.add(n);
       if (n !== i) otherNumberRefs.add(n);
     });
-    refs.colours.forEach((n) => {
-      colourRefs.add(n);
-      if (n !== i) otherColourRefs.add(n);
-    });
+    if (refs.colours.length) colourClues.set(i, refs.colours);
   });
+
+  // One ring at a time, and it belongs to the newest colour clue. A ring lights
+  // a whole group at once, so two of them running together stop reading as two
+  // answers to two clues and start reading as one smear across the board — the
+  // number halo can stack because it marks single cards. Order of activation is
+  // remembered so that dimming the newest clue hands the ring back to the one
+  // before it, rather than leaving an open colour clue with nothing to show.
+  // Keeping the order in a ref is safe under a double render: the rebuild
+  // below is a filter and an append of what is missing, so it lands on the same
+  // list every time.
+  const ringOrder = useRef<number[]>([]);
+  ringOrder.current = [
+    ...ringOrder.current.filter((i) => colourClues.has(i)),
+    ...[...colourClues.keys()].filter((i) => !ringOrder.current.includes(i)),
+  ];
+  const ringClue = ringOrder.current.at(-1) ?? null;
+  const colourRefs = new Set<number>(ringClue === null ? [] : (colourClues.get(ringClue) ?? []));
+  const otherColourRefs = new Set<number>([...colourRefs].filter((n) => n !== ringClue));
 
   // Bounce animation plays only for cards newly emphasized by an unhidden
   // clue (a fresh flip or un-consuming), never on the initial mount (so a

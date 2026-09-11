@@ -82,7 +82,11 @@ its number the same way. The confetti is a one-second burst thrown from the card
 that was just called Numberwang, not a pattern the solved card keeps; a board of
 twenty kept patterns was twenty patterns, and the confetti stopped meaning
 anything. A clue that names a colour group rings the cards in that group, in the
-group's own colour.
+group's own colour — one group at a time, the most recently revealed (or
+un-dimmed) colour clue, since a ring lights a whole group and two at once read
+as one smear. Dimming that clue hands the ring back to the colour clue before
+it. The ring is drawn above the corner ticks unless a tick has been coloured,
+which makes it the player's own note and gives it back its corner.
 
 Eight colours is past what colour alone reliably carries, and the design records
 a named band as the first thing to add back if identifying groups turns out to
