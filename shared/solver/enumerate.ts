@@ -13,13 +13,13 @@ export type Known = (boolean | null)[];
 
 export class ContradictionError extends Error {}
 
-export function maskOf(criminal: boolean[]): number {
+export function maskOf(numberwang: boolean[]): number {
   let mask = 0;
-  for (let i = 0; i < criminal.length; i++) if (criminal[i]) mask |= 1 << i;
+  for (let i = 0; i < numberwang.length; i++) if (numberwang[i]) mask |= 1 << i;
   return mask;
 }
 
-export function criminalOf(mask: number, size: number): boolean[] {
+export function numberwangOf(mask: number, size: number): boolean[] {
   return Array.from({ length: size }, (_, i) => (mask & (1 << i)) !== 0);
 }
 
@@ -42,14 +42,14 @@ export function allMasks(shape: Shape, known: Known): Uint32Array {
 
 export function filterMasks(shape: Shape, masks: Uint32Array, hints: Hint[]): Uint32Array {
   const size = shape.grid.size;
-  const criminal = new Array<boolean>(size).fill(false);
-  const board: Board = makeBoard(shape.grid, shape.colours, shape.numbers, criminal);
+  const numberwang = new Array<boolean>(size).fill(false);
+  const board: Board = makeBoard(shape.grid, shape.colours, shape.numbers, numberwang);
   let current = masks;
   for (const hint of hints) {
     let write = 0;
     for (let read = 0; read < current.length; read++) {
       const mask = current[read];
-      for (let i = 0; i < size; i++) criminal[i] = (mask & (1 << i)) !== 0;
+      for (let i = 0; i < size; i++) numberwang[i] = (mask & (1 << i)) !== 0;
       if (evaluate(board, hint)) current[write++] = mask;
     }
     current = current.subarray(0, write);

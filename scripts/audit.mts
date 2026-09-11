@@ -45,7 +45,7 @@ const PUZZLE_FILE = /^\d{4}-\d{2}-\d{2}\.json$/;
 const ABSOLUTE_PRED_CAP = 7;
 const WORST_PRED_SHARE = 0.5;
 
-/** Counts these families never word: "0 persons in a corner have an innocent
+/** Counts these families never word: "0 persons in a corner have an not_numberwang
  * directly above them" floors at 1 across all 41 real instances. */
 const DIR_FAMILIES = new Set([
   'n_in_unit_have_trait_in_dir',
@@ -157,7 +157,7 @@ export function auditPuzzle(l: Loaded, bands: Bands, shapes: Set<string>): strin
     // A clue may not name the card it sits on.
     if (namedCards(board, hint).has(i)) bad.push(`card ${i}: its own clue refers to it`);
 
-    // "Only 1 of the 1 criminals ... is ..." reads as a slip and duplicates
+    // "Only 1 of the 1 numberwangs ... is ..." reads as a slip and duplicates
     // `both_traits_in_unit_are_in_unit`; every real instance has shared < total.
     if (hint.pred === 'unit_shares_n_out_of_n_traits_with_unit') {
       const [shared, total] = hint.args.slice(3);
@@ -174,8 +174,8 @@ export function auditPuzzle(l: Loaded, bands: Bands, shapes: Set<string>): strin
       if (count.t === 'num' && count.n < 2) bad.push(`card ${i}: clue says "one of 1"`);
       // Naming one member of a unit whose members all share the trait tells the
       // player nothing: unit membership is visible, so "Cleo is one of
-      // Desmond's 3 innocent neighbors" only says Desmond's neighbors are
-      // innocent, with Cleo dressed up as a distinction she does not have.
+      // Desmond's 3 not_numberwang neighbors" only says Desmond's neighbors are
+      // not_numberwang, with Cleo dressed up as a distinction she does not have.
       if (unit.t === 'unit' && count.t === 'num') {
         const members = unitMembers(board, unit.unit);
         if (count.n >= members.length) {

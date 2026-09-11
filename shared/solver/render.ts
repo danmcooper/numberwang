@@ -16,7 +16,7 @@ const colourN = (c: string) => `#COLOURN:${c}`;
 /**
  * How much the renderer says beyond what the source site says.
  *
- * `colourTotals` turns "Exactly 1 cook has an innocent directly below them"
+ * `colourTotals` turns "Exactly 1 cook has an not_numberwang directly below them"
  * into "Exactly 1 of 3 cooks has …". The source never states the total, which is
  * fine on its 4x5 board where you can count five cooks at a glance and less fine
  * on a 7x7 with twenty-one colours. Off by default so that `render` stays a
@@ -24,7 +24,7 @@ const colourN = (c: string) => `#COLOURN:${c}`;
  * test in corpus.test.ts checks; generation turns it on.
  *
  * Only for clues that put a number on one colour's members. A comparison
- * between two colours ("more criminal judges than criminal mechanics") is
+ * between two colours ("more numberwang judges than numberwang mechanics") is
  * about the difference, and two totals in one sentence obscure it rather than
  * help.
  */
@@ -47,31 +47,51 @@ const between = (a: number, b: number) => `#BETWEEN:pair(${a},${b})`;
  */
 const NBSP = ' ';
 
+const NOUN: Record<Trait, [string, string]> = {
+  numberwang: ['Numberwang card', 'Numberwang cards'],
+  not_numberwang: ['Not Numberwang card', 'Not Numberwang cards'],
+};
+
+/** The noun a clue uses for a trait. Never "numberwangs": the trait is a
+ * verdict on a card, and the card is the thing a clue counts. */
 export function plural(t: Trait, n: number): string {
-  return n === 1 ? t : `${t}s`;
+  const [one, many] = NOUN[t];
+  return n === 1 ? one : many;
 }
 
-const article = (t: Trait) => (t === 'innocent' ? 'an innocent' : 'a criminal');
+const ADJ: Record<Trait, string> = {
+  numberwang: 'Numberwang',
+  not_numberwang: 'Not Numberwang',
+};
 
 /**
- * "no criminals" / "only one criminal" / "exactly 3 criminals".
+ * The trait as a modifier rather than a noun: "3 Numberwang neighbors",
+ * "an odd number of Numberwang #COLOURS:teal". The noun in those phrases is
+ * something other than the card, so `plural` would say "card" twice.
+ */
+const adj = (t: Trait) => ADJ[t];
+
+const article = (t: Trait) => `a ${plural(t, 1)}`;
+
+/**
+ * "no numberwangs" / "only one numberwang" / "exactly 3 numberwangs".
  *
  * Pass `bare: true` to drop the "exactly" for n >= 2 — ground truth
  * (docs/superpowers/specs/2026-08-29-clue-templates.txt, number_of_traits_in_unit
- * section) attests only "There are N innocents on the edges", never "... exactly N ...",
+ * section) attests only "There are N not_numberwangs on the edges", never "... exactly N ...",
  * for the edge unit, unlike every other unit kind in that family.
  */
 function quantity(n: number, t: Trait, bare = false): string {
-  if (n === 0) return `no ${t}s`;
-  if (n === 1) return `only one ${t}`;
-  return bare ? `${n} ${t}s` : `exactly ${n} ${t}s`;
+  if (n === 0) return `no ${plural(t, 0)}`;
+  if (n === 1) return `only one ${plural(t, 1)}`;
+  return bare ? `${n} ${plural(t, n)}` : `exactly ${n} ${plural(t, n)}`;
 }
 
-/** "no criminals" / "one criminal" / "3 criminals" — for "with exactly …" contexts */
+/** "no numberwangs" / "one numberwang" / "3 numberwangs" — for "with exactly …" contexts */
 function bareQuantity(n: number, t: Trait): string {
-  if (n === 0) return `no ${t}s`;
-  if (n === 1) return `one ${t}`;
-  return `${n} ${t}s`;
+  if (n === 0) return `no ${plural(t, 0)}`;
+  if (n === 1) return `one ${plural(t, 1)}`;
+  return `${n} ${plural(t, n)}`;
 }
 
 /** Locative phrase: where the members of this unit are. */
@@ -168,17 +188,17 @@ function dirSubject(u: Unit, n: number, o: RenderOptions): string {
 export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => string> = {
   has_trait: (a) => {
     const t = argTrait(a, 1);
-    return `${name(argIndex(a, 0))} is ${t === 'innocent' ? 'innocent' : 'a criminal'}`;
+    return `${name(argIndex(a, 0))} is ${adj(t)}`;
   },
 
-  number_of_traits: (a) => `There are ${argNum(a, 1)} ${argTrait(a, 0)}s in total`,
+  number_of_traits: (a) => `There are ${argNum(a, 1)} ${plural(argTrait(a, 0), 2)} in total`,
 
   number_of_traits_in_unit: (a) => {
     const u = argUnit(a, 0);
     const t = argTrait(a, 1);
     const n = argNum(a, 2);
     if (u.kind === 'neighbor') {
-      const q = n === 0 ? `no ${t} neighbors` : n === 1 ? `only one ${t} neighbor` : `exactly ${n} ${t} neighbors`;
+      const q = n === 0 ? `no ${adj(t)} neighbors` : n === 1 ? `only one ${adj(t)} neighbor` : `exactly ${n} ${adj(t)} neighbors`;
       return `${name(u.i)} has ${q}`;
     }
     const verb = n === 1 ? 'There is' : 'There are';
@@ -196,8 +216,8 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
   odd_number_of_traits_in_unit: (a) => {
     const u = argUnit(a, 0);
     const t = argTrait(a, 1);
-    if (u.kind === 'colour') return `There's an odd number of ${t} ${colours(u.name)}`;
-    return `There's an odd number of ${t}s ${where(u)}`;
+    if (u.kind === 'colour') return `There's an odd number of ${adj(t)} ${colours(u.name)}`;
+    return `There's an odd number of ${plural(t, 2)} ${where(u)}`;
   },
 
   is_one_of_n_traits_in_unit: (a) => {
@@ -206,13 +226,13 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     const t = argTrait(a, 2);
     const n = argNum(a, 3);
     if (u.kind === 'neighbor') {
-      return `${name(i)} is one of ${names(u.i)} ${n} ${t} neighbors`;
+      return `${name(i)} is one of ${names(u.i)} ${n} ${adj(t)} neighbors`;
     }
-    return `${name(i)} is one of ${n} ${t}s ${where(u)}`;
+    return `${name(i)} is one of ${n} ${plural(t, 2)} ${where(u)}`;
   },
 
   is_not_only_trait_in_unit: (a) =>
-    `${name(argIndex(a, 1))} is one of two or more ${argTrait(a, 2)}s ${where(argUnit(a, 0))}`,
+    `${name(argIndex(a, 1))} is one of two or more ${plural(argTrait(a, 2), 2)} ${where(argUnit(a, 0))}`,
 
   all_units_have_at_least_n_traits: (a) => {
     const k = argKind(a, 0);
@@ -220,9 +240,9 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     const n = argNum(a, 2);
     if (k === 'colour') {
       if (n !== 1) throw new UnsupportedShapeError('colour form only attested for n=1');
-      return `There is at least one ${t} among all colours`;
+      return `There is at least one ${plural(t, 1)} among all colours`;
     }
-    if (k === 'neighbor') return `Everyone has at least ${n} ${t} neighbors`;
+    if (k === 'neighbor') return `Everyone has at least ${n} ${adj(t)} neighbors`;
     return `Each ${kindWord(k)} has at least ${bareQuantity(n, t)}`;
   },
 
@@ -230,7 +250,7 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     const k = argKind(a, 0);
     const t = argTrait(a, 1);
     const n = argNum(a, 2);
-    const tail = n === 0 ? `no ${t}s` : `exactly ${bareQuantity(n, t)}`;
+    const tail = n === 0 ? `no ${plural(t, 2)}` : `exactly ${bareQuantity(n, t)}`;
     return `Only one ${kindWord(k)} has ${tail}`;
   },
 
@@ -241,16 +261,16 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     switch (u1.kind) {
       case 'neighbor':
         pairOfSameKind(u1, u2);
-        return `${name(u1.i)} has more ${t} neighbors than ${name(u2.i)}`;
+        return `${name(u1.i)} has more ${adj(t)} neighbors than ${name(u2.i)}`;
       case 'row':
         pairOfSameKind(u1, u2);
-        return `There are more ${t}s in row${NBSP}${u1.n} than row${NBSP}${u2.n}`;
+        return `There are more ${plural(t, 2)} in row${NBSP}${u1.n} than row${NBSP}${u2.n}`;
       case 'col':
         pairOfSameKind(u1, u2);
-        return `There are more ${t}s in column${NBSP}${col(u1.n)} than column${NBSP}${col(u2.n)}`;
+        return `There are more ${plural(t, 2)} in column${NBSP}${col(u1.n)} than column${NBSP}${col(u2.n)}`;
       case 'colour':
         pairOfSameKind(u1, u2);
-        return `There are more ${t} ${colours(u1.name)} than ${t} ${colours(u2.name)}`;
+        return `There are more ${adj(t)} ${colours(u1.name)} than ${adj(t)} ${colours(u2.name)}`;
       default:
         throw new UnsupportedShapeError(`more_traits_in_unit_than_unit over ${u1.kind}`);
     }
@@ -263,16 +283,16 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     switch (u1.kind) {
       case 'neighbor':
         pairOfSameKind(u1, u2);
-        return `${name(u1.i)} and ${name(u2.i)} have an equal number of ${t} neighbors`;
+        return `${name(u1.i)} and ${name(u2.i)} have an equal number of ${adj(t)} neighbors`;
       case 'row':
         pairOfSameKind(u1, u2);
-        return `There's an equal number of ${t}s in rows ${u1.n} and ${u2.n}`;
+        return `There's an equal number of ${plural(t, 2)} in rows ${u1.n} and ${u2.n}`;
       case 'col':
         pairOfSameKind(u1, u2);
-        return `There's an equal number of ${t}s in columns ${col(u1.n)} and ${col(u2.n)}`;
+        return `There's an equal number of ${plural(t, 2)} in columns ${col(u1.n)} and ${col(u2.n)}`;
       case 'colour':
         pairOfSameKind(u1, u2);
-        return `There are as many ${t} ${colours(u1.name)} as there are ${t} ${colours(u2.name)}`;
+        return `There are as many ${adj(t)} ${colours(u1.name)} as there are ${adj(t)} ${colours(u2.name)}`;
       default:
         throw new UnsupportedShapeError(`equal_number_of_traits_in_units over ${u1.kind}`);
     }
@@ -286,16 +306,16 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     switch (u1.kind) {
       case 'neighbor':
         pairOfSameKind(u1, u2);
-        return `${name(u1.i)} has more ${t1} neighbors than ${name(u2.i)} has ${t2} ones`;
+        return `${name(u1.i)} has more ${adj(t1)} neighbors than ${name(u2.i)} has ${adj(t2)} ones`;
       case 'row':
         pairOfSameKind(u1, u2);
-        return `There are more ${t1}s in row${NBSP}${u1.n} than ${t2}s in row${NBSP}${u2.n}`;
+        return `There are more ${plural(t1, 2)} in row${NBSP}${u1.n} than ${plural(t2, 2)} in row${NBSP}${u2.n}`;
       case 'col':
         pairOfSameKind(u1, u2);
-        return `There are more ${t1}s in column${NBSP}${col(u1.n)} than ${t2}s in column${NBSP}${col(u2.n)}`;
+        return `There are more ${plural(t1, 2)} in column${NBSP}${col(u1.n)} than ${plural(t2, 2)} in column${NBSP}${col(u2.n)}`;
       case 'colour':
         pairOfSameKind(u1, u2);
-        return `There are more ${t1} ${colours(u1.name)} than ${t2} ${colours(u2.name)}`;
+        return `There are more ${adj(t1)} ${colours(u1.name)} than ${adj(t2)} ${colours(u2.name)}`;
       default:
         throw new UnsupportedShapeError(`more_traits_in_unit_than_traits_in_unit over ${u1.kind}`);
     }
@@ -309,16 +329,16 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     switch (u1.kind) {
       case 'neighbor':
         pairOfSameKind(u1, u2);
-        return `${name(u1.i)} has as many ${t1} neighbors as ${name(u2.i)} has ${t2} ones`;
+        return `${name(u1.i)} has as many ${adj(t1)} neighbors as ${name(u2.i)} has ${adj(t2)} ones`;
       case 'row':
         pairOfSameKind(u1, u2);
-        return `There are as many ${t1}s in row${NBSP}${u1.n} as ${t2}s in row${NBSP}${u2.n}`;
+        return `There are as many ${plural(t1, 2)} in row${NBSP}${u1.n} as ${plural(t2, 2)} in row${NBSP}${u2.n}`;
       case 'col':
         pairOfSameKind(u1, u2);
-        return `There are as many ${t1}s in column${NBSP}${col(u1.n)} as ${t2}s in column${NBSP}${col(u2.n)}`;
+        return `There are as many ${plural(t1, 2)} in column${NBSP}${col(u1.n)} as ${plural(t2, 2)} in column${NBSP}${col(u2.n)}`;
       case 'colour':
         pairOfSameKind(u1, u2);
-        return `There are as many ${t1} ${colours(u1.name)} as there are ${t2} ${colours(u2.name)}`;
+        return `There are as many ${adj(t1)} ${colours(u1.name)} as there are ${adj(t2)} ${colours(u2.name)}`;
       default:
         throw new UnsupportedShapeError(`equal_traits_in_unit_and_traits_in_unit over ${u1.kind}`);
     }
@@ -328,8 +348,8 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     const u = argUnit(a, 0);
     const t1 = argTrait(a, 1);
     const t2 = argTrait(a, 2);
-    if (u.kind === 'neighbor') return `${name(u.i)} has more ${t1} than ${t2} neighbors`;
-    return `There are more ${t1}s than ${t2}s ${where(u)}`;
+    if (u.kind === 'neighbor') return `${name(u.i)} has more ${adj(t1)} than ${adj(t2)} neighbors`;
+    return `There are more ${plural(t1, 2)} than ${plural(t2, 2)} ${where(u)}`;
   },
 
   equal_traits_and_traits_in_unit: (a) => {
@@ -337,9 +357,9 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     const t1 = argTrait(a, 1);
     const t2 = argTrait(a, 2);
     if (u.kind === 'colour') {
-      return `There's an equal number of ${t1} and ${t2} ${colours(u.name)}`;
+      return `There's an equal number of ${adj(t1)} and ${adj(t2)} ${colours(u.name)}`;
     }
-    return `There are as many ${t1}s as ${t2}s ${where(u)}`;
+    return `There are as many ${plural(t1, 2)} as ${plural(t2, 2)} ${where(u)}`;
   },
 
   has_most_traits: (a) => {
@@ -347,11 +367,11 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     const t = argTrait(a, 1);
     switch (u.kind) {
       case 'row':
-        return `Row ${u.n} has more ${t}s than any other row`;
+        return `Row ${u.n} has more ${plural(t, 2)} than any other row`;
       case 'col':
-        return `Column ${col(u.n)} has more ${t}s than any other column`;
+        return `Column ${col(u.n)} has more ${plural(t, 2)} than any other column`;
       case 'neighbor':
-        return `${name(u.i)} has the most ${t} neighbors`;
+        return `${name(u.i)} has the most ${adj(t)} neighbors`;
       default:
         throw new UnsupportedShapeError(`has_most_traits over ${u.kind}`);
     }
@@ -361,15 +381,15 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     const u = argUnit(a, 0);
     const t = argTrait(a, 1);
     const n = argNum(a, 2);
-    const tail = n === 0 ? `no ${t}s` : `exactly ${bareQuantity(n, t)}`;
+    const tail = n === 0 ? `no ${plural(t, 2)}` : `exactly ${bareQuantity(n, t)}`;
     if (u.kind === 'row') return `Row${NBSP}${u.n} is the only row with ${tail}`;
     if (u.kind === 'col') return `Column${NBSP}${col(u.n)} is the only column with ${tail}`;
     if (u.kind === 'neighbor') {
       // Ground truth (only_unit_has_exactly_n_traits, line 214) attests a neighbor-shaped
-      // clue: "NAME is the only one with exactly N criminal neighbor" — singular "neighbor"
+      // clue: "NAME is the only one with exactly N numberwang neighbor" — singular "neighbor"
       // verbatim regardless of n. The brief's step-1 test expected this shape to throw;
       // ground truth wins per task instructions, so we render it (bug-for-bug) instead.
-      return `${name(u.i)} is the only one with exactly ${n} ${t} neighbor`;
+      return `${name(u.i)} is the only one with exactly ${n} ${adj(t)} neighbor`;
     }
     throw new UnsupportedShapeError(`only_unit_has_exactly_n_traits over ${u.kind}`);
   },
@@ -382,10 +402,10 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     if (u1.kind === 'neighbor' && u2.kind === 'neighbor') {
       // The archive's ten instances of this shape all count 1 or more, so the
       // zero wording is ours: spell it "no", as every other zero-count branch of
-      // this predicate does. "have 0 criminal neighbors in common" is not a
+      // this predicate does. "have 0 numberwang neighbors in common" is not a
       // sentence the source would write.
       const q =
-        n === 0 ? `no ${t} neighbors` : n === 1 ? `only one ${t} neighbor` : `${n} ${t} neighbors`;
+        n === 0 ? `no ${adj(t)} neighbors` : n === 1 ? `only one ${adj(t)} neighbor` : `${n} ${adj(t)} neighbors`;
       return `${name(u1.i)} and ${name(u2.i)} have ${q} in common`;
     }
     if (u1.kind === 'neighbor' && u2.kind !== 'neighbor') {
@@ -399,12 +419,12 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     }
     if (n === 0 && u2.kind === 'neighbor') {
       // Ground truth (units_share_n_traits, line 60) attests a distinct zero-count phrasing
-      // for a neighbor target: "There are no innocents BTW who neighbor NAME" — not the
+      // for a neighbor target: "There are no not_numberwangs BTW who neighbor NAME" — not the
       // generic "No X ... is neighboring NAME" the brief's fallback would otherwise produce.
-      return `There are no ${t}s ${where(u1)} who neighbor ${name(u2.i)}`;
+      return `There are no ${plural(t, 2)} ${where(u1)} who neighbor ${name(u2.i)}`;
     }
     const tail = u2.kind === 'neighbor' ? `neighboring ${name(u2.i)}` : where(u2);
-    if (n === 0) return `No ${t} ${where(u1)} is ${tail}`;
+    if (n === 0) return `No ${plural(t, 1)} ${where(u1)} is ${tail}`;
     const verb = n === 1 ? 'is' : 'are';
     return `Exactly ${n} ${plural(t, n)} ${where(u1)} ${verb} ${tail}`;
   },
@@ -419,7 +439,7 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     if (other.kind === 'neighbor') {
       throw new UnsupportedShapeError('units_share_odd_n_traits over two neighbor units');
     }
-    return `An odd number of ${t}s ${where(other)} neighbor ${name(nbr.i)}`;
+    return `An odd number of ${plural(t, 2)} ${where(other)} neighbor ${name(nbr.i)}`;
   },
 
   unit_shares_n_out_of_n_traits_with_unit: (a) => {
@@ -433,9 +453,9 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
       // puzzles/2026-08-18.json), not the anonymized ground-truth dump alone (which can't
       // show actual numeric values) — see fix-round-1 report for detail. All three real
       // n!==1 occurrences are n=2 (m in {3,4,5}); unverified for n>=3.
-      return `Exactly ${n} of ${names(u1.i)} ${m} ${t} neighbors also neighbor ${name(u2.i)}`;
+      return `Exactly ${n} of ${names(u1.i)} ${m} ${adj(t)} neighbors also neighbor ${name(u2.i)}`;
     }
-    const head = n === 1 ? `Only 1 of the ${m} ${t}s` : `Exactly ${n} of the ${m} ${t}s`;
+    const head = n === 1 ? `Only 1 of the ${m} ${plural(t, 2)}` : `Exactly ${n} of the ${m} ${plural(t, 2)}`;
     const verb = n === 1 ? 'is' : 'are';
     return `${head} ${where(u1)} ${verb} ${predicateTail(u2, n === 1)}`;
   },
@@ -443,21 +463,21 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
   max_number_of_traits_in_neighbors_in_unit: (a) => {
     const t = argTrait(a, 1);
     const n = argNum(a, 2);
-    const tail = n === 1 ? `one ${t} neighbor` : `${n} ${t} neighbors`;
+    const tail = n === 1 ? `one ${adj(t)} neighbor` : `${n} ${adj(t)} neighbors`;
     return `No one ${where(argUnit(a, 0))} has more than ${tail}`;
   },
 
   both_traits_in_unit_are_in_unit: (a) =>
-    `Both ${argTrait(a, 2)}s ${where(argUnit(a, 0))} are ${predicateTail(argUnit(a, 1), false)}`,
+    `Both ${plural(argTrait(a, 2), 2)} ${where(argUnit(a, 0))} are ${predicateTail(argUnit(a, 1), false)}`,
 
   only_trait_in_unit_is_in_unit: (a) =>
-    `The only ${argTrait(a, 2)} ${where(argUnit(a, 0))} is ${predicateTail(argUnit(a, 1), true)}`,
+    `The only ${plural(argTrait(a, 2), 1)} ${where(argUnit(a, 0))} is ${predicateTail(argUnit(a, 1), true)}`,
 
   both_traits_are_neighbors_in_unit: (a) =>
-    `Both ${argTrait(a, 1)}s ${where(argUnit(a, 0))} are connected`,
+    `Both ${plural(argTrait(a, 1), 2)} ${where(argUnit(a, 0))} are connected`,
 
   all_traits_are_neighbors_in_unit: (a) =>
-    `All ${argTrait(a, 1)}s ${where(argUnit(a, 0))} are connected`,
+    `All ${plural(argTrait(a, 1), 2)} ${where(argUnit(a, 0))} are connected`,
 
   only_one_person_in_unit_has_exactly_n_trait_neighbors: (a, o) => {
     const u = argUnit(a, 0);
@@ -470,7 +490,7 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
           ? `Exactly 1 of ${colourN(u.name)}`
           : `Only one ${colour(u.name)}`;
     const tail =
-      n === 0 ? `no ${t} neighbors` : n === 1 ? `exactly one ${t} neighbor` : `exactly ${n} ${t} neighbors`;
+      n === 0 ? `no ${adj(t)} neighbors` : n === 1 ? `exactly one ${adj(t)} neighbor` : `exactly ${n} ${adj(t)} neighbors`;
     return `${head} has ${tail}`;
   },
 
@@ -494,7 +514,7 @@ export const RENDERERS: Record<string, (a: HintArg[], o: RenderOptions) => strin
     // puzzles/2026-08-27.json) — matching this file's convention of always saying "Only one"
     // for a singular subject elsewhere. The brief's bare "One X ..." matched only the minority
     // instance (puzzles/2026-07-21.json); ground truth's dominant form wins per task instructions.
-    const head = n === 1 ? `Only one ${t1}` : `Exactly ${n} ${t1}s`;
+    const head = n === 1 ? `Only one ${plural(t1, 1)}` : `Exactly ${n} ${plural(t1, 2)}`;
     const verb = n === 1 ? 'has' : 'have';
     return `${head} ${where(u)} ${verb} ${article(t2)} ${dirPhrase(argNum(a, 3), argNum(a, 4))}`;
   },

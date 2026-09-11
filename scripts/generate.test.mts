@@ -13,7 +13,7 @@ import {
   defaultDates,
   runGenerate,
   seedFor,
-  unionCriminals,
+  unionNumberwangs,
   upcomingDates,
 } from './generate.mts';
 
@@ -97,16 +97,16 @@ describe('defaultDates', () => {
   });
 });
 
-describe('unionCriminals', () => {
+describe('unionNumberwangs', () => {
   it('spans every calibrated label rather than one', () => {
     // The count of hidden cards carries no difficulty signal across the puzzles
     // the bands were fitted from, so narrowing it to the shaping band's own
     // range would only make every puzzle the same density.
     const bands = loadBands(bandsData);
-    const union = unionCriminals(bands);
+    const union = unionNumberwangs(bands);
     for (const band of Object.values(bands)) {
-      expect(union.min).toBeLessThanOrEqual(band.criminals.min);
-      expect(union.max).toBeGreaterThanOrEqual(band.criminals.max);
+      expect(union.min).toBeLessThanOrEqual(band.numberwangs.min);
+      expect(union.max).toBeGreaterThanOrEqual(band.numberwangs.max);
     }
     expect(union.max).toBeGreaterThan(union.min);
   });

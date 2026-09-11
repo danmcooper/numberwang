@@ -17,9 +17,9 @@ export interface Board {
   /** 1..size, one per card. The arithmetic predicates in `arith.ts` are the
    * only readers; every other predicate is a function of the verdict alone. */
   numbers: number[];
-  criminal: boolean[];
+  numberwang: boolean[];
   /** Memoises unit membership; safe because membership depends only on the grid
-   * and colours, never on `criminal` or `numbers`. */
+   * and colours, never on `numberwang` or `numbers`. */
   cache?: Map<string, number[]>;
 }
 
@@ -48,9 +48,9 @@ export function makeBoard(
   grid: Grid,
   colours: string[],
   numbers: number[],
-  criminal: boolean[],
+  numberwang: boolean[],
 ): Board {
-  return { grid, colours, numbers, criminal, cache: new Map() };
+  return { grid, colours, numbers, numberwang, cache: new Map() };
 }
 
 export function unitMembers(b: Board, u: Unit): number[] {
@@ -84,7 +84,7 @@ export function unitsOfKind(b: Board, kind: UnitKind): Unit[] {
 }
 
 export function hasTrait(b: Board, i: number, t: Trait): boolean {
-  return t === 'criminal' ? b.criminal[i] : !b.criminal[i];
+  return t === 'numberwang' ? b.numberwang[i] : !b.numberwang[i];
 }
 
 export function countTrait(b: Board, members: number[], t: Trait): number {
@@ -126,8 +126,8 @@ export function hintFeatures(b: Board, hint: Hint): string[] {
     out.push(`dir:${argNum(nums, 0)},${argNum(nums, 1)}`);
   }
   // How far a clue's two units overlap decides whether the second one is doing
-  // any work. At an overlap of one card, "only 1 of the 3 criminals neighbouring
-  // Jonas is in row 2" says no more than "that one shared card is criminal" —
+  // any work. At an overlap of one card, "only 1 of the 3 numberwangs neighbouring
+  // Jonas is in row 2" says no more than "that one shared card is numberwang" —
   // the row is scaffolding, and a player who has already resolved it learns
   // nothing from the mention. The archive centres on overlaps of two or three
   // and holds one-card overlaps to 14%; the pool is mostly near-disjoint pairs,
@@ -208,7 +208,7 @@ export const EVALUATORS: Record<string, (b: Board, a: HintArg[]) => boolean> = {
   has_trait: (b, a) => hasTrait(b, argIndex(a, 0), argTrait(a, 1)),
 
   number_of_traits: (b, a) =>
-    countTrait(b, [...b.criminal.keys()], argTrait(a, 0)) === argNum(a, 1),
+    countTrait(b, [...b.numberwang.keys()], argTrait(a, 0)) === argNum(a, 1),
 
   number_of_traits_in_unit: (b, a) => cnt(b, a, 0, argTrait(a, 1)) === argNum(a, 2),
 
@@ -266,7 +266,7 @@ export const EVALUATORS: Record<string, (b: Board, a: HintArg[]) => boolean> = {
   // The two above each hold one thing fixed: same trait across two units, or two
   // traits inside one unit. These vary both. The source never phrases a clue this
   // way, which is a fact about the source rather than about the game — "there are
-  // as many innocent cooks as criminal cops" is an ordinary deduction, and holding
+  // as many not_numberwang cooks as numberwang cops" is an ordinary deduction, and holding
   // it back leaves the generator repeating the eight shapes it does have.
   more_traits_in_unit_than_traits_in_unit: (b, a) =>
     countTrait(b, unitMembers(b, argUnit(a, 0)), argTrait(a, 1)) >

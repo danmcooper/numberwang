@@ -1,7 +1,7 @@
 /**
  * Clues to CNF.
  *
- * Every predicate in `predicates.ts` is a Boolean function of the criminal
+ * Every predicate in `predicates.ts` is a Boolean function of the numberwang
  * assignment alone — units, colours and geometry are all fixed before a
  * single card is decided, which is exactly why `unitMembers` can memoise. So
  * each clue becomes a constraint over one Boolean per card, and the board stops
@@ -113,7 +113,7 @@ const sameUnit = (a: Unit, b: Unit): boolean => JSON.stringify(a) === JSON.strin
 
 export interface Encoded {
   cnf: Cnf;
-  /** `vars[i]` is true exactly when card `i` is criminal. */
+  /** `vars[i]` is true exactly when card `i` is numberwang. */
   vars: number[];
 }
 
@@ -134,9 +134,9 @@ export function encode(shape: Shape, hints: Hint[], known: Known): Encoded {
 function encodeHint(cnf: Cnf, board: Board, shape: Shape, vars: number[], hint: Hint): void {
   const a = hint.args;
   const grid = shape.grid;
-  // An innocent card is the same variable read the other way up, so a trait is a
+  // An not_numberwang card is the same variable read the other way up, so a trait is a
   // choice of polarity rather than a second set of variables.
-  const lit = (i: number, t: Trait) => (t === 'criminal' ? vars[i] : -vars[i]);
+  const lit = (i: number, t: Trait) => (t === 'numberwang' ? vars[i] : -vars[i]);
   const litsOf = (members: number[], t: Trait) => members.map((i) => lit(i, t));
   const members = (u: Unit) => unitMembers(board, u);
   const countOf = (u: Unit, t: Trait) => counter(cnf, litsOf(members(u), t));

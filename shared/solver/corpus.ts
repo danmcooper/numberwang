@@ -6,8 +6,8 @@
  * share 0, and `orderPool` multiplies by share. A predicate with share 0 is
  * generated never. These are the ones that need telling otherwise.
  *
- * The source compares one trait across two units ("more criminals in row 1 than
- * row 4") and two traits within one unit ("more criminals than innocents in row
+ * The source compares one trait across two units ("more numberwangs in row 1 than
+ * row 4") and two traits within one unit ("more numberwangs than not_numberwangs in row
  * 1"), and never both at once. That looks like an accident of what the source
  * happened to write rather than a rule of the game.
  */

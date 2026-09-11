@@ -122,8 +122,8 @@ export function parityOdd(cnf: Cnf, lits: number[]): void {
 
 /**
  * Comparisons between two unary counters. 14% of the archive's clues are one
- * count set against another — "more criminals in row 2 than in column 3", "as
- * many criminal doctors as criminal clerks" — and the two literal sets are
+ * count set against another — "more numberwangs in row 2 than in column 3", "as
+ * many numberwang doctors as numberwang clerks" — and the two literal sets are
  * often not disjoint, so these constrain the counters rather than the cards.
  *
  * `a` at index j-1 means "at least j", which makes each comparison a chain of

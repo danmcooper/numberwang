@@ -1,7 +1,7 @@
 {
   "Medium": {
     "samples": 9,
-    "criminals": {
+    "numberwangs": {
       "min": 6,
       "max": 15
     },
@@ -28,7 +28,7 @@
   },
   "Tricky": {
     "samples": 22,
-    "criminals": {
+    "numberwangs": {
       "min": 4,
       "max": 16
     },
@@ -55,7 +55,7 @@
   },
   "Hard": {
     "samples": 11,
-    "criminals": {
+    "numberwangs": {
       "min": 4,
       "max": 16
     },
@@ -82,7 +82,7 @@
   },
   "Brutal": {
     "samples": 3,
-    "criminals": {
+    "numberwangs": {
       "min": 11,
       "max": 16
     },
@@ -109,7 +109,7 @@
   },
   "Easy": {
     "samples": 9,
-    "criminals": {
+    "numberwangs": {
       "min": 4,
       "max": 10
     },

@@ -3,7 +3,7 @@ import { type Hint, type HintArg, type Trait, type Unit, formatHint } from './hi
 import { type Board, countTrait, evaluate, hasTrait, unitMembers, unitsOfKind } from './predicates';
 import { canRender } from './render';
 
-const TRAITS: Trait[] = ['criminal', 'innocent'];
+const TRAITS: Trait[] = ['numberwang', 'not_numberwang'];
 const DIRS: [number, number][] = [
   [1, 0],
   [-1, 0],
@@ -64,7 +64,7 @@ const hasMultipleUnitsOfKind = (b: Board, unit: Unit): boolean => unitsOfKind(b,
 /**
  * True when no member of `members` has a valid cell in direction (dx, dy) — e.g. every
  * member of the unit is already in the grid's topmost row and dy = -1 ("above"). Since
- * offset validity depends only on grid position, never on the criminal/innocent
+ * offset validity depends only on grid position, never on the numberwang/not_numberwang
  * assignment, this makes `dirCount` structurally 0 for every conceivable board, not just
  * the actual one — the exact same failure mode as the has_most_traits gate above, just
  * discovered via the exhaustive 3x3 regression rather than archive comparison. Detected
@@ -85,7 +85,7 @@ const dirIsStructurallyEmpty = (b: Board, members: number[], dx: number, dy: num
  * `both_traits_are_neighbors_in_unit` is not a tautology on such a unit (it also demands
  * exactly two of the trait, which can fail), but it is worse than useless as a clue: it
  * degenerates into `number_of_traits_in_unit(unit, trait, 2)` wearing a connectedness
- * clause that costs the solver nothing. "Both innocents between #12 and #13 are
+ * clause that costs the solver nothing. "Both not_numberwangs between #12 and #13 are
  * connected" — there are only two cards there and they are side by side. The archive's 54
  * instances are all full rows, full columns, or spans of three or more. Two shapes in the
  * candidate pool
@@ -98,7 +98,7 @@ const dirIsStructurallyEmpty = (b: Board, members: number[], dx: number, dy: num
  * Units laid out in a straight line, which are the only ones "are connected" can be asked
  * about without the clue becoming unanswerable.
  *
- * Adjacency in this game includes diagonals — 29 of the archive's 29 "n innocents
+ * Adjacency in this game includes diagonals — 29 of the archive's 29 "n not_numberwangs
  * neighboring X" clues are only true when the diagonal cards count, and 8 of 29 are true
  * without them, so `neighbors` being 8-way is settled. Connectedness is built on the same
  * relation, and there it is not settled at all: all 59 of the archive's connectedness
@@ -106,8 +106,8 @@ const dirIsStructurallyEmpty = (b: Board, members: number[], dx: number, dy: num
  * readings coincide exactly. The source game never once asks whether a scattered set is
  * connected, so it never has to say what it would mean.
  *
- * We did, and it produced "Both innocents neighboring Wren are connected" on a 7x7. Read
- * with diagonals the other innocent is Suri or Tessa and there is nothing to deduce; read
+ * We did, and it produced "Both not_numberwangs neighboring Wren are connected" on a 7x7. Read
+ * with diagonals the other not_numberwang is Suri or Tessa and there is nothing to deduce; read
  * without them it is Tessa and the card flips. Nothing in the puzzle tells a player which
  * reading to use, so the clue is not solvable, only guessable. Restricting the predicate
  * to lines is what the archive does anyway, and it puts the question beyond asking.
@@ -146,8 +146,8 @@ export function candidateHints(b: Board): Hint[] {
   /**
    * Whether u1 and u2's raw memberships (trait-independent) actually overlap. Membership
    * is fixed once the board's grid and colour assignment are fixed — it never depends
-   * on the criminal/innocent assignment — so when this is false, `overlap(u1, u2, trait)`
-   * is 0 for every conceivable criminal assignment on this board, not just the actual one.
+   * on the numberwang/not_numberwang assignment — so when this is false, `overlap(u1, u2, trait)`
+   * is 0 for every conceivable numberwang assignment on this board, not just the actual one.
    * `units_share_n_traits(u1, u2, trait, 0)` in that case is a structural tautology: true
    * regardless of the board, exactly the failure mode the has_most_traits gate above
    * exists to avoid. The archive does use n=0 for this predicate (confirmed: all 10 real
@@ -168,7 +168,7 @@ export function candidateHints(b: Board): Hint[] {
     for (const trait of TRAITS) push('has_trait', [idx(i), t(trait)]);
   }
   for (const trait of TRAITS) {
-    push('number_of_traits', [t(trait), n(countTrait(b, [...b.criminal.keys()], trait))]);
+    push('number_of_traits', [t(trait), n(countTrait(b, [...b.numberwang.keys()], trait))]);
   }
 
   for (const unit of units) {
@@ -203,7 +203,7 @@ export function candidateHints(b: Board): Hint[] {
         // assignment. So whenever the pushed threshold is >= the largest degree among the
         // unit's members, "no one has more than N trait neighbors" is true of every
         // conceivable board — e.g. every corner cell has exactly 3 neighbors, so
-        // "no one in the corners has more than 3 innocent neighbors" is always true.
+        // "no one in the corners has more than 3 not_numberwang neighbors" is always true.
         // Only push when the threshold is still below that structural ceiling.
         const maxDegree = Math.max(...members.map((i) => neighbors(b.grid, i).length));
         if (maxCount < maxDegree) {
@@ -218,15 +218,15 @@ export function candidateHints(b: Board): Hint[] {
         // Two floors, both of which the archive's 42 instances respect (counts run
         // 2..12, never 1, never the whole unit).
         //
-        // c === 1 renders as "#NAME:1 is one of 1 criminals between #0 and #3" — the
+        // c === 1 renders as "#NAME:1 is one of 1 numberwangs between #0 and #3" — the
         // same slip as "only 1 of the 1", and the case the source words as "is the
-        // only criminal there".
+        // only numberwang there".
         //
         // c === members.length says every member has the trait, and since unit
         // membership is visible on the board — you can see that a corner card has
         // three neighbors — naming one of them adds nothing at all: "Cleo is one of
-        // Desmond's 3 innocent neighbors" is "all of Desmond's neighbors are
-        // innocent" dressed up as a distinction Cleo does not have.
+        // Desmond's 3 not_numberwang neighbors" is "all of Desmond's neighbors are
+        // not_numberwang" dressed up as a distinction Cleo does not have.
         if (c >= 2 && c < members.length) {
           push('is_one_of_n_traits_in_unit', [u(unit), idx(i), t(trait), n(c)]);
         }
@@ -241,7 +241,7 @@ export function candidateHints(b: Board): Hint[] {
         if (dirIsStructurallyEmpty(b, members, dx, dy)) continue;
         // A zero count is contingent, not a tautology — the structural check above
         // already dropped the always-zero shapes — but "0 persons in a corner have an
-        // innocent directly above them" is not a sentence the source writes. Its 41
+        // not_numberwang directly above them" is not a sentence the source writes. Its 41
         // real instances across the three directional families all count 1 or more.
         const inDir = dirCount(members, trait, dx, dy);
         if (inDir > 0) {
@@ -259,8 +259,8 @@ export function candidateHints(b: Board): Hint[] {
       }
     }
     for (const [t1, t2] of [
-      ['criminal', 'innocent'],
-      ['innocent', 'criminal'],
+      ['numberwang', 'not_numberwang'],
+      ['not_numberwang', 'numberwang'],
     ] as [Trait, Trait][]) {
       push('more_traits_than_traits_in_unit', [u(unit), t(t1), t(t2)]);
       push('equal_traits_and_traits_in_unit', [u(unit), t(t1), t(t2)]);
@@ -295,11 +295,11 @@ export function candidateHints(b: Board): Hint[] {
         if (u1.kind === u2.kind) {
           push('more_traits_in_unit_than_unit', [u(u1), u(u2), t(trait)]);
           push('equal_number_of_traits_in_units', [u(u1), u(u2), t(trait)]);
-          // The cross-trait pair: "as many innocent cooks as criminal cops". Only
+          // The cross-trait pair: "as many not_numberwang cooks as numberwang cops". Only
           // the opposite trait, since matching traits would just be the two
           // predicates above with a longer sentence. Same kind for the same reason
           // they are: the renderer has words for row/row, not for row/colour.
-          const other = trait === 'criminal' ? 'innocent' : 'criminal';
+          const other = trait === 'numberwang' ? 'not_numberwang' : 'numberwang';
           push('more_traits_in_unit_than_traits_in_unit', [u(u1), t(trait), u(u2), t(other)]);
           push('equal_traits_in_unit_and_traits_in_unit', [u(u1), t(trait), u(u2), t(other)]);
         }
@@ -317,7 +317,7 @@ export function candidateHints(b: Board): Hint[] {
         // real, falsifiable count), but the source never phrases it that way and "shares 0
         // out of m" reads as if the 0 were meaningful when it's often structurally
         // guaranteed — so drop shared=0 here regardless of intersection.
-        // Also drop shared === total: "Only 1 of the 1 criminals ... is ..." reads as a
+        // Also drop shared === total: "Only 1 of the 1 numberwangs ... is ..." reads as a
         // slip, and semantically it is just both_traits_in_unit_are_in_unit (pushed below)
         // in worse words. The archive agrees — all 78 real instances have shared < total.
         const total = count(u1, trait);
@@ -338,7 +338,7 @@ export function candidateHints(b: Board): Hint[] {
     for (const trait of TRAITS) {
       for (const [dx, dy] of DIRS) {
         // Same structural boundary check as above: colour membership is fixed given
-        // the board (independent of the criminal assignment), so if every card of this
+        // the board (independent of the numberwang assignment), so if every card of this
         // colour structurally lacks a cell in this direction, the count is always 0.
         if (dirIsStructurallyEmpty(b, members, dx, dy)) continue;
         // Same zero-count floor as the two families above.

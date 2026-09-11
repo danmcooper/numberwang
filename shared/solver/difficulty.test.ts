@@ -20,22 +20,22 @@ import {
 const shape = { grid: makeGrid(4, 5), colours: Array.from({ length: 20 }, () => 'cook'), numbers: Array.from({ length: 20 }, (_, i) => i + 1) };
 const truth = Array.from({ length: 20 }, (_, i) => i < 2);
 const clues: Clues = Array.from({ length: 20 }, () => null);
-clues[0] = parseHint('number_of_traits(criminal,2)');
-clues[1] = parseHint('number_of_traits_in_unit(unit(between,pair(2,19)),criminal,0)');
+clues[0] = parseHint('number_of_traits(numberwang,2)');
+clues[1] = parseHint('number_of_traits_in_unit(unit(between,pair(2,19)),numberwang,0)');
 
 const paths: (number[][] | null)[] = Array.from({ length: 20 }, () => [[0, 1]]);
 paths[0] = [];
 
 describe('measure', () => {
   it('reports counts, chain shape, and predicate mix', () => {
-    // Both criminals must be revealed up front: with only card 0 revealed,
+    // Both numberwangs must be revealed up front: with only card 0 revealed,
     // clue 1 (on card 1) is not yet active, and clue 0 alone ("exactly 2
-    // criminals") cannot force any of the 19 remaining candidate positions
-    // for the second criminal, so the chain would have zero steps. With
-    // [0, 1] both clues are active from the start and "exactly 2 criminals"
-    // forces all 18 remaining cards innocent in a single step.
+    // numberwangs") cannot force any of the 19 remaining candidate positions
+    // for the second numberwang, so the chain would have zero steps. With
+    // [0, 1] both clues are active from the start and "exactly 2 numberwangs"
+    // forces all 18 remaining cards not_numberwang in a single step.
     const m = measure({ shape, clues, truth, initialReveals: [0, 1], paths });
-    expect(m.criminals).toBe(2);
+    expect(m.numberwangs).toBe(2);
     expect(m.clueCards).toBe(2);
     expect(m.chainLength).toBe(1);
     expect(m.meanRevealsPerStep).toBe(18);
@@ -52,14 +52,14 @@ describe('measure abstractShare', () => {
   it('is the share of clues drawn from the abstract predicate family', () => {
     // 2 clues from the abstract family, 6 from outside it: 2/8 = 0.25.
     const mixClues: Clues = Array.from({ length: 20 }, () => null);
-    mixClues[0] = parseHint('is_not_only_trait_in_unit(unit(row,0),3,criminal)');
-    mixClues[1] = parseHint('only_unit_has_exactly_n_traits(unit(col,1),criminal,2)');
-    mixClues[2] = parseHint('has_trait(4,criminal)');
-    mixClues[3] = parseHint('number_of_traits(criminal,2)');
-    mixClues[4] = parseHint('number_of_traits_in_unit(unit(row,2),criminal,1)');
-    mixClues[5] = parseHint('odd_number_of_traits_in_unit(unit(col,2),criminal)');
-    mixClues[6] = parseHint('has_most_traits(unit(row,3),criminal)');
-    mixClues[7] = parseHint('min_number_of_traits_in_unit(unit(col,3),criminal,1)');
+    mixClues[0] = parseHint('is_not_only_trait_in_unit(unit(row,0),3,numberwang)');
+    mixClues[1] = parseHint('only_unit_has_exactly_n_traits(unit(col,1),numberwang,2)');
+    mixClues[2] = parseHint('has_trait(4,numberwang)');
+    mixClues[3] = parseHint('number_of_traits(numberwang,2)');
+    mixClues[4] = parseHint('number_of_traits_in_unit(unit(row,2),numberwang,1)');
+    mixClues[5] = parseHint('odd_number_of_traits_in_unit(unit(col,2),numberwang)');
+    mixClues[6] = parseHint('has_most_traits(unit(row,3),numberwang)');
+    mixClues[7] = parseHint('min_number_of_traits_in_unit(unit(col,3),numberwang,1)');
     const mixPaths: (number[][] | null)[] = Array.from({ length: 20 }, () => [[0, 1]]);
 
     // initialReveals is deliberately empty: forcedGiven only checks hints on
@@ -82,7 +82,7 @@ describe('measure abstractShare', () => {
 });
 
 const metrics = (over: Partial<Metrics>): Metrics => ({
-  criminals: 5,
+  numberwangs: 5,
   clueCards: 8,
   chainLength: 6,
   meanRevealsPerStep: 2,
@@ -103,7 +103,7 @@ describe('buildBands', () => {
     ]);
     expect(bands.Easy.samples).toBe(3);
     expect(bands.Easy.chainLength).toEqual({ min: 4, max: 9 });
-    expect(bands.Easy.criminals).toEqual({ min: 5, max: 5 });
+    expect(bands.Easy.numberwangs).toEqual({ min: 5, max: 5 });
   });
   it('refuses to invent a band from too few samples', () => {
     expect(() => buildBands([{ label: 'Brutal', metrics: metrics({}) }])).toThrow(
@@ -128,9 +128,9 @@ describe('bandsFor', () => {
     for (const label of Object.keys(bands)) {
       const was = bands[label];
       const now = got[label];
-      expect(now.criminals, label).toEqual({
-        min: Math.round(was.criminals.min * 1.5),
-        max: Math.round(was.criminals.max * 1.5),
+      expect(now.numberwangs, label).toEqual({
+        min: Math.round(was.numberwangs.min * 1.5),
+        max: Math.round(was.numberwangs.max * 1.5),
       });
       expect(now.clueCards, label).toEqual({
         min: Math.round(was.clueCards.min * 1.5),
@@ -146,10 +146,10 @@ describe('bandsFor', () => {
     }
   });
 
-  it('never asks a board for more criminals than it has cards', () => {
+  it('never asks a board for more numberwangs than it has cards', () => {
     for (const [label, band] of Object.entries(bandsFor(bands, 30))) {
-      expect(band.criminals.max, label).toBeLessThanOrEqual(30);
-      expect(band.criminals.min, label).toBeGreaterThan(0);
+      expect(band.numberwangs.max, label).toBeLessThanOrEqual(30);
+      expect(band.numberwangs.min, label).toBeGreaterThan(0);
     }
   });
 
@@ -175,8 +175,8 @@ describe('gatesPass', () => {
     expect(gatesPass(band, metrics({ chainLength: 12 }))).toBe(false);
     expect(gatesPass(band, metrics({ abstractShare: 0.9 }))).toBe(false);
   });
-  it('ignores criminal count, which is sampled rather than gated', () => {
-    expect(gatesPass(band, metrics({ criminals: 99 }))).toBe(true);
+  it('ignores numberwang count, which is sampled rather than gated', () => {
+    expect(gatesPass(band, metrics({ numberwangs: 99 }))).toBe(true);
     expect(gatesPass(band, metrics({ clueCards: 99 }))).toBe(false);
   });
   it('ignores meanPathSize, which is recorded but not yet gated because the generator cannot currently reach the calibrated range', () => {

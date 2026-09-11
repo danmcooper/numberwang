@@ -25,7 +25,7 @@ const trait = (t: Trait) => ({ t: 'trait' as const, trait: t });
 const index = (i: number) => ({ t: 'index' as const, i });
 const colour = (name: string) => ({ t: 'colour' as const, name });
 
-const other = (t: Trait): Trait => (t === 'criminal' ? 'innocent' : 'criminal');
+const other = (t: Trait): Trait => (t === 'numberwang' ? 'not_numberwang' : 'numberwang');
 
 /** Everything a builder needs about the board it is writing a clue for. */
 export interface SampleCtx {
@@ -44,7 +44,7 @@ export interface SampleCtx {
   pick: <T>(xs: T[]) => T | null;
   /**
    * A unit satisfying `ok`, or null if the board has none. Builders that need a
-   * particular shape — a unit holding exactly two adjacent criminals, say — get
+   * particular shape — a unit holding exactly two adjacent numberwangs, say — get
    * one this way rather than by hoping a random unit fits: a shape that turns up
    * once in fifty draws would otherwise almost never be produced, and an
    * encoding nothing generates is an encoding nothing tests.
@@ -354,7 +354,7 @@ export function makeSampleCtx(
   shape: Shape,
   truth: boolean[],
 ): SampleCtx {
-  const has = (i: number, t: Trait) => (t === 'criminal' ? truth[i] : !truth[i]);
+  const has = (i: number, t: Trait) => (t === 'numberwang' ? truth[i] : !truth[i]);
   const members = (u: Unit) => unitMembers(board, u);
   const colours = [...new Set(shape.colours)].sort();
   const { width, height, size } = shape.grid;
@@ -395,6 +395,6 @@ export function makeSampleCtx(
  */
 export function randomTrueClue(c: SampleCtx, preds: string[] = SAMPLED_PREDICATES): Hint | null {
   const pred = preds[Math.floor(c.rng() * preds.length)];
-  const t: Trait = c.rng() < 0.5 ? 'criminal' : 'innocent';
+  const t: Trait = c.rng() < 0.5 ? 'numberwang' : 'not_numberwang';
   return CLUE_BUILDERS[pred](c, t, randomUnit(c.rng, c.shape, c.colours));
 }

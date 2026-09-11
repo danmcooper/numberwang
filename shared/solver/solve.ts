@@ -153,7 +153,7 @@ export function hintSteps(
       const flipped = path.filter((i) => i !== index).sort((a, b) => a - b);
 
       // A path is minimal in cards, which is not the same as minimal in clues: a
-      // card can earn its place by its known criminal/innocent value alone while
+      // card can earn its place by its known numberwang/not_numberwang value alone while
       // its clue contributes nothing. Outlining it anyway is what separates a
       // hint that points at one sentence from one that points at three, so drop
       // each clue in turn — keeping the card flipped — and outline only those

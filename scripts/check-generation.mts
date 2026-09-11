@@ -159,7 +159,7 @@ for (const person of puzzle.people) {
 console.log(
   [
     `aimed at ${label}, seed ${seed}, ${boardArg} — generated in ${seconds.toFixed(1)}s`,
-    `labelled ${puzzle.difficulty}: ${metrics.criminals} criminals, ${metrics.clueCards} clues, ` +
+    `labelled ${puzzle.difficulty}: ${metrics.numberwangs} numberwangs, ${metrics.clueCards} clues, ` +
       `chain ${metrics.chainLength}, abstract share ${metrics.abstractShare.toFixed(2)}`,
     `cast [${castShape}], ${preds.size} distinct predicates, worst repeat ${Math.max(...preds.values())}`,
   ].join('\n'),

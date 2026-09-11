@@ -3,23 +3,23 @@ import { ARG_KINDS, formatHint, HintParseError, parseHint } from './hint';
 
 describe('parseHint', () => {
   it('parses a unit with a pair argument', () => {
-    expect(parseHint('all_traits_are_neighbors_in_unit(unit(between,pair(0,3)),criminal)')).toEqual({
+    expect(parseHint('all_traits_are_neighbors_in_unit(unit(between,pair(0,3)),numberwang)')).toEqual({
       pred: 'all_traits_are_neighbors_in_unit',
       args: [
         { t: 'unit', unit: { kind: 'between', a: 0, b: 3 } },
-        { t: 'trait', trait: 'criminal' },
+        { t: 'trait', trait: 'numberwang' },
       ],
     });
   });
 
   it('parses bare kinds, numbers and negative direction offsets', () => {
-    expect(parseHint('all_units_have_at_least_n_traits(col,innocent,1)').args[0]).toEqual({
+    expect(parseHint('all_units_have_at_least_n_traits(col,not_numberwang,1)').args[0]).toEqual({
       t: 'kind',
       kind: 'col',
     });
-    expect(parseHint('n_colours_have_trait_in_dir(cook,innocent,0,-1,1)').args).toEqual([
+    expect(parseHint('n_colours_have_trait_in_dir(cook,not_numberwang,0,-1,1)').args).toEqual([
       { t: 'colour', name: 'cook' },
-      { t: 'trait', trait: 'innocent' },
+      { t: 'trait', trait: 'not_numberwang' },
       { t: 'num', n: 0 },
       { t: 'num', n: -1 },
       { t: 'num', n: 1 },
@@ -27,21 +27,21 @@ describe('parseHint', () => {
   });
 
   it('parses void-argument units and person indices', () => {
-    expect(parseHint('is_one_of_n_traits_in_unit(unit(edge,void),7,innocent,3)').args).toEqual([
+    expect(parseHint('is_one_of_n_traits_in_unit(unit(edge,void),7,not_numberwang,3)').args).toEqual([
       { t: 'unit', unit: { kind: 'edge' } },
       { t: 'index', i: 7 },
-      { t: 'trait', trait: 'innocent' },
+      { t: 'trait', trait: 'not_numberwang' },
       { t: 'num', n: 3 },
     ]);
   });
 
   it('rejects unknown predicates and wrong arity', () => {
-    expect(() => parseHint('no_such_predicate(criminal)')).toThrow(HintParseError);
-    expect(() => parseHint('number_of_traits(criminal)')).toThrow(HintParseError);
+    expect(() => parseHint('no_such_predicate(numberwang)')).toThrow(HintParseError);
+    expect(() => parseHint('number_of_traits(numberwang)')).toThrow(HintParseError);
   });
 
   it('rejects a malformed kind literal', () => {
-    expect(() => parseHint('all_units_have_at_least_n_traits(rowz,criminal,1)')).toThrow(
+    expect(() => parseHint('all_units_have_at_least_n_traits(rowz,numberwang,1)')).toThrow(
       HintParseError,
     );
   });
@@ -50,14 +50,14 @@ describe('parseHint', () => {
 describe('formatHint', () => {
   it('round-trips every signature shape', () => {
     for (const s of [
-      'has_trait(11,innocent)',
-      'number_of_traits(criminal,6)',
-      'number_of_traits_in_unit(unit(between,pair(4,7)),innocent,2)',
-      'odd_number_of_traits_in_unit(unit(neighbor,12),criminal)',
-      'only_one_unit_has_exactly_n_traits(row,criminal,2)',
-      'unit_shares_n_out_of_n_traits_with_unit(unit(neighbor,5),unit(row,3),criminal,1,2)',
-      'n_t_in_unit_have_trait_in_dir(unit(edge,void),innocent,innocent,1,0,2)',
-      'equal_number_of_traits_in_units(unit(colour,cook),unit(colour,cop),innocent)',
+      'has_trait(11,not_numberwang)',
+      'number_of_traits(numberwang,6)',
+      'number_of_traits_in_unit(unit(between,pair(4,7)),not_numberwang,2)',
+      'odd_number_of_traits_in_unit(unit(neighbor,12),numberwang)',
+      'only_one_unit_has_exactly_n_traits(row,numberwang,2)',
+      'unit_shares_n_out_of_n_traits_with_unit(unit(neighbor,5),unit(row,3),numberwang,1,2)',
+      'n_t_in_unit_have_trait_in_dir(unit(edge,void),not_numberwang,not_numberwang,1,0,2)',
+      'equal_number_of_traits_in_units(unit(colour,cook),unit(colour,cop),not_numberwang)',
     ]) {
       expect(formatHint(parseHint(s))).toBe(s);
     }

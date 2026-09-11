@@ -60,7 +60,7 @@ export function seedFor(date: string): number {
 }
 
 /**
- * The union of every calibrated label's `criminals` range.
+ * The union of every calibrated label's `numberwangs` range.
  *
  * Measured across the puzzles the bands were fitted from, the count of hidden
  * cards carries no difficulty signal: Medium, Tricky and Hard cluster within
@@ -69,11 +69,11 @@ export function seedFor(date: string): number {
  * would therefore not make a puzzle any harder, it would only make every puzzle
  * the same density.
  */
-export function unionCriminals(bands: Bands): Band {
+export function unionNumberwangs(bands: Bands): Band {
   const labels = Object.values(bands);
   return {
-    min: Math.min(...labels.map((b) => b.criminals.min)),
-    max: Math.max(...labels.map((b) => b.criminals.max)),
+    min: Math.min(...labels.map((b) => b.numberwangs.min)),
+    max: Math.max(...labels.map((b) => b.numberwangs.max)),
   };
 }
 
@@ -88,7 +88,7 @@ export function buildPuzzle(date: string): Puzzle {
   const bands = loadBands(bandData);
   const shaping = bands[SHAPING_LABEL];
   if (!shaping) throw new Error(`no calibrated band named ${SHAPING_LABEL}`);
-  const band: LabelBand = { ...shaping, criminals: unionCriminals(bands) };
+  const band: LabelBand = { ...shaping, numberwangs: unionNumberwangs(bands) };
   const boardBands = bandsFor(bands, SIZE);
   return generatePuzzle({
     date,

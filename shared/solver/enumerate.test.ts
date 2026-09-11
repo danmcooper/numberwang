@@ -5,7 +5,7 @@ import {
   type Shape,
   ContradictionError,
   allMasks,
-  criminalOf,
+  numberwangOf,
   filterMasks,
   forcedFromMasks,
   maskOf,
@@ -21,9 +21,9 @@ const unknown = () => Array.from({ length: 20 }, () => null) as (boolean | null)
 
 describe('mask conversion', () => {
   it('round-trips', () => {
-    const criminal = Array.from({ length: 20 }, (_, i) => i === 0 || i === 19);
-    expect(maskOf(criminal)).toBe((1 << 0) | (1 << 19));
-    expect(criminalOf(maskOf(criminal), 20)).toEqual(criminal);
+    const numberwang = Array.from({ length: 20 }, (_, i) => i === 0 || i === 19);
+    expect(maskOf(numberwang)).toBe((1 << 0) | (1 << 19));
+    expect(numberwangOf(maskOf(numberwang), 20)).toEqual(numberwang);
   });
 });
 
@@ -46,14 +46,14 @@ describe('allMasks', () => {
 
 describe('filterMasks', () => {
   it('keeps only assignments satisfying every hint', () => {
-    const hints = [parseHint('number_of_traits(criminal,20)')];
+    const hints = [parseHint('number_of_traits(numberwang,20)')];
     const out = filterMasks(shape, allMasks(shape, unknown()), hints);
     expect(out.length).toBe(1);
     expect(out[0]).toBe(2 ** 20 - 1);
   });
   it('runs a full-space pass in reasonable time', () => {
     const started = Date.now();
-    const out = survivors(shape, unknown(), [parseHint('number_of_traits(criminal,5)')]);
+    const out = survivors(shape, unknown(), [parseHint('number_of_traits(numberwang,5)')]);
     expect(out.length).toBe(15504); // C(20,5)
     expect(Date.now() - started).toBeLessThan(20000);
   });
@@ -63,8 +63,8 @@ describe('forcedFromMasks', () => {
   it('marks cards that agree across every survivor', () => {
     const known = unknown();
     const out = survivors(shape, known, [
-      parseHint('number_of_traits_in_unit(unit(row,1),criminal,4)'),
-      parseHint('number_of_traits_in_unit(unit(row,5),criminal,0)'),
+      parseHint('number_of_traits_in_unit(unit(row,1),numberwang,4)'),
+      parseHint('number_of_traits_in_unit(unit(row,5),numberwang,0)'),
     ]);
     const forced = forcedFromMasks(out, 20);
     expect(forced.slice(0, 4)).toEqual([true, true, true, true]);
@@ -73,8 +73,8 @@ describe('forcedFromMasks', () => {
   });
   it('throws on an unsatisfiable clue set', () => {
     const out = survivors(shape, unknown(), [
-      parseHint('number_of_traits(criminal,3)'),
-      parseHint('number_of_traits(criminal,4)'),
+      parseHint('number_of_traits(numberwang,3)'),
+      parseHint('number_of_traits(numberwang,4)'),
     ]);
     expect(() => forcedFromMasks(out, 20)).toThrow(ContradictionError);
   });

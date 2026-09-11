@@ -37,7 +37,7 @@ describe('encode', () => {
     expect(() =>
       encode(
         wide,
-        [{ pred: 'all_traits_are_neighbors_in_unit', args: [{ t: 'unit', unit: { kind: 'edge' } }, { t: 'trait', trait: 'criminal' }] }],
+        [{ pred: 'all_traits_are_neighbors_in_unit', args: [{ t: 'unit', unit: { kind: 'edge' } }, { t: 'trait', trait: 'numberwang' }] }],
         Array<null>(30).fill(null),
       ),
     ).toThrow(UnsupportedPredicateError);

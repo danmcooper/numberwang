@@ -2,7 +2,7 @@ import type { Shape } from './enumerate';
 import { type Clues, solveChain } from './solve';
 
 export interface Metrics {
-  criminals: number;
+  numberwangs: number;
   clueCards: number;
   chainLength: number;
   meanRevealsPerStep: number;
@@ -65,7 +65,7 @@ export function measure(input: MeasureInput): Metrics {
   }
 
   return {
-    criminals: input.truth.filter(Boolean).length,
+    numberwangs: input.truth.filter(Boolean).length,
     clueCards,
     chainLength: chain.steps.length,
     meanRevealsPerStep: mean(revealCounts),
@@ -84,7 +84,7 @@ export interface Band {
 
 export interface LabelBand {
   samples: number;
-  criminals: Band;
+  numberwangs: Band;
   clueCards: Band;
   chainLength: Band;
   meanRevealsPerStep: Band;
@@ -97,7 +97,7 @@ export type Bands = Record<string, LabelBand>;
 export class InsufficientSamplesError extends Error {}
 
 const BANDED = [
-  'criminals',
+  'numberwangs',
   'clueCards',
   'chainLength',
   'meanRevealsPerStep',
@@ -108,7 +108,7 @@ const BANDED = [
 /**
  * Metrics that gate a generated puzzle after the fact.
  *
- * `criminals` is excluded because criminal count carries no difficulty
+ * `numberwangs` is excluded because numberwang count carries no difficulty
  * signal (rho 0.301, and Medium/Tricky/Hard means sit within 0.23 of each
  * other): generation samples it from the union of every label's range
  * rather than the target label's own band, so gating on it here would
@@ -193,8 +193,8 @@ export const CALIBRATION_SIZE = 20;
 /**
  * Metrics whose bands move with the board, and the ones that do not.
  *
- * `criminals` and `clueCards` count cards, so they are proportional to the
- * board by construction: the archive is 46.6% criminal (503 over 54 puzzles)
+ * `numberwangs` and `clueCards` count cards, so they are proportional to the
+ * board by construction: the archive is 46.6% numberwang (503 over 54 puzzles)
  * whatever else is true of a puzzle, and a wider board needs proportionally
  * more clue hosts to pin it down. Generated 5x6 puzzles bear the second one
  * out — their clueCards mean runs 1.478x the 4x5 population's against the
@@ -210,7 +210,7 @@ export const CALIBRATION_SIZE = 20;
  * `abstractShare` is a ratio and `meanPathSize` is a per-card average; neither
  * has a board size in it.
  */
-const SCALES_WITH_BOARD: readonly (keyof LabelBand)[] = ['criminals', 'clueCards'];
+const SCALES_WITH_BOARD: readonly (keyof LabelBand)[] = ['numberwangs', 'clueCards'];
 
 /**
  * The calibrated bands as they apply to a board of `size` cards.
@@ -236,7 +236,7 @@ export function bandsFor(bands: Bands, size: number): Bands {
       const b = band[key] as Band;
       (scaled[key] as Band) = {
         // A band that scales below one card would ask for a puzzle with no
-        // criminals in it; the ceiling cannot exceed the board.
+        // numberwangs in it; the ceiling cannot exceed the board.
         min: Math.min(Math.max(1, Math.round(b.min * factor)), size),
         max: Math.min(Math.round(b.max * factor), size),
       };

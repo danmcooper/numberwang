@@ -3,7 +3,7 @@ export interface Person {
   number: number;
   /** One of `PALETTE`. Replaces `colour`, and groups the same way. */
   colour: string;
-  /** The hidden verdict. Replaces `criminal`. */
+  /** The hidden verdict. Replaces `numberwang`. */
   numberwang: boolean;
   clue: string | null;
   origHint: string | null;

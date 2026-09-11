@@ -63,19 +63,19 @@ export function shuffled<T>(rng: () => number, xs: readonly T[]): T[] {
   return out;
 }
 
-/** Share of a puzzle's criminals the archive puts on the edge: 331 of 503 across
+/** Share of a puzzle's numberwangs the archive puts on the edge: 331 of 503 across
  * the 54 puzzles, against the 70% a uniform draw over a 4x5 board would give
  * (t = -2.30, p = 0.025). */
 const EDGE_CRIMINAL_SHARE = 331 / 503;
 
 /**
- * Which cards are criminal, drawn leaning slightly inward.
+ * Which cards are numberwang, drawn leaning slightly inward.
  *
- * A uniform draw puts criminals on the edge at whatever rate the board is edge —
+ * A uniform draw puts numberwangs on the edge at whatever rate the board is edge —
  * 70% of a 4x5. The archive runs below that, and the difference is not nothing
  * to play against: an interior card touches eight others where a corner touches
  * three, so the neighbour clues that carry most of the deduction have more to
- * say about an interior criminal. Generated puzzles came out at the uniform
+ * say about an interior numberwang. Generated puzzles came out at the uniform
  * rate, which made their neighbour clues quietly thinner than the real ones.
  *
  * The weight is solved from the board rather than tuned: with `e` edge cards and
@@ -84,13 +84,13 @@ const EDGE_CRIMINAL_SHARE = 331 / 503;
  * `w = e*(1 - share) / (n*share)`. Drawing without replacement — Efraimidis-
  * Spirakis, the same scheme `orderPool` uses — pulls the result back toward
  * uniform, because a region that has given up several cards has fewer left to
- * give: nine criminals on a 4x5 land at 67.0% rather than the 65.8% asked for,
+ * give: nine numberwangs on a 4x5 land at 67.0% rather than the 65.8% asked for,
  * against 70.0% uniform. That is most of the gap, and the remainder sits inside
  * the archive's own standard error of 1.6 points, so it is not worth a scheme
  * that trades this one's guarantees — every card reachable, exactly `count`
  * returned — for a decimal place.
  */
-export function pickCriminals(rng: () => number, grid: Grid, count: number): number[] {
+export function pickNumberwangs(rng: () => number, grid: Grid, count: number): number[] {
   const edge = new Set(edgeMembers(grid));
   const interior = grid.size - edge.size;
   const weight =
@@ -151,7 +151,7 @@ function shareIn<T>(xs: readonly T[], keys: (x: T) => string[]): Map<string, num
  * and that factor is large: colour groups are 0.4% of the pool's unit slots
  * against the archive's 7%. The head came out at three times the archive's
  * colour rate, which is a worse error than the under-correction it was
- * fixing — the player notices "there are more criminal judges than criminal
+ * fixing — the player notices "there are more numberwang judges than numberwang
  * doctors" twice a puzzle instead of once.
  *
  * So iterate: measure the weighted marginals, correct each feature by how far it
@@ -301,7 +301,7 @@ export interface Cast {
  * Every archived puzzle names its cast in alphabetical reading order, with a
  * distinct initial on each of the twenty cards. That is a playability
  * constraint, not decoration: clues name people ("#NAME:10 has only one
- * criminal neighbor"), and the player has to find that person on the board.
+ * numberwang neighbor"), and the player has to find that person on the board.
  * Sorted, uniquely-lettered names turn that lookup into a glance at roughly
  * where the letter falls; an arbitrary order forces a scan of all twenty
  * cards for every name in every clue.
@@ -643,9 +643,9 @@ export function generatePuzzle(input: GenerateInput): GenerateResult {
     const cast = castOf(rng, shapes, grid.size);
     const shape: Shape = { grid, colours: cast.colours, numbers: cast.numbers };
 
-    const criminals = randInt(rng, band.criminals.min, band.criminals.max);
-    const criminalSet = new Set(pickCriminals(rng, grid, criminals));
-    const truth = Array.from({ length: grid.size }, (_, i) => criminalSet.has(i));
+    const numberwangs = randInt(rng, band.numberwangs.min, band.numberwangs.max);
+    const numberwangSet = new Set(pickNumberwangs(rng, grid, numberwangs));
+    const truth = Array.from({ length: grid.size }, (_, i) => numberwangSet.has(i));
 
     const board = makeBoard(grid, cast.colours, cast.numbers, truth);
     const pool = orderPool(rng, board, candidateHints(board), input.mix);
@@ -690,12 +690,12 @@ export function generatePuzzle(input: GenerateInput): GenerateResult {
 
     const flavour = shuffled(rng, FLAVOUR);
     let flavourAt = 0;
-    const people: Person[] = truth.map((criminal, i) => {
+    const people: Person[] = truth.map((numberwang, i) => {
       const hint = built.clues[i];
       return {
         number: cast.numbers[i],
         colour: cast.colours[i],
-        numberwang: criminal,
+        numberwang: numberwang,
         // A generated board runs to 49 cards and twenty-one colours, where
         // "Exactly 1 cook has …" leaves you counting cooks before you can use it.
         clue: hint ? render(hint, { colourTotals: true }) : flavour[flavourAt++ % flavour.length],

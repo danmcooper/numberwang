@@ -1,4 +1,4 @@
-export type Trait = 'criminal' | 'innocent';
+export type Trait = 'numberwang' | 'not_numberwang';
 export type UnitKind = 'row' | 'col' | 'neighbor' | 'between' | 'colour' | 'edge' | 'corner';
 
 export type Unit =
@@ -128,7 +128,7 @@ function parseArg(raw: string, want: ArgKind): HintArg {
       }
       return { t: 'kind', kind: s };
     case 'trait':
-      if (s !== 'criminal' && s !== 'innocent') throw new HintParseError(`bad trait: ${s}`);
+      if (s !== 'numberwang' && s !== 'not_numberwang') throw new HintParseError(`bad trait: ${s}`);
       return { t: 'trait', trait: s };
     case 'num':
       return { t: 'num', n: Number(s) };

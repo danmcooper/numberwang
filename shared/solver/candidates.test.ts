@@ -52,7 +52,7 @@ describe('candidateHints', () => {
       expect(u2.t, formatHint(h)).toBe('unit');
       if (u1.t !== 'unit' || u2.t !== 'unit') continue;
       // Same kind, because that is the only shape the renderer has words for, and
-      // because "as many criminals in row 2 as innocent cooks" reads as two clues
+      // because "as many numberwangs in row 2 as not_numberwang cooks" reads as two clues
       // glued together.
       expect(u1.unit.kind, formatHint(h)).toBe(u2.unit.kind);
       expect(formatHint({ ...h, args: [u1] })).not.toBe(formatHint({ ...h, args: [u2] }));
@@ -83,9 +83,9 @@ describe('candidateHints', () => {
   });
   it('never asks whether traits are connected inside a unit whose members are all mutually ' +
     'adjacent — the connectedness clause carries no information there', () => {
-    // "Both innocents between #12 and #13 are connected": those are the only two
+    // "Both not_numberwangs between #12 and #13 are connected": those are the only two
     // cards in the segment and they are side by side, so this says no more than
-    // "there are exactly 2 innocents there". Not a tautology — it can be false —
+    // "there are exactly 2 not_numberwangs there". Not a tautology — it can be false —
     // but the connectedness half of it is free, which is why the archive's 54
     // instances are all full rows, full columns, or 3+ card spans and never this.
     // all_traits_are_neighbors_in_unit is already guarded; both_ was not.
@@ -104,12 +104,12 @@ describe('candidateHints', () => {
   });
   it('only asks whether traits are connected along a line, where the answer does not turn ' +
     'on whether diagonals count', () => {
-    // Adjacency in this game includes diagonals: 29 of the archive's 29 "n innocents
+    // Adjacency in this game includes diagonals: 29 of the archive's 29 "n not_numberwangs
     // neighboring X" clues need the diagonal cards to be true, and only 8 are true
     // without them. Connectedness is built on the same relation but the archive never
     // pins it down — all 59 of its connectedness clues are over `between` segments,
     // where no diagonal step is possible and both readings agree. On a scattered unit
-    // they stop agreeing and the clue becomes unanswerable: "Both innocents neighboring
+    // they stop agreeing and the clue becomes unanswerable: "Both not_numberwangs neighboring
     // Wren are connected" left Suri and Tessa equally possible with diagonals and only
     // Tessa without, and nothing on the board says which. See isLineUnit.
     const connectedness = ['both_traits_are_neighbors_in_unit', 'all_traits_are_neighbors_in_unit'];
@@ -124,9 +124,9 @@ describe('candidateHints', () => {
     expect(seen).toBeGreaterThan(0);
   });
   it('never counts zero in a directional clue — the archive floors all three families at one, ' +
-    'and "0 #COLOURS:guard have a criminal directly above them" is not how the source words it', () => {
+    'and "0 #COLOURS:guard have a numberwang directly above them" is not how the source words it', () => {
     // These read as a template that never got its "no one" branch: the source
-    // says "Only one person in a corner has an innocent above them", never
+    // says "Only one person in a corner has an not_numberwang above them", never
     // "0 persons in a corner have...". Measured over the 54 real puzzles, by
     // argument position: n_in_unit 1x9/2x5/4x2, n_t_in_unit 1x4/2x6/3x1/4x1,
     // n_colours 1x13/2x8 — not one zero among the 41.
@@ -147,8 +147,8 @@ describe('candidateHints', () => {
   });
   it('never says a card is "one of 1" of a trait — the same slip as "1 of the 1", and the ' +
     'archive floors this count at two', () => {
-    // "#NAME:1 is one of 1 criminals between #0 and #3" should be "is the only
-    // criminal between...". The archive's 63 instances start at 2 (2x15, 3x23,
+    // "#NAME:1 is one of 1 numberwangs between #0 and #3" should be "is the only
+    // numberwang between...". The archive's 63 instances start at 2 (2x15, 3x23,
     // then a long tail); is_not_only_trait_in_unit already covers the >= 2 case
     // in words that work, and the n = 1 case has no rendering that does.
     let seen = 0;
@@ -162,7 +162,7 @@ describe('candidateHints', () => {
     expect(seen).toBeGreaterThan(0);
   });
   it('never singles out one member of a unit whose members all share the trait — "Cleo is one ' +
-    'of Desmond\'s 3 innocent neighbors" says nothing when Desmond sits in a corner', () => {
+    'of Desmond\'s 3 not_numberwang neighbors" says nothing when Desmond sits in a corner', () => {
     // Who neighbors whom is visible on the board, so when the count covers the
     // whole unit the clue reduces to "every one of them has the trait" and the
     // named card adds nothing — while the wording implies a distinction that
@@ -209,7 +209,7 @@ describe('candidateHints exhaustive tautology regression', () => {
       // happens to generate — a filter that is wrong only for some *other* assignment's
       // pool would sail through untested. That is precisely how the
       // max_number_of_traits_in_neighbors_in_unit tautology (a corner cell can never have
-      // more than 3 neighbors, so "no one in the corners has more than 3 innocent
+      // more than 3 neighbors, so "no one in the corners has more than 3 not_numberwang
       // neighbors" is true of every board) escaped detection. So instead: build
       // candidateHints for EVERY one of the 512 assignments, pool the results
       // (deduplicated by formatHint so equivalent hints from different pools are only
@@ -221,8 +221,8 @@ describe('candidateHints exhaustive tautology regression', () => {
 
       const allBoards: Board[] = [];
       for (let mask = 0; mask < 512; mask++) {
-        const criminal = Array.from({ length: 9 }, (_, i) => ((mask >> i) & 1) === 1);
-        allBoards.push(makeBoard(grid, colours, numbers, criminal));
+        const numberwang = Array.from({ length: 9 }, (_, i) => ((mask >> i) & 1) === 1);
+        allBoards.push(makeBoard(grid, colours, numbers, numberwang));
       }
 
       const distinct = new Map<string, Hint>();
@@ -251,11 +251,11 @@ describe('candidateHints exhaustive tautology regression', () => {
 
 describe('referencedCards', () => {
   it('collects unit members and bare indices', () => {
-    expect([...referencedCards(board, parseHint('number_of_traits_in_unit(unit(row,2),criminal,1)'))].sort(
+    expect([...referencedCards(board, parseHint('number_of_traits_in_unit(unit(row,2),numberwang,1)'))].sort(
       (a, b) => a - b,
     )).toEqual([4, 5, 6, 7]);
-    expect(referencedCards(board, parseHint('has_trait(11,innocent)'))).toEqual(new Set([11]));
-    expect(referencedCards(board, parseHint('is_one_of_n_traits_in_unit(unit(neighbor,5),1,criminal,2)'))).toContain(
+    expect(referencedCards(board, parseHint('has_trait(11,not_numberwang)'))).toEqual(new Set([11]));
+    expect(referencedCards(board, parseHint('is_one_of_n_traits_in_unit(unit(neighbor,5),1,numberwang,2)'))).toContain(
       1,
     );
   });
@@ -264,7 +264,7 @@ describe('referencedCards', () => {
     // unitMembers(neighbor,5) is 5's neighbors, which never includes 5 itself — but every
     // rendering of a neighbor unit names the anchor card explicitly (e.g. "neighboring
     // #NAME:5"), so the anchor must be treated as referenced too.
-    const cards = referencedCards(board, parseHint('has_most_traits(unit(neighbor,5),criminal)'));
+    const cards = referencedCards(board, parseHint('has_most_traits(unit(neighbor,5),numberwang)'));
     expect(cards).toContain(5);
   });
 });
@@ -275,17 +275,17 @@ describe('namedCards', () => {
     // (it renders as a locative phrase like "in row 2"), so none of its members
     // should show up here — unlike referencedCards, which deliberately includes
     // them for the pool-building use case at its other call site.
-    expect(namedCards(board, parseHint('number_of_traits_in_unit(unit(row,2),criminal,1)'))).toEqual(new Set());
-    expect(namedCards(board, parseHint('has_trait(11,innocent)'))).toEqual(new Set([11]));
+    expect(namedCards(board, parseHint('number_of_traits_in_unit(unit(row,2),numberwang,1)'))).toEqual(new Set());
+    expect(namedCards(board, parseHint('has_trait(11,not_numberwang)'))).toEqual(new Set([11]));
     // Arg 1 here is a real card index too (the "one of n" card being described,
     // rendered via #NAME:), not a bare count — so both it and the neighbor
     // unit's anchor are named.
-    expect(namedCards(board, parseHint('is_one_of_n_traits_in_unit(unit(neighbor,5),1,criminal,2)'))).toEqual(
+    expect(namedCards(board, parseHint('is_one_of_n_traits_in_unit(unit(neighbor,5),1,numberwang,2)'))).toEqual(
       new Set([5, 1]),
     );
     expect(
-      namedCards(board, parseHint('all_traits_are_neighbors_in_unit(unit(between,pair(0,3)),criminal)')),
+      namedCards(board, parseHint('all_traits_are_neighbors_in_unit(unit(between,pair(0,3)),numberwang)')),
     ).toEqual(new Set([0, 3]));
-    expect(namedCards(board, parseHint('has_most_traits(unit(colour,cook),criminal)'))).toEqual(new Set());
+    expect(namedCards(board, parseHint('has_most_traits(unit(colour,cook),numberwang)'))).toEqual(new Set());
   });
 });

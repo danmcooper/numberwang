@@ -159,7 +159,7 @@ describe('counter comparisons', () => {
   });
 
   it('compares counts over literals that share variables', () => {
-    // "as many criminals as innocents in this unit" counts v and -v over the
+    // "as many numberwangs as not_numberwangs in this unit" counts v and -v over the
     // same cards, so the two counters are not independent.
     const cnf = new Cnf();
     const vars = [cnf.newVar(), cnf.newVar(), cnf.newVar(), cnf.newVar()];
@@ -179,7 +179,7 @@ describe('counter comparisons', () => {
 
 describe('encodings over negative literals', () => {
   it('counts a negated literal as true when its variable is false', () => {
-    // Innocent cards enter the encoding as -v, so this is the common case, not
+    // Not Numberwang cards enter the encoding as -v, so this is the common case, not
     // an edge case.
     const cnf = new Cnf();
     const vars = [cnf.newVar(), cnf.newVar(), cnf.newVar()];

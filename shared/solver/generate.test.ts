@@ -17,7 +17,7 @@ import {
   generatePuzzle,
   makeRng,
   orderPool,
-  pickCriminals,
+  pickNumberwangs,
   colourShapesFor,
   shuffled,
 } from './generate';
@@ -26,7 +26,7 @@ import { EXTRA_PALETTE, PALETTE, faceOf, coloursFor } from './vocab';
 // Wide bands: this test proves the machinery works, not that it hits a target.
 const band: LabelBand = {
   samples: 10,
-  criminals: { min: 4, max: 7 },
+  numberwangs: { min: 4, max: 7 },
   clueCards: { min: 4, max: 16 },
   chainLength: { min: 2, max: 19 },
   meanRevealsPerStep: { min: 1, max: 8 },
@@ -40,7 +40,7 @@ const mix = loadMix(mixData);
 /**
  * Generating a puzzle here uses a 4x4 board rather than the shipped 4x5.
  *
- * Solving enumerates every assignment of criminals to cards, so the cost is
+ * Solving enumerates every assignment of numberwangs to cards, so the cost is
  * 2^(width*height): dropping one row is sixteen times cheaper, which is the
  * difference between this file running in the ordinary suite and needing a
  * separate slow one. Nothing under test is 4x5-specific — rows of four, both
@@ -264,20 +264,20 @@ describe('colourShapesFor', () => {
   });
 });
 
-describe('pickCriminals', () => {
-  // 70% of a 4x5 board is edge, so a uniform draw puts 70% of the criminals
+describe('pickNumberwangs', () => {
+  // 70% of a 4x5 board is edge, so a uniform draw puts 70% of the numberwangs
   // there. The archive puts 65.8% (331 of 503, t = -2.30 against 70% over the 54
-  // puzzles): a real if modest pull inward. It shows in play — a criminal in the
+  // puzzles): a real if modest pull inward. It shows in play — a numberwang in the
   // interior touches eight cards, so the neighbour clues that name it have more
   // to bite on than the same clue about a corner with three.
-  it('leans criminals inward at the archive\'s rate', () => {
+  it('leans numberwangs inward at the archive\'s rate', () => {
     const grid = makeGrid(4, 5);
     const edge = new Set(edgeMembers(grid));
     const rng = makeRng(11);
     let on = 0;
     let total = 0;
     for (let trial = 0; trial < 2000; trial++) {
-      const picked = pickCriminals(rng, grid, 9);
+      const picked = pickNumberwangs(rng, grid, 9);
       expect(new Set(picked).size).toBe(9);
       for (const i of picked) {
         total++;
@@ -296,9 +296,9 @@ describe('pickCriminals', () => {
     const grid = makeGrid(4, 5);
     const rng = makeRng(3);
     const seen = new Set<number>();
-    for (let trial = 0; trial < 200; trial++) for (const i of pickCriminals(rng, grid, 5)) seen.add(i);
+    for (let trial = 0; trial < 200; trial++) for (const i of pickNumberwangs(rng, grid, 5)) seen.add(i);
     expect(seen.size).toBe(20);
-    expect(pickCriminals(rng, grid, 20).sort((a, b) => a - b)).toEqual([...Array(20).keys()]);
+    expect(pickNumberwangs(rng, grid, 20).sort((a, b) => a - b)).toEqual([...Array(20).keys()]);
   });
 });
 
@@ -346,8 +346,8 @@ describe('orderPool', () => {
 
   it('rarely picks two units that share a single card', () => {
     // When a clue's two units overlap in exactly one card, the second unit is
-    // scaffolding: "only 1 of the 3 criminals neighbouring Jonas is in row 2"
-    // reduces to "that one shared card is criminal" the moment you notice the
+    // scaffolding: "only 1 of the 3 numberwangs neighbouring Jonas is in row 2"
+    // reduces to "that one shared card is numberwang" the moment you notice the
     // overlap, and the row does no work. The archive keeps this to 14% of its
     // two-unit clues and centres on overlaps of 2 or 3 (78%); the pool's own
     // shape is full of near-disjoint pairs, and nothing in `hintFeatures`
@@ -481,14 +481,14 @@ describe('generatePuzzle', () => {
   });
 
   // The bands are calibrated on the archive's twenty-card board, so the counts
-  // in them — how many criminals, how many clue cards — mean "out of twenty".
-  // Sampling the criminal count straight out of an unscaled band gives a wider
-  // board a thinner puzzle than any real one: a 5x6 came out 30% criminal
+  // in them — how many numberwangs, how many clue cards — mean "out of twenty".
+  // Sampling the numberwang count straight out of an unscaled band gives a wider
+  // board a thinner puzzle than any real one: a 5x6 came out 30% numberwang
   // against the archive's 47%.
   it('scales the band it was given to the board it is filling', () => {
-    // min === max, so the criminal count is decided entirely by the scaling:
+    // min === max, so the numberwang count is decided entirely by the scaling:
     // ten of twenty is five of ten, and eight of the sixteen cards here.
-    const tenOfTwenty: LabelBand = { ...band, criminals: { min: 10, max: 10 } };
+    const tenOfTwenty: LabelBand = { ...band, numberwangs: { min: 10, max: 10 } };
     const { puzzle: p } = generatePuzzle({
       date: '2026-01-01', difficulty: 'Medium', band: tenOfTwenty, seed: 5,
       mix: boardMix, ...BOARD,
