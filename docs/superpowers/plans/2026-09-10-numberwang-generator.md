@@ -76,7 +76,7 @@ Get a repo whose tests pass with everything that depends on a scraped archive re
 - Consumes: nothing
 - Produces: a tree where `shared/solver/*` compiles and `npm test` passes; `ClueMix` and `loadMix()` from `mix.ts`; `CROSS_TRAIT` and `CROSS_TRAIT_RATE` from `corpus.ts`
 
-- [ ] **Step 1: Copy the tree, excluding what the fork does not want**
+- [x] **Step 1: Copy the tree, excluding what the fork does not want**
 
 `site/` is excluded deliberately: the app is a separate plan
 (`2026-09-10-numberwang-app.md`), and its tests read `person.name` and
@@ -92,7 +92,7 @@ rsync -a --exclude='.git' --exclude='node_modules' --exclude='puzzles' \
   /Users/dan/code/cbsbd/ ./
 ```
 
-- [ ] **Step 2: Delete the source-site half**
+- [x] **Step 2: Delete the source-site half**
 
 ```bash
 cd /Users/dan/code/numberwang
@@ -103,7 +103,7 @@ rm -rf scripts/lib scripts/extract.mts scripts/extract.test.mts \
 git mv scripts/audit-dan.mts scripts/audit.mts 2>/dev/null || mv scripts/audit-dan.mts scripts/audit.mts
 ```
 
-- [ ] **Step 3: Copy the no-archive mix machinery from cbsbd3d**
+- [x] **Step 3: Copy the no-archive mix machinery from cbsbd3d**
 
 `cbsbd3d` already solved the problem Numberwang has: clue proportions for a game with no scraped archive of its own. Take its module and its committed JSON rather than rebuilding either.
 
@@ -114,7 +114,7 @@ cp /Users/dan/code/cbsbd3d/shared/solver/mix.test.ts shared/solver/mix.test.ts
 cp /Users/dan/code/cbsbd3d/config/clue-mix.json      config/clue-mix.json
 ```
 
-- [ ] **Step 4: Rewrite `corpus.ts` to hold only the cross-trait budgets**
+- [x] **Step 4: Rewrite `corpus.ts` to hold only the cross-trait budgets**
 
 Everything else in it read the archive. Replace the whole file with:
 
@@ -143,11 +143,11 @@ export const CROSS_TRAIT: Record<string, string> = {
 export const CROSS_TRAIT_RATE = 1 / 3;
 ```
 
-- [ ] **Step 5: Strip `VARIANTS`, `ONE_OFFS` and `puzzleBillingOf` from `shared/puzzle.ts`**
+- [x] **Step 5: Strip `VARIANTS`, `ONE_OFFS` and `puzzleBillingOf` from `shared/puzzle.ts`**
 
 Delete the `VARIANTS` const and its `Variant` type, the `ONE_OFFS` const and its `OneOffSlug` type, `puzzleBillingOf`, the `VARIANT_NAMES` const, the `variant` field on `Puzzle`, and the `variant` branch of `validatePuzzle`. Every puzzle here is simply the puzzle for its date.
 
-- [ ] **Step 6: Update `package.json`**
+- [x] **Step 6: Update `package.json`**
 
 ```json
 {
@@ -170,7 +170,7 @@ only risk a different version. `dev`, `build` and `preview` are absent because
 there is nothing to serve until the app plan restores `site/` and
 `vite.config.ts`.
 
-- [ ] **Step 7: Delete every test that referenced what was removed, then run the suite**
+- [x] **Step 7: Delete every test that referenced what was removed, then run the suite**
 
 Run: `npm install && npx tsc --noEmit`
 Expected: errors ONLY in `scripts/` and tests that referenced `VARIANTS`, `ONE_OFFS`, `puzzleBillingOf`, `archiveClueMix`, or the extractor. Fix each by deleting the referencing test case or, in `scripts/`, the referencing branch. `shared/solver/*.ts` must compile untouched.
@@ -178,7 +178,7 @@ Expected: errors ONLY in `scripts/` and tests that referenced `VARIANTS`, `ONE_O
 Run: `npm test`
 Expected: PASS. If a solver test fails here, the fork copied wrong — stop and re-copy rather than editing the solver.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add -A
@@ -203,7 +203,7 @@ archive of its own."
 - Consumes: nothing from Task 1 beyond the stripped file
 - Produces: `Person { number: number; colour: string; numberwang: boolean; clue: string | null; origHint: string | null; paths: number[][] | null }`; `validatePuzzle(data: unknown): Puzzle` enforcing a `1..N` permutation
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Add to `shared/puzzle.test.ts`:
 
@@ -255,12 +255,12 @@ describe('validatePuzzle numbers', () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `npx vitest run shared/puzzle.test.ts`
 Expected: FAIL — the old `Person` shape has `name`/`profession`/`criminal`, so the fixtures are rejected or the number checks are absent.
 
-- [ ] **Step 3: Rewrite `Person` and add the number check**
+- [x] **Step 3: Rewrite `Person` and add the number check**
 
 Replace the `Person` interface with:
 
@@ -299,12 +299,12 @@ In `validatePuzzle`, after the `people.length` check, add:
 
 The uniqueness check plus the `1..count` range check together prove a permutation without sorting: `count` distinct integers drawn from a range of size `count` must be all of them.
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `npx vitest run shared/puzzle.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add shared/puzzle.ts shared/puzzle.test.ts
@@ -329,7 +329,7 @@ The arithmetic predicates need each card's number at evaluation time, and `Board
 - Consumes: `Person` from Task 2
 - Produces: `Shape { grid: Grid; colours: string[]; numbers: number[] }`; `makeBoard(grid, colours, numbers, numberwang): Board`; `Board { grid; colours; numbers; numberwang; cache? }`; `Unit` variant `{ kind: 'colour'; name: string }`; `HintArg` variant `{ t: 'colour'; name: string }`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Add to `shared/solver/predicates.test.ts`:
 
@@ -354,12 +354,12 @@ describe('board numbers and colours', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `npx vitest run shared/solver/predicates.test.ts`
 Expected: FAIL — `makeBoard` takes three arguments and there is no `colour` unit kind.
 
-- [ ] **Step 3: Rename `profession` to `colour` mechanically**
+- [x] **Step 3: Rename `profession` to `colour` mechanically**
 
 The rename is exact and total across the solver. Run it, then read the diff.
 
@@ -399,7 +399,7 @@ generator actually writes.
 sed -i '' 's/"professionShapes"/"colourShapes"/' config/clue-mix.json
 ```
 
-- [ ] **Step 4: Rename the three token helpers in `render.ts` by hand**
+- [x] **Step 4: Rename the three token helpers in `render.ts` by hand**
 
 `sed` cannot see these — they are `prof`, not `profession`:
 
@@ -424,7 +424,7 @@ grep -rn '\bprofN\?s\?\b' shared scripts || echo 'no short prof names left'
 `RenderOptions.professionTotals` is renamed to `colourTotals` by Step 3's sed;
 verify that with the same grep.
 
-- [ ] **Step 5: Add `numbers` to `Shape` and `Board`**
+- [x] **Step 5: Add `numbers` to `Shape` and `Board`**
 
 In `shared/solver/enumerate.ts`:
 
@@ -462,17 +462,17 @@ export function makeBoard(
 }
 ```
 
-- [ ] **Step 6: Fix every `makeBoard` call site**
+- [x] **Step 6: Fix every `makeBoard` call site**
 
 Run: `npx tsc --noEmit`
 Expected: errors at each `makeBoard(...)` call with 3 arguments. Fix each by threading `shape.numbers` through as the third argument. In `enumerate.ts`'s `filterMasks`, that is `makeBoard(shape.grid, shape.colours, shape.numbers, numberwang)`. In `encode.ts`'s `encode`, the same. Where a test constructs a board with no arithmetic in play, pass an ascending array: `Array.from({ length: size }, (_, i) => i + 1)`.
 
-- [ ] **Step 7: Run the tests to verify they pass**
+- [x] **Step 7: Run the tests to verify they pass**
 
 Run: `npx tsc --noEmit && npm test`
 Expected: PASS, clean typecheck.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add -A
@@ -496,7 +496,7 @@ verdict alone, which is still why unitMembers can memoise."
 - Consumes: Task 3's board
 - Produces: `Trait = 'numberwang' | 'not_numberwang'`; `plural(t: Trait, n: number): string` returning the card nouns
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Add to `shared/solver/render.test.ts`:
 
@@ -514,12 +514,12 @@ describe('trait nouns', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `npx vitest run shared/solver/render.test.ts`
 Expected: FAIL — `'numberwang'` is not assignable to `Trait`.
 
-- [ ] **Step 3: Rename the trait mechanically**
+- [x] **Step 3: Rename the trait mechanically**
 
 Order matters: rewrite `innocent` first, so that the `criminal`→`numberwang` pass cannot then rewrite anything the first pass produced.
 
@@ -544,7 +544,7 @@ git diff --stat
 sed -i '' 's/"criminals"/"numberwangs"/' config/difficulty.json
 ```
 
-- [ ] **Step 4: Replace `plural` in `render.ts` with the card nouns**
+- [x] **Step 4: Replace `plural` in `render.ts` with the card nouns**
 
 The mechanical pass will have produced `numberwang`/`numberwangs` as the rendered nouns, which is wrong English and wrong for the game. Replace `plural` with:
 
@@ -562,7 +562,7 @@ export function plural(t: Trait, n: number): string {
 }
 ```
 
-- [ ] **Step 5: Read every rendered string and fix the ones the rename broke**
+- [x] **Step 5: Read every rendered string and fix the ones the rename broke**
 
 Run: `npx vitest run shared/solver/render.test.ts`
 Expected: many failures with visibly wrong English, because the archive-derived phrasings assumed a one-word noun. Fix each renderer's template so the sentence reads correctly with a multi-word noun — in particular any that wrote `${t}s` or `${argTrait(a, 0)}s` inline rather than calling `plural`.
@@ -573,12 +573,12 @@ grep -n 'argTrait(a, [0-9])}s\|${t}s' shared/solver/render.ts
 
 Every hit is a bug introduced by the rename. Route each through `plural`.
 
-- [ ] **Step 6: Run the whole suite**
+- [x] **Step 6: Run the whole suite**
 
 Run: `npx tsc --noEmit && npm test`
 Expected: PASS
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add -A
@@ -602,7 +602,7 @@ on a card now, so the noun a clue counts is the card: \"Numberwang cards\", not
 - Consumes: `ClueMix` and its `colourShapes` from `mix.ts`
 - Produces: `PALETTE: string[]`; `numbersFor(size: number, rng: () => number): number[]`; `colourShapeFor(mix: ClueMix, size: number, rng: () => number): number[]`; `coloursFor(size: number, shape: number[], rng: () => number): string[]`; `TITLES: string[]`; `FLAVOUR: string[]`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Replace `shared/solver/vocab.test.ts` with:
 
@@ -676,12 +676,12 @@ describe('coloursFor', () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `npx vitest run shared/solver/vocab.test.ts`
 Expected: FAIL — none of these functions exist.
 
-- [ ] **Step 3: Rewrite `vocab.ts`**
+- [x] **Step 3: Rewrite `vocab.ts`**
 
 Replace the whole file:
 
@@ -803,12 +803,12 @@ export const FLAVOUR: string[] = [
 ];
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `npx vitest run shared/solver/vocab.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Run the whole suite and fix `castOf` call sites**
+- [x] **Step 5: Run the whole suite and fix `castOf` call sites**
 
 Run: `npx tsc --noEmit`
 Expected: errors wherever `generate.ts` or `sample.ts` called `castOf`, `namesFor` or `coloursFor`'s old signature. Replace each with `numbersFor` + `colourShapeFor` + `coloursFor`.
@@ -816,7 +816,7 @@ Expected: errors wherever `generate.ts` or `sample.ts` called `castOf`, `namesFo
 Run: `npm test`
 Expected: PASS
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add -A
@@ -843,7 +843,7 @@ them — they are what gives only_trait_in_unit_is_in_unit anything to say."
 - Consumes: `Board` (with `numbers`) from Task 3; `unitMembers`, `hasTrait` from `predicates.ts`
 - Produces: `ARITH_PREDS: readonly string[]`; `traitSum(b, members, t): number`; `ARITH_EVALUATORS: Record<string, (b: Board, a: HintArg[]) => boolean>`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `shared/solver/arith.test.ts`:
 
@@ -940,12 +940,12 @@ describe('sum_parity_in_unit', () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `npx vitest run shared/solver/arith.test.ts`
 Expected: FAIL — `Cannot find module './arith'`.
 
-- [ ] **Step 3: Add the four predicates to the hint DSL**
+- [x] **Step 3: Add the four predicates to the hint DSL**
 
 In `shared/solver/hint.ts`, add to `ARG_KINDS`:
 
@@ -956,7 +956,7 @@ In `shared/solver/hint.ts`, add to `ARG_KINDS`:
   sum_parity_in_unit: [U, T, N],
 ```
 
-- [ ] **Step 4: Write `arith.ts`**
+- [x] **Step 4: Write `arith.ts`**
 
 Create `shared/solver/arith.ts`:
 
@@ -1048,7 +1048,7 @@ export const ARITH_EVALUATORS: Record<string, (b: Board, a: HintArg[]) => boolea
 };
 ```
 
-- [ ] **Step 5: Wire the evaluators into `predicates.ts`**
+- [x] **Step 5: Wire the evaluators into `predicates.ts`**
 
 At the end of `predicates.ts`'s `EVALUATORS` declaration, spread the arithmetic ones in:
 
@@ -1063,12 +1063,12 @@ export const EVALUATORS: Record<string, (b: Board, a: HintArg[]) => boolean> = {
 
 `arith.ts` imports `Board`, `hasTrait` and `unitMembers` from `predicates.ts`, and `predicates.ts` imports `ARITH_EVALUATORS` back — a cycle that ESM resolves because the spread runs at module evaluation and `ARITH_EVALUATORS` is a top-level const in a module with no top-level side effects. If the cycle proves troublesome, move `Board`, `hasTrait` and `unitMembers` to a new `board.ts` that both import; do not duplicate them.
 
-- [ ] **Step 6: Run the tests to verify they pass**
+- [x] **Step 6: Run the tests to verify they pass**
 
 Run: `npx vitest run shared/solver/arith.test.ts`
 Expected: PASS
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add shared/solver/arith.ts shared/solver/arith.test.ts shared/solver/hint.ts shared/solver/predicates.ts
@@ -1097,7 +1097,7 @@ The load-bearing task. An encoding that disagrees with the semantics produces br
 - Consumes: `ARITH_EVALUATORS`, `IS_ARITH` from Task 6; `Cnf` from `sat.ts`; `MAX_ENUMERATED_UNIT` from `encode.ts`
 - Produces: `encodeArith(cnf: Cnf, board: Board, vars: number[], hint: Hint): void`
 
-- [ ] **Step 1: Write the failing differential test**
+- [x] **Step 1: Write the failing differential test**
 
 Create `shared/solver/arith.differential.test.ts`:
 
@@ -1210,12 +1210,12 @@ describe('the unit-size ceiling', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `npx vitest run shared/solver/arith.differential.test.ts`
 Expected: FAIL — `encodeArith` is not exported from `./arith`.
 
-- [ ] **Step 3: Write `encodeArith`**
+- [x] **Step 3: Write `encodeArith`**
 
 Append to `shared/solver/arith.ts`:
 
@@ -1273,12 +1273,12 @@ export function encodeArith(cnf: Cnf, board: Board, vars: number[], hint: Hint):
 
 Note the scratch board is built by spreading `board`, which carries its `cache` along — deliberately, since membership cannot change and re-deriving it 2^n times would dominate the cost.
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `npx vitest run shared/solver/arith.differential.test.ts`
 Expected: PASS. If a case fails, the printed `combo N of <hint>` names the exact assignment — decode it against the hint's scope rather than guessing.
 
-- [ ] **Step 5: Dispatch the four from `encode.ts`**
+- [x] **Step 5: Dispatch the four from `encode.ts`**
 
 In `shared/solver/encode.ts`, add the four to `SUPPORTED`:
 
@@ -1300,14 +1300,14 @@ and at the top of `encodeHint`, before the switch:
 
 with `import { IS_ARITH, encodeArith } from './arith';`.
 
-- [ ] **Step 6: Verify the solver agrees with brute force end to end**
+- [x] **Step 6: Verify the solver agrees with brute force end to end**
 
 The existing `sat.differential.test.ts` compares SAT results against `enumerate.ts`'s exhaustive filter. Add an arithmetic clue to whatever hint set it uses, so the check covers the new path through the real solver rather than only the encoding in isolation.
 
 Run: `npm test`
 Expected: PASS
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add -A
@@ -1337,7 +1337,7 @@ solutions."
 - Consumes: `candidateUnits`, `hasMultipleUnitsOfKind` from `candidates.ts`
 - Produces: `arithCandidates(b: Board, units: Unit[]): Hint[]`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Add to `shared/solver/arith.test.ts`:
 
@@ -1394,12 +1394,12 @@ describe('arithCandidates', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `npx vitest run shared/solver/arith.test.ts`
 Expected: FAIL — `arithCandidates` is not exported.
 
-- [ ] **Step 3: Write `arithCandidates`**
+- [x] **Step 3: Write `arithCandidates`**
 
 Append to `shared/solver/arith.ts`:
 
@@ -1462,12 +1462,12 @@ export function arithCandidates(b: Board, units: Unit[]): Hint[] {
 }
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `npx vitest run shared/solver/arith.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Wire into `candidates.ts`**
+- [x] **Step 5: Wire into `candidates.ts`**
 
 At the end of `candidateHints`, before the return, add:
 
@@ -1477,12 +1477,12 @@ At the end of `candidateHints`, before the return, add:
 
 with `import { arithCandidates } from './arith';`. `candidateHints` already computes its units; reuse that local rather than calling `candidateUnits` twice.
 
-- [ ] **Step 6: Run the whole suite**
+- [x] **Step 6: Run the whole suite**
 
 Run: `npx tsc --noEmit && npm test`
 Expected: PASS
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add -A
@@ -1515,7 +1515,7 @@ so these four inherit them rather than inventing a third.
 - Consumes: `plural`, `where`, `colours`, `argUnit`, `argTrait`, `argNum` from `render.ts`
 - Produces: four `RENDERERS` entries; `where` gains a `colour` case returning `among #COLOURS:<name>`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Add to `shared/solver/render.test.ts`:
 
@@ -1580,14 +1580,14 @@ describe('arithmetic clue text', () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `npx vitest run shared/solver/render.test.ts`
 Expected: FAIL — `UnsupportedShapeError` naming each of the four predicates, and
 for the colour-group cases `UnsupportedShapeError: colour has no locative phrase`
 thrown from `where`.
 
-- [ ] **Step 3: Give `where` a phrase for a colour unit**
+- [x] **Step 3: Give `where` a phrase for a colour unit**
 
 The mechanical rename in Task 3 turned `case 'profession'` into `case 'colour'`,
 still throwing. It threw because no predicate in Clues by Sam ever put a
@@ -1605,7 +1605,7 @@ profession unit in a locative position — these four do. Replace the throw:
 `wherePerson` delegates to `where` for every kind but `corner`, so it inherits
 this and needs no change.
 
-- [ ] **Step 4: Add the four renderers**
+- [x] **Step 4: Add the four renderers**
 
 In `shared/solver/render.ts`, add to `RENDERERS`:
 
@@ -1636,12 +1636,12 @@ agreed on. `plural(t, 2)` is the plural form even when a clue's answer involves
 one card: "The Numberwang cards in row 2 add to 25" is right whether that row
 holds one of them or four.
 
-- [ ] **Step 5: Run the tests to verify they pass**
+- [x] **Step 5: Run the tests to verify they pass**
 
 Run: `npx vitest run shared/solver/render.test.ts`
 Expected: PASS
 
-- [ ] **Step 6: Confirm nothing else regressed**
+- [x] **Step 6: Confirm nothing else regressed**
 
 `where` gained a branch that other predicates reach through `wherePerson`, so run
 the whole suite rather than just the render tests.
@@ -1649,7 +1649,7 @@ the whole suite rather than just the render tests.
 Run: `npm test`
 Expected: PASS
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add shared/solver/render.ts shared/solver/render.test.ts
@@ -1667,6 +1667,48 @@ locative for the obvious reason — a colour group is not anywhere."
 
 ---
 
+### Task 9b: Number properties — prime, even, odd, divisible by n
+
+Added mid-execution, at the user's request, after Task 9 and before Task 10 so
+that the budgets in Task 10 are written once for all eight predicates rather
+than twice.
+
+Four counting predicates, all `[U, T, N]` but for the divisor that
+`n_traits_in_unit_are_divisible` carries ahead of its count:
+
+- `n_traits_in_unit_are_prime`
+- `n_traits_in_unit_are_even`
+- `n_traits_in_unit_are_odd`
+- `n_traits_in_unit_are_divisible`
+
+They live in `arith.ts` beside the four sum predicates and reuse every piece of
+machinery Tasks 6–9 built: `encodeArith` encodes them unchanged, because
+blocking clauses do not care what Boolean function they are blocking;
+`arithCandidates` proposes the count the board has; `propertyCount` in
+`render.ts` says all four.
+
+Three judgements worth keeping:
+
+- **The divisor floor is 3.** "Divisible by 1" is every card and "divisible by
+  2" is `n_traits_in_unit_are_even` in worse English, so `MIN_DIVISOR` refuses
+  both rather than leaving the generator to write a clue the player already has.
+- **Candidates only propose a count that could have differed.** If no member of
+  the unit has the property, the count is 0 under every assignment and the clue
+  is a tautology — the same failure `sum_parity_in_unit` had over a unit of
+  all-even numbers.
+- **Divisors need at least two multiples in the unit** (`MIN_MULTIPLES`), which
+  also keeps them below its largest number: "divisible by 19" over a unit whose
+  biggest card is 12 is a roundabout way of saying none of them are, and a
+  divisor with one multiple makes the count that single card's verdict in
+  arithmetic — "exactly one of the teal cards is evenly divisible by 9" is
+  "18 is Numberwang" with the answer printed on it.
+
+`ARITH_PREDS` is now `SUM_PREDS` plus `PROP_PREDS`, so everything keyed off it —
+`IS_ARITH`, `SUPPORTED`, the differential test, Task 10's budgets — picks the
+new four up without a second list to keep in step.
+
+---
+
 ### Task 10: Clue-mix budgets and the one-per-puzzle cap
 
 Without this the four predicates are generated never: `clue-mix.json` comes from an archive that never wrote them, so their share is 0, and `orderPool` multiplies by share.
@@ -1679,7 +1721,7 @@ Without this the four predicates are generated never: `clue-mix.json` comes from
 - Consumes: `ClueMix` from `mix.ts`; `CROSS_TRAIT_RATE` from `corpus.ts`
 - Produces: `ARITH_RATE: Record<string, number>`; `withArithBudgets(mix: ClueMix): ClueMix`; a `MAX_EXACT_SUMS = 1` cap honoured in `generate.ts`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Add to `shared/solver/mix.test.ts`:
 
@@ -1728,12 +1770,12 @@ describe('withArithBudgets', () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `npx vitest run shared/solver/mix.test.ts`
 Expected: FAIL — `withArithBudgets` is not exported.
 
-- [ ] **Step 3: Add the budgets to `mix.ts`**
+- [x] **Step 3: Add the budgets to `mix.ts`**
 
 ```ts
 import { ARITH_PREDS } from './arith';
@@ -1775,12 +1817,12 @@ export function withArithBudgets(mix: ClueMix): ClueMix {
 }
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `npx vitest run shared/solver/mix.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Write the failing cap test**
+- [x] **Step 5: Write the failing cap test**
 
 Add to `shared/solver/generate.test.ts`:
 
@@ -1799,12 +1841,12 @@ it('never spends more than one exact sum on a puzzle', () => {
 });
 ```
 
-- [ ] **Step 6: Run it to verify it fails**
+- [x] **Step 6: Run it to verify it fails**
 
 Run: `npx vitest run shared/solver/generate.test.ts`
 Expected: FAIL — `MAX_EXACT_SUMS` is not exported.
 
-- [ ] **Step 7: Enforce the cap in `generate.ts`**
+- [x] **Step 7: Enforce the cap in `generate.ts`**
 
 ```ts
 /**
@@ -1825,12 +1867,12 @@ Wrap the mix load so every generation path sees the budgets:
 const mix = withArithBudgets(loadMix());
 ```
 
-- [ ] **Step 8: Run the whole suite**
+- [x] **Step 8: Run the whole suite**
 
 Run: `npx tsc --noEmit && npm test`
 Expected: PASS
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add -A
@@ -1859,7 +1901,7 @@ landing on the same board."
 - Consumes: everything above
 - Produces: `puzzles/YYYY-MM-DD.json` files and `puzzles/index.json`; `npm run generate`, `npm run manifest`, `npm run audit`, `npm run test:generate` all working
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Add to `scripts/generate.test.mts`:
 
@@ -1901,12 +1943,12 @@ describe('buildPuzzle', () => {
 });
 ```
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 Run: `npx vitest run scripts/generate.test.mts`
 Expected: FAIL — `buildPuzzle` is not exported, and `generate.mts` still walks real puzzles for its work list.
 
-- [ ] **Step 3: Rewrite `generate.mts`'s work list and shape construction**
+- [x] **Step 3: Rewrite `generate.mts`'s work list and shape construction**
 
 `cbsbd`'s `runGenerate` finds its work by walking the scraped puzzles and takes each one's difficulty as an aim. Neither applies. Replace with:
 
@@ -1914,7 +1956,7 @@ Expected: FAIL — `buildPuzzle` is not exported, and `generate.mts` still walks
 - `buildPuzzle(date: string): Puzzle`, exported, which seeds the rng from the date string, builds the shape with `numbersFor`, `colourShapeFor` and `coloursFor`, generates clues against `withArithBudgets(loadMix())`, scores the finished puzzle with `difficulty.ts`, and writes that score into `difficulty`.
 - No `variant` field, no `aimedAt` parameter, no `WEEKDAY_BOARDS`. Delete that table; the board is `makeGrid(4, 5)` everywhere.
 
-- [ ] **Step 4: Demote `difficulty.ts` from target to reporter**
+- [x] **Step 4: Demote `difficulty.ts` from target to reporter**
 
 Delete any exported function whose job is to decide whether a puzzle *hits* a label — the acceptance predicate generation used to steer by. Keep the scorer that turns a finished puzzle into a label, and keep `bandsFor`. Add a note at the top of the file:
 
@@ -1931,12 +1973,12 @@ Delete any exported function whose job is to decide whether a puzzle *hits* a la
  */
 ```
 
-- [ ] **Step 5: Run the tests to verify they pass**
+- [x] **Step 5: Run the tests to verify they pass**
 
 Run: `npx vitest run scripts/generate.test.mts`
 Expected: PASS
 
-- [ ] **Step 6: Update `manifest.mts` and `audit.mts`**
+- [x] **Step 6: Update `manifest.mts` and `audit.mts`**
 
 `manifest.mts`: drop the variant grouping and the `puzzleBillingOf` call; one entry per date, carrying `date`, `id`, `title`, `difficulty`, `width`, `height`.
 
@@ -1945,7 +1987,7 @@ Expected: PASS
 Run: `npx vitest run scripts/manifest.test.mts`
 Expected: PASS
 
-- [ ] **Step 7: Generate a real puzzle and read it**
+- [x] **Step 7: Generate a real puzzle and read it**
 
 Run: `npm run test:generate`
 Expected: one 4x5 puzzle built and checked sound, in well under a minute.
@@ -1953,14 +1995,14 @@ Expected: one 4x5 puzzle built and checked sound, in well under a minute.
 Run: `npm run generate -- 2026-09-10 && cat puzzles/2026-09-10.json | head -40`
 Expected: a valid file. **Read the clue text.** Confirm the arithmetic clues read as English, that at most one is an exact sum, and that the numbers are a permutation of 1–20.
 
-- [ ] **Step 8: Generate a week and audit it**
+- [x] **Step 8: Generate a week and audit it**
 
 ```bash
 npm run generate && npm run manifest && npm run audit
 ```
 Expected: seven or more puzzles, a manifest listing them, a clean audit.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add -A
@@ -1993,7 +2035,7 @@ its own.
 - Consumes: `npm run generate`, `npm run manifest`, `npm run audit`
 - Produces: a nightly commit of a week of puzzles to `puzzles/`
 
-- [ ] **Step 1: Adapt the nightly workflow**
+- [x] **Step 1: Adapt the nightly workflow**
 
 Take `/Users/dan/code/cbsbd3d/.github/workflows/generate.yml` as the base and
 adjust: `npm ci`, then `npm run generate`, `npm run manifest`, `npm run audit`,
@@ -2004,7 +2046,7 @@ puzzle. Remove any step that references the extractor or a source site.
 Delete the inherited `pages.yml`; there is nothing to deploy until the app plan
 restores `site/`, and a workflow that fails every push is worse than none.
 
-- [ ] **Step 2: Verify the workflow parses**
+- [x] **Step 2: Verify the workflow parses**
 
 The `yaml` package is already a dependency, so parse it in Node rather than
 trusting the eye:
@@ -2019,7 +2061,7 @@ console.log(Object.keys(wf.jobs));
 ```
 Expected: the job names print, no throw.
 
-- [ ] **Step 3: Prove the workflow's own commands run clean from a cold start**
+- [x] **Step 3: Prove the workflow's own commands run clean from a cold start**
 
 The workflow's value is that it works unattended, so run exactly what it runs:
 
@@ -2029,7 +2071,7 @@ rm -rf puzzles && npm run generate && npm run manifest && npm run audit
 Expected: a week or more of `puzzles/YYYY-MM-DD.json`, an `index.json` listing
 them, and a clean audit. Read one clue from a puzzle you have not read before.
 
-- [ ] **Step 4: Write the README**
+- [x] **Step 4: Write the README**
 
 Document: what the game is; the commands (`test`, `test:generate`, `generate`,
 `manifest`, `audit`); the board and number rules; that eight colours and their
@@ -2044,7 +2086,7 @@ script that generates it.
 
 Note that the playable site is not in this repo yet and point at the app plan.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add -A

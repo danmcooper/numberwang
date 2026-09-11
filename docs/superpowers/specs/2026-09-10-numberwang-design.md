@@ -131,7 +131,7 @@ Four new predicates. These are the point of the project.
 | `sum_of_trait_in_unit` | "The Numberwang cards in row 2 add to 25" | pins its unit 72% of the time |
 | `diff_of_two_traits_in_unit` | "Two Numberwang cards in teal subtract to 6" | names two cards, leaves the rest open |
 | `more_sum_in_unit_than_unit` | "The Numberwang cards in row 1 add to more than those in row 3" | settles nothing alone |
-| `sum_parity_in_unit` | "The Numberwang cards in column 2 add to an even number" | one clean bit |
+| `sum_parity_in_unit` | "The Numberwang cards in column 2 add to an even total" | one clean bit |
 
 The four are deliberately a spread of strengths. A generator with only the exact
 sum would write puzzles that fall over in four steps; the comparison and the

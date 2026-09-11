@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** The playable Numberwang — a 4x5 board of numbered cards in eight colour groups, where clicking a card calls it Numberwang or Not Numberwang, a correct call reveals its clue, and the archive lists every day so far — deployed to GitHub Pages at `/numberwang/`.
+**Goal:** The playable Numberwang — a 4x5 board of numbered cards in eight colour groups, where clicking a card calls it Numberwang or Wangernumb, a correct call reveals its clue, and the archive lists every day so far — deployed to GitHub Pages at `/numberwang/`.
 
 **Architecture:** Fork `cbsbd`'s `site/` and adapt it. The play mechanic is unchanged — same reducer, same deduction gate, same hint ladder, same local-storage progress, same archive — so this plan is a rename through the game layer plus a genuinely new card, a new clue tokenizer contract, and a set of deletions that a fixed 4-wide board of numbers makes possible. React 19 with no router library (hash routing in 71 lines), no state library (one `useReducer`), no CSS framework (one stylesheet).
 
@@ -18,9 +18,41 @@
 - **Card states are exactly three**, and their colours are the approved mockup's, verbatim:
   - Unsolved — `#f4f1ec` ground, `#2a2724` number, `1px solid #ddd6cc` border
   - Numberwang — `#FFD9B8` peach ground, `#3a2a1c` number, subtle confetti in `#7FB2E5` (blue) and `#F2A6C4` (pink) at 0.5 opacity
-  - Not Numberwang — `#111` ground, `#fff` number
+  - Wangernumb — `#111` ground, `#fff` number
 - **The colour band is a plain strip across the top of the card and carries no text.** It is present in all three states and the card background never touches it.
-- **The trait is spoken as "Numberwang" and "Not Numberwang"** in every player-facing string. Never "numberwangs", never "criminal".
+- **The trait is spoken as "Numberwang" and "Wangernumb"** in every player-facing string. Never "numberwangs", never "criminal". Wangernumb is the show's own reversed round, and the nearest thing it has to an opposite; Numberwang is only ever declared, never denied. Renamed after Task 3, so Tasks 1-3 below still say "Not Numberwang" and `not-numberwang` where the code now says Wangernumb and `wangernumb` — they record what was done at the time. The DSL trait token stays `not_numberwang` everywhere: in hints, in puzzle JSON, and in `Guess`.
+- **The number on a card is drawn in that card's group colour**, and on an
+  unsolved card it is as large as the card will hold. Asked for after Task 4,
+  and it supersedes the numbers named in the card-state constraint above: the
+  three grounds and the confetti stand, the number's colour does not. The band
+  went to 14px in the same round, the tag moved from a triangle in the top-right
+  to a square flush into the bottom-left corner, a clue that names a colour
+  group draws a small bar of it after the word (eight groups is more than a
+  player can hold by name), and a card whose text is a fact rather than a clue
+  sets that text in italic.
+- **The two verdict colours are Clues by Sam's own green and red** — Numberwang
+  `#264d3b` edged `#2e664c`, Wangernumb `#5c2235` edged `#8b2a53`, both in white
+  ink, with `#58a284` and `#c66464` as the accents the verdict buttons outline
+  themselves in. Asked for after Task 7, replacing a round of light green and
+  pinkish red, and it supersedes the peach and the black in the card-state
+  constraint above; the confetti stays blue and pink, and the gray unsolved
+  ground stays. Three dark grounds means the hue carries the verdict on its own,
+  so the group-colour numbers are lifted on every state, not only on two.
+- **Most of a board carries a clue, not a fact.** Generator-side, and recorded
+  here because it was asked for while this plan was being executed: the chain
+  now prefers a clue that flips a single card, which took a twenty-card board
+  from about 10 clue cards to 14-18, and the arithmetic budget went from 0.23
+  of the clues to 0.375 weighted toward the three predicates that add, so
+  "add to" turns up on nearly every board.
+- **At most three cards carry a fact, and colour is named far more often than
+  the archive named a profession.** Asked for after Task 7, and generator-side
+  again. `fillSpareCards` gives every card the chain never hosted from a true,
+  redundant clue, keeping `MAX_FACT_CARDS` — three — for a fact; and
+  `COLOUR_UNIT_RATE` lifts the colour unit from its measured 5.7% to 0.3, with
+  the filler reaching for a colour clue before anything else, because the chain
+  will not deduce from a scattered two-card group however the pool is weighted.
+  A board went from 17 clues / 3-6 facts with 11% of clues naming a colour, to
+  17 clues / 3 facts with 38%.
 - **No analytics.** `cbsbd`'s `index.html` carries a umami script with cbsbd's own website id; it does not come along.
 - **Deploy base path is `/numberwang/`**, with no UUID and no `config/site.json`.
 - **Local-storage keys are namespaced `nw:`**, so a browser that has played `cbsbd` on the same host cannot collide.
@@ -131,7 +163,7 @@ showing raw fields, but real and clickable.
 - Consumes: `Person`, `Puzzle`, `validatePuzzle` from `shared/puzzle.ts`; `Shape` from `shared/solver/enumerate.ts`; `ManifestEntry` from `scripts/manifest.mts`
 - Produces: `Guess = 'numberwang' | 'not_numberwang'`; `parseHash(hash: string): Route` with `Route = { screen: 'archive' } | { screen: 'play'; slug: string }`; local-storage keys prefixed `nw:`
 
-- [ ] **Step 1: Copy the app in**
+- [x] **Step 1: Copy the app in**
 
 ```bash
 cd /Users/dan/code/numberwang
@@ -144,7 +176,7 @@ cp /Users/dan/code/cbsbd/vite.config.ts ./vite.config.ts
 above found nothing at the repo root, that is correct — `site/index.html` came
 across with the rsync.
 
-- [ ] **Step 2: Restore the app scripts to `package.json`**
+- [x] **Step 2: Restore the app scripts to `package.json`**
 
 The generator plan removed these because there was nothing to serve:
 
@@ -156,7 +188,7 @@ The generator plan removed these because there was nothing to serve:
 
 Put them back above `"test"`, keeping the rest of `scripts` as it is.
 
-- [ ] **Step 3: Point `vite.config.ts` at `/numberwang/` and stop reading a deleted file**
+- [x] **Step 3: Point `vite.config.ts` at `/numberwang/` and stop reading a deleted file**
 
 The inherited config reads `config/site.json` for a UUID base path; the generator
 plan deleted that file. Replace the top of the file:
@@ -176,7 +208,7 @@ const base = '/numberwang/';
 Leave the `servePuzzles` plugin and the `defineConfig` call as they are — the
 plugin closes over `base` and needs no change.
 
-- [ ] **Step 4: Delete `faces.ts`**
+- [x] **Step 4: Delete `faces.ts`**
 
 ```bash
 rm site/src/faces.ts site/src/faces.test.ts
@@ -186,7 +218,7 @@ A profession needed a picture because "cook" is a word; a number is already a
 glyph, and the biggest thing on the card. Every `faceFor` call goes away in Tasks
 2 and 4; for now, expect the typecheck to name them.
 
-- [ ] **Step 5: Write the failing tests for the two renamed contracts**
+- [x] **Step 5: Write the failing tests for the two renamed contracts**
 
 Add to `site/src/router.test.ts`:
 
@@ -221,13 +253,13 @@ it('namespaces progress under nw:, not cbs:', () => {
 });
 ```
 
-- [ ] **Step 6: Run them to verify they fail**
+- [x] **Step 6: Run them to verify they fail**
 
 Run: `npx vitest run site/src/router.test.ts site/src/game/storage.test.ts`
 Expected: FAIL — `router.ts` still imports `VARIANTS` and `ONE_OFFS`, which no
 longer exist, so the module will not even load; `storage.ts` still writes `cbs:`.
 
-- [ ] **Step 7: Simplify `router.ts`**
+- [x] **Step 7: Simplify `router.ts`**
 
 Both alternations existed to route a *suffix* or a *name*. Neither exists now, so
 the whole mechanism collapses to a date:
@@ -256,7 +288,7 @@ export function parseHash(hash: string): Route {
 Keep the rest of the file — the route-identity helper and the `useRoute` hook —
 exactly as it is.
 
-- [ ] **Step 8: Renamespace `storage.ts`**
+- [x] **Step 8: Renamespace `storage.ts`**
 
 ```ts
 /**
@@ -278,7 +310,7 @@ grep -rn "'cbs:" site/src
 - `Archive.tsx`'s `SOURCE_KEY` (`cbs:pref:archiveSource`) — deleted, not renamed.
   It remembers a source filter that Step 11 removes.
 
-- [ ] **Step 9: Rename the trait through the game layer**
+- [x] **Step 9: Rename the trait through the game layer**
 
 ```bash
 cd /Users/dan/code/numberwang
@@ -308,7 +340,7 @@ card's look; until then the classes the TSX emits and the classes the stylesheet
 defines disagree, and the board renders unstyled cards. That is expected and the
 tests do not depend on it.
 
-- [ ] **Step 10: Give `deduce.ts` the numbers the solver now requires**
+- [x] **Step 10: Give `deduce.ts` the numbers the solver now requires**
 
 `Shape` gained a `numbers` field, and the arithmetic predicates read it. Without
 it the deduction gate silently degrades: `solvableFor` throws, the `catch` returns
@@ -327,7 +359,7 @@ it the deduction gate silently degrades: `solvableFor` throws, the `catch` retur
       },
 ```
 
-- [ ] **Step 11: Fix the remaining typecheck errors**
+- [x] **Step 11: Fix the remaining typecheck errors**
 
 Run: `npx tsc --noEmit`
 
@@ -403,13 +435,13 @@ The errors, and what each wants:
   difficulty options are scoped to the current source. They assert a distinction
   that no longer exists, so there is nothing to salvage.
 
-- [ ] **Step 12: Run the whole suite**
+- [x] **Step 12: Run the whole suite**
 
 Run: `npx tsc --noEmit && npm test`
 Expected: PASS, clean typecheck. Delete, don't weaken, any test that asserted
 something the fork removed (a face, a variant label).
 
-- [ ] **Step 13: Look at it**
+- [x] **Step 13: Look at it**
 
 ```bash
 npm run generate -- 2026-09-10 && npm run manifest && npm run dev
@@ -419,7 +451,7 @@ unstyled cards showing numbers, clickable, and a guess modal with two buttons.
 It will look wrong. Confirm it *works* — a correct call flips a card and reveals
 its clue text.
 
-- [ ] **Step 14: Commit**
+- [x] **Step 14: Commit**
 
 ```bash
 git add -A
@@ -452,7 +484,7 @@ and .innocent. The next commit is the card."
 - Consumes: `Person` from `shared/puzzle.ts`; `Tag`, `TAG_COLORS` from `game/reducer.ts`
 - Produces: `Card` props gain `colourReferenced: boolean` and `colourBounce: boolean`, replacing `profReferenced`/`profBounce`; `numberReferenced`/`numberBounce` replace `nameReferenced`/`nameBounce`; CSS classes `.card.numberwang`, `.card.not-numberwang`, `.colour-band`, `.card-number`, and `--colour-<name>` custom properties for the eight palette colours
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `site/src/components/Card.test.tsx`:
 
@@ -572,13 +604,13 @@ Note `classList.contains` rather than `className.includes`: `numberwang` is a
 substring of `not-numberwang`, so a substring test cannot tell the two states
 apart.
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `npx vitest run site/src/components/Card.test.tsx`
 Expected: FAIL — the props are still `nameReferenced`/`profReferenced`, there is
 no `.colour-band` and no `.card-number`.
 
-- [ ] **Step 3: Rebuild the card's markup**
+- [x] **Step 3: Rebuild the card's markup**
 
 In `Card.tsx`, rename the four reference props and replace the face/name/prof
 elements. The prop block becomes:
@@ -664,13 +696,13 @@ And on the card element itself, the confetti offset:
 The number is the seed because it is already unique per card and already known
 here — no index needs threading down for it.
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `npx vitest run site/src/components/Card.test.tsx`
 Expected: PASS. `Grid.tsx` still passes the old prop names, so `tsc` will
 complain — that is Task 3.
 
-- [ ] **Step 5: Restyle the card**
+- [x] **Step 5: Restyle the card**
 
 In `styles.css`, add the palette to `:root`. These are the mockup's hexes, chosen
 to stay distinguishable as small strips on a dark ground:
@@ -801,7 +833,7 @@ grep -n 'innocent\|criminal\|card-face\|card-name\|card-prof' site/src/styles.cs
 Every hit is either a card rule handled above or a button/modal rule Task 4 owns.
 Rename the card ones now; leave the modal ones for Task 4.
 
-- [ ] **Step 6: Look at all three states at once**
+- [x] **Step 6: Look at all three states at once**
 
 Run: `npm run dev`, open the day's board, and solve four or five cards on purpose
 — getting some wrong so both solved states are on screen together.
@@ -810,7 +842,7 @@ Check, and fix what fails: the band is legible on all three grounds; the peach
 card's number is readable over the confetti; the black card does not dissolve into
 the page; two adjacent solved Numberwang cards do not have identical confetti.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add site/src/components/Card.tsx site/src/components/Card.test.tsx site/src/styles.css
@@ -844,7 +876,7 @@ The clue is the game. This task is what turns `The Numberwang cards among
 - Consumes: the token table in **The Contract With The Generator**
 - Produces: `ClueSegment` variant `{ kind: 'colour'; word: string; plural: boolean; counted: boolean }`; `clueReferencedIndices(clue, people, width, selfIndex): { numbers: number[]; colours: number[] }`
 
-- [ ] **Step 1: Write the failing tokenizer tests**
+- [x] **Step 1: Write the failing tokenizer tests**
 
 Add to `site/src/clue/tokenize.test.ts`:
 
@@ -878,12 +910,12 @@ it('keeps parsing names, columns and ranges', () => {
 });
 ```
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**
 
 Run: `npx vitest run site/src/clue/tokenize.test.ts`
 Expected: FAIL — `#COLOUR:teal` falls through to the raw-text fallback.
 
-- [ ] **Step 3: Teach the tokenizer the colour tokens**
+- [x] **Step 3: Teach the tokenizer the colour tokens**
 
 In `tokenize.ts`, replace the `prof` segment variant and its cases:
 
@@ -908,12 +940,12 @@ In `tokenize.ts`, replace the `prof` segment variant and its cases:
 The `TOKEN` regex is `/#([A-Z]+)(?::(pair\(\d+,\d+\)|\w+))?/g` and needs no
 change; `COLOURN` matches `[A-Z]+` already.
 
-- [ ] **Step 4: Run them to verify they pass**
+- [x] **Step 4: Run them to verify they pass**
 
 Run: `npx vitest run site/src/clue/tokenize.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Write the failing `ClueText` tests**
+- [x] **Step 5: Write the failing `ClueText` tests**
 
 `ClueText.test.tsx` already has a `renderClue(clue, opts)` helper returning the
 container's text, and Task 1 rewrote its `person` helper. Add a board whose
@@ -992,13 +1024,13 @@ describe('clueReferencedIndices with colours', () => {
 
 The tests already in this file, which Task 1 renamed to numbers, stay as they are.
 
-- [ ] **Step 6: Run them to verify they fail**
+- [x] **Step 6: Run them to verify they fail**
 
 Run: `npx vitest run site/src/clue/ClueText.test.tsx`
 Expected: FAIL — the `prof` segment kind is gone, `clueReferencedIndices` still
 returns `{ names, profs }`, and `capitalize` is being applied to a number.
 
-- [ ] **Step 7: Rework `ClueText.tsx`**
+- [x] **Step 7: Rework `ClueText.tsx`**
 
 Four changes.
 
@@ -1075,12 +1107,12 @@ sketch's own register — and it works on `#NAME:` tokens, which still exist. Th
 one thing to check is its `capitalize` of the finished clue: `'17 is …'` is
 unchanged by it, so it stays.
 
-- [ ] **Step 8: Run them to verify they pass**
+- [x] **Step 8: Run them to verify they pass**
 
 Run: `npx vitest run site/src/clue/ClueText.test.tsx`
 Expected: PASS
 
-- [ ] **Step 9: Rewire `Grid.tsx`**
+- [x] **Step 9: Rewire `Grid.tsx`**
 
 Rename its four sets and pass the renamed props through:
 
@@ -1117,12 +1149,12 @@ Rename the two `useState` sets and the `prevOtherRefs` ref fields to match. The
 bounce logic itself — never on mount, only for newly emphasized cards — is
 unchanged and still correct.
 
-- [ ] **Step 10: Run the whole suite**
+- [x] **Step 10: Run the whole suite**
 
 Run: `npx tsc --noEmit && npm test`
 Expected: PASS
 
-- [ ] **Step 11: Read the clues on a real board**
+- [x] **Step 11: Read the clues on a real board**
 
 Run: `npm run dev` and solve most of a board. Read every clue that appears out
 loud. Expected: complete English sentences, no `#` anywhere on screen, the
@@ -1136,7 +1168,7 @@ If a board has none, generate a few more dates and check one that does — the
 counted token only appears when the generator turns `colourTotals` on for a clue
 that names one group.
 
-- [ ] **Step 12: Commit**
+- [x] **Step 12: Commit**
 
 ```bash
 git add -A
@@ -1162,7 +1194,7 @@ more at home in this game than in the one it came from."
 
 **Interfaces:**
 - Consumes: `Guess` from `game/reducer.ts`; the palette custom properties from Task 2
-- Produces: CSS classes `.btn-numberwang`, `.btn-not-numberwang`, `.modal-number`, `.modal-colour`
+- Produces: CSS classes `.btn-numberwang`, `.btn-wangernumb`, `.modal-number`, `.modal-colour`
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -1177,8 +1209,8 @@ describe('the guess modal', () => {
     await renderGame(user);
     await user.click(screen.getAllByRole('group')[2]); // card 2, unrevealed
     const modal = screen.getByRole('dialog');
-    expect(modal.getAttribute('aria-label')).toBe('12');
-    expect(modal.textContent).toContain('12');
+    expect(modal.getAttribute('aria-label')).toBe('4');
+    expect(modal.textContent).toContain('4');
     expect(modal.querySelector('.modal-colour')!.getAttribute('aria-label')).toBe('red');
   });
 
@@ -1187,23 +1219,18 @@ describe('the guess modal', () => {
     await renderGame(user);
     await user.click(screen.getAllByRole('group')[2]);
     expect(screen.getByRole('button', { name: 'Numberwang' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Not Numberwang' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Wangernumb' })).toBeTruthy();
   });
 });
 ```
 
 `getByRole('button', { name: 'Numberwang' })` matches the accessible name in
-full, so it will not also match "Not Numberwang" — but a `/numberwang/i` regex
-would. Use the exact string in every one of these.
+full, and "Wangernumb" does not contain it — but a `/numberwang/i` regex would
+match both. Use the exact string in every one of these.
 
-Then relabel the tests this file already has. They click `{ name: 'Criminal' }`
-and `{ name: 'Innocent' }` in about twenty places, which Task 1's sed turned into
-`Numberwang` and `NotNumberwang`:
-
-```bash
-sed -i '' "s/'NotNumberwang'/'Not Numberwang'/g" site/src/screens/Game.test.tsx
-grep -n 'NotNumberwang' site/src/screens/Game.test.tsx
-```
+The tests this file already has were relabelled when the verdict was renamed
+(see "Numberwang or Wangernumb" below), so they already click
+`{ name: 'Wangernumb' }`.
 
 The blocked-verdict test this file already has — a rejected verdict is disabled
 until the next reveal — is the coverage this task needs for `blocked`, so it wants
@@ -1213,7 +1240,7 @@ the relabelling and nothing more.
 
 Run: `npx vitest run site/src/screens/Game.test.tsx`
 Expected: FAIL — the modal has no `.modal-colour`, its `aria-label` is a number
-rather than a string, and its buttons still read `NotNumberwang`.
+rather than a string.
 
 - [ ] **Step 3: Rebuild the modal body**
 
@@ -1247,11 +1274,11 @@ Then the body:
             Numberwang
           </button>
           <button
-            className="btn-not-numberwang"
+            className="btn-wangernumb"
             disabled={blocked.includes('not_numberwang')}
             onClick={() => onGuess('not_numberwang')}
           >
-            Not Numberwang
+            Wangernumb
           </button>
         </div>
 ```
@@ -1283,8 +1310,8 @@ In `styles.css`, replace the `.modal-face` / `.modal-name` / `.modal-prof` and
   border-radius: 2px;
   margin: 8px auto 4px;
 }
-/* "Not Numberwang" is two words and will not fit beside "Numberwang" on a phone
-   at the inherited horizontal layout, so the two verdicts stack. */
+/* The two verdicts stack rather than sitting side by side: at the inherited
+   horizontal layout neither button gets enough width to read on a phone. */
 .modal-choices {
   display: flex;
   flex-direction: column;
@@ -1295,15 +1322,15 @@ In `styles.css`, replace the `.modal-face` / `.modal-name` / `.modal-prof` and
   color: var(--card-numberwang-text);
   border-color: #e8bd93;
 }
-.btn-not-numberwang {
-  background: var(--card-not);
-  color: var(--card-not-text);
+.btn-wangernumb {
+  background: var(--card-wangernumb);
+  color: var(--card-wangernumb-text);
   border-color: #3a3a3a;
 }
 .btn-numberwang:hover:not(:disabled) {
   border-color: #fff;
 }
-.btn-not-numberwang:hover:not(:disabled) {
+.btn-wangernumb:hover:not(:disabled) {
   border-color: #fff;
 }
 ```
@@ -1311,13 +1338,13 @@ In `styles.css`, replace the `.modal-face` / `.modal-name` / `.modal-prof` and
 Each verdict button wears the colour of the card it will produce, so the choice
 and its consequence look the same — which the two buttons in `cbsbd` also do.
 
-- [ ] **Step 5: Fix the player-facing copy**
+- [x] **Step 5: Fix the player-facing copy**
 
-`NotNumberwang` — the sed's output for `Innocent` — must not survive anywhere a
-player can see it, and the rest of the sed's output needs reading as English:
+The verdict copy is already right; what is left is the rest of the sed's output
+from Task 1, which needs reading as English:
 
 ```bash
-grep -rn 'NotNumberwang' site/src && echo 'FIX THESE' || echo 'clean'
+grep -rn 'NotNumberwang\|Not Numberwang' site/src && echo 'FIX THESE' || echo 'clean'
 grep -in 'suspect\|evidence\|caught\|mystery\|crime' site/src/screens/Game.tsx
 ```
 
@@ -1327,31 +1354,45 @@ evidence!" rejection, the completion line, the share text.
 The share grid's cell classes (`.share-green`, `.share-yellow`, …) encode *how* a
 card was solved, not what it was, so they are unchanged.
 
-- [ ] **Step 6: Run the tests to verify they pass**
+*Done:* the first grep was clean; every hit was in the wrong-guess popup.
+`EvidenceModal` is now `NotProvenModal`, its heading "Not enough information!"
+(it fires for a wrong call and for a correct-but-undeducible one alike, and must
+not leak which), `.suspect` is `.card-ref`, and — the actual defect — the two
+`<b>` tags printed the DSL's own `not_numberwang` at the player. A `VERDICT`
+map now speaks them. The completion banner also read "1 mistakes"; it counts in
+English now.
+
+- [x] **Step 6: Run the tests to verify they pass**
 
 Run: `npx vitest run site/src/screens/Game.test.tsx`
 Expected: PASS
 
-- [ ] **Step 7: Run the whole suite**
+- [x] **Step 7: Run the whole suite**
 
 Run: `npx tsc --noEmit && npm test`
 Expected: PASS
 
-- [ ] **Step 8: Play a board to the end**
+- [x] **Step 8: Play a board to the end**
 
 Run: `npm run dev`, solve a whole puzzle including at least one wrong call and one
 hint. Check the modal, the rejection popup, the completion screen and the copied
 share text all read as this game.
 
-- [ ] **Step 9: Commit**
+*Done* through the headless screenshot loop rather than `npm run dev`: seeded
+2026-09-11 nineteen cards deep, called the last one, and read the results popup
+("Solved in 04:02", the share grid, the solved banner) off the screenshot.
+
+- [x] **Step 9: Commit**
 
 ```bash
 git add -A
-git commit -m "Call it Numberwang or Not Numberwang
+git commit -m "Call it Numberwang or Wangernumb
 
-Each verdict button wears the colour of the card it produces, and the two stack
-rather than sitting side by side — \"Not Numberwang\" is two words and does not
-fit beside \"Numberwang\" on a phone.
+Each verdict button is cued by a border in the colour of the card it produces,
+and the two stack rather than sitting side by side, which leaves each of them a
+full row to be read in. (Written here as a fill; filled buttons either side of
+the card's number read as two more cards rather than as two choices about one,
+so the fill moved to the hover state in the round of tweaks after this task.)
 
 The modal repeats the card's colour band. It covers the board while it is open,
 so without it a clue about a colour group cannot be checked against the card you
@@ -1482,7 +1523,9 @@ with it, and the document head.
 - Consumes: `ManifestEntry` and `ArchiveFilters` as Task 1 left them
 - Produces: an archive with exactly two filters, entries keyed and linked by date
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**  *(Done: two of the four were already
+in the file — Task 1's own tests cover the play links and the difficulty
+options — so the two added were the no-source-filter check and the note.)*
 
 `Archive.test.tsx` renders with a bare `render(<Archive />)` against a
 module-level `manifest` served by a stubbed `fetch`; there is no render helper.
@@ -1540,7 +1583,9 @@ it('takes no variant filter', () => {
 });
 ```
 
-- [ ] **Step 2: Run them to verify they fail**
+- [x] **Step 2: Run them to verify they fail**  *(Done: the note failed, "Unable
+to find an element with the text: /measured, not aimed at/". The other three
+passed, as the step expected.)*
 
 Run: `npx vitest run site/src/screens/`
 Expected: FAIL on the note (nothing in the tree has `.arch-note`) and on the
@@ -1548,7 +1593,9 @@ difficulty options (Task 1 deleted that test). The other two should already pass
 they assert what Task 1 built, and a test that cannot fail first is worth knowing
 about.
 
-- [ ] **Step 3: Finish the archive screen**
+- [x] **Step 3: Finish the archive screen**  *(Done. Also replaced the empty-
+archive line, which still said the scraper runs daily; here a generator runs
+nightly.)*
 
 `cbsbd`'s archive explains that a generated puzzle's difficulty is the source's
 label for the puzzle it is a sibling of. That relationship does not exist here.
@@ -1573,7 +1620,9 @@ Replace the note with what is true, above the year sections:
 Delete the `.arch-source` rule from `styles.css` — Task 1 deleted the only element
 that ever carried the class.
 
-- [ ] **Step 4: Rewrite the document head**
+- [x] **Step 4: Rewrite the document head**  *(done early, out of task order:
+the player asked for the title while Task 4 was in hand, and the umami script
+went with it rather than being left pointing at cbsbd for another commit.)*
 
 Replace `site/index.html`'s head, keeping the module script tag and the root div:
 
@@ -1599,12 +1648,15 @@ The umami `<script>` is deliberately absent. It carried cbsbd's own website id,
 so leaving it in would file this game's traffic under that one — and nobody asked
 for analytics here.
 
-- [ ] **Step 5: Run the tests to verify they pass**
+- [x] **Step 5: Run the tests to verify they pass**  *(Done: 70 passed.)*
 
 Run: `npx vitest run site/src/screens/`
 Expected: PASS
 
-- [ ] **Step 6: Run the whole suite and sweep for stale copy**
+- [x] **Step 6: Run the whole suite and sweep for stale copy**  *(Done: 1088
+passed. The sweep left four "suspect" comments and one "scraper" line, all
+internal; renamed. The remaining hits are the archive note's deliberate credit
+and storage.ts explaining why the key prefix is not cbsbd's.)*
 
 ```bash
 npx tsc --noEmit && npm test
@@ -1614,13 +1666,15 @@ grep -rni 'clues by sam\|cbs\b\|suspect\|criminal' site/src site/index.html
 Every hit should be either a class name that is not player-facing or a deliberate
 reference to the parent game (the archive note above is one). Fix the rest.
 
-- [ ] **Step 7: Look at the archive**
+- [x] **Step 7: Look at the archive**  *(Done, in the headless-screenshot loop
+rather than `npm run dev`: note, both filters, year and month sections, one row
+per date, statuses reading from local storage.)*
 
 Run: `npm run generate && npm run manifest && npm run dev` and open the archive.
 Expected: puzzles grouped by year and month, two working filters, statuses that
 reflect what you have played, and every link opening its board.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add -A
@@ -1647,7 +1701,8 @@ it would have filed this game's traffic under that one."
 - Consumes: `npm run build`; `puzzles/` and `puzzles/index.json`
 - Produces: a Pages deploy serving the app at `/numberwang/` with its puzzles alongside
 
-- [ ] **Step 1: Confirm the production build works and is correctly based**
+- [x] **Step 1: Confirm the production build works and is correctly based**  *(Done:
+`/numberwang/assets/index-kL0YWo25.js` and the matching css.)*
 
 ```bash
 npm run build
@@ -1656,7 +1711,10 @@ grep -o '/numberwang/assets/[^"]*' site/dist/index.html | head
 Expected: asset paths under `/numberwang/`. A path starting `/assets/` means the
 base did not apply and every asset will 404 on Pages.
 
-- [ ] **Step 2: Write the workflow**
+- [x] **Step 2: Write the workflow**  *(Done: node-version 24, to match
+`generate.yml`. The artifact is `site/dist` with `puzzles/*.json` copied in,
+rather than cbsbd3d's separate `artifact/` tree — there is no UUID base here, so
+the build directory already has the shape Pages serves.)*
 
 Take `/Users/dan/code/cbsbd3d/.github/workflows/pages.yml` as the base. It must:
 checkout, set up Node, `npm ci`, `npm run build`, **copy `puzzles/` into
@@ -1667,7 +1725,9 @@ That copy step is the one to get right. In dev the `servePuzzles` plugin serves
 place the files at the same path the app fetches — `<base>puzzles/`. Miss it and
 the app builds, deploys, and every board fails to load.
 
-- [ ] **Step 3: Verify the workflow parses and its build output is complete**
+- [x] **Step 3: Verify the workflow parses and its build output is complete**
+*(Done: `build-deploy`, 7 steps. Rehearsed the artifact and served it at
+`/numberwang/`: the archive lists all eight puzzles and 2026-09-11 plays.)*
 
 ```bash
 node --input-type=module -e "
@@ -1689,7 +1749,10 @@ Open the previewed URL at `/numberwang/`. Expected: the archive lists puzzles an
 a board opens and plays. This catches the missing-puzzles mistake before a deploy
 does.
 
-- [ ] **Step 4: Update the README**
+- [x] **Step 4: Update the README**  *(Done: a "The app" section with the base,
+the hash routing, the two ways `puzzles/` is served and the card states. Also
+fixed three things the app made stale: "Not Numberwang" is Wangernumb, the
+arithmetic budget is 37.5% not 23%, and the measured share is now 44 of 124.)*
 
 Add to what the generator plan's README already says: `npm run dev` for the app,
 `npm run build` for the artifact, that the app reads `puzzles/` through a
@@ -1711,7 +1774,10 @@ directory from the repo root and in production nothing does, so without the copy
 the site builds and deploys clean and then fails to load a single board."
 ```
 
-- [ ] **Step 6: Push, and check the deployed site**
+- [ ] **Step 6: Push, and check the deployed site**  *(Blocked: this repo has no
+git remote, so there is nowhere to push and no Pages site to open yet. The
+workflow is committed and will run on the first push to `main` of a repo with
+Pages enabled. Everything it does was rehearsed locally in Step 3.)*
 
 ```bash
 git push

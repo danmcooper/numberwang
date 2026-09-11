@@ -1,0 +1,937 @@
+/* Palette and metrics lifted from cluesbysam.com (dark theme). */
+:root {
+  --bg: #1a1d24;
+  --card-bg: #322f3b;
+  --background-highlight: #0000002c;
+  --modal-bg: #242830;
+  --text: #f3f3f3;
+  --text-muted: #a6acb8;
+  --border-neutral: #4a4b55;
+  /* The one green: Start, the completed line, the hint affordance. It was
+     called --innocent in the game this forked from, where it meant a verdict;
+     here it is only ever a highlight. */
+  --accent-green: #58a284;
+  --overlay: rgba(26, 29, 36, 0.5);
+
+  /* The eight colour groups. A band is a small strip on a dark card, so these
+     are the mockup's measured values rather than named CSS colours, which are
+     too light (yellow) or too dark (purple) at this size. */
+  --colour-red: #d6453f;
+  --colour-orange: #de7a28;
+  --colour-yellow: #c9a21b;
+  --colour-green: #3e9b62;
+  --colour-teal: #2b9a9a;
+  --colour-blue: #2f6fb5;
+  --colour-purple: #8e5aa8;
+  --colour-pink: #db6fa4;
+
+  /* The three card states. */
+  /* The same gray the archive's rows are drawn on. An unsolved card is the
+     absence of a verdict, and a near-white one read as a third verdict next to
+     the two that mean something; against the gray the group colour on the
+     number is the only thing on the card with any colour in it, which is the
+     point of it. */
+  --card-unsolved: #322f3b;
+  --card-unsolved-text: #f3f3f3;
+  --card-unsolved-border: #4a4b55;
+  /* The two verdicts, in Clues by Sam's own green and red. Both are dark
+     grounds carrying white text, as there: the hue is what says which verdict a
+     card holds, and the board stays one weight of ink throughout. `-edge` is the
+     card's border against the page ground, which is nearly as dark as the card;
+     `-accent` is the same verdict lifted to where it can be ink — the outline
+     and the label on the verdict buttons, which are not filled until pressed. */
+  --card-numberwang: #264d3b;
+  --card-numberwang-text: #fff;
+  --card-numberwang-edge: #2e664c;
+  --card-numberwang-accent: #58a284;
+  --card-wangernumb: #5c2235;
+  --card-wangernumb-text: #fff;
+  --card-wangernumb-edge: #8b2a53;
+  --card-wangernumb-accent: #c66464;
+  --confetti-blue: #7fb2e5;
+  --confetti-pink: #f2a6c4;
+
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid var(--border-neutral);
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+a {
+  color: var(--text-muted);
+}
+
+/* Sized to whatever board it holds, then centred. A flat 420px was right while
+   every board was the source site's 4x5; a 7-wide board is 639px and simply
+   overflowed it, off to one side, because `text-align: center` centres an
+   inline-block only while it fits — past that it starts at the line's left edge
+   and spills right. `useFitBoard` keeps the board itself inside the viewport,
+   so sizing to it here cannot push anything off the screen. Everything else on
+   the screen lives inside `.board-wrap`, so nothing stretches with it. */
+.game {
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 0 1rem 1rem;
+  text-align: center;
+}
+/* Shrinks to the grid's width so children can align to the grid edges.
+   Top margin and small-screen scaling match the real site's breakpoints. */
+.board-wrap {
+  display: inline-block;
+  text-align: center;
+  margin-top: 4px;
+  /* Containing block for the pause dim, which covers this box rather than the
+     viewport so that the two scale together and stay in one stacking context. */
+  position: relative;
+}
+@media (min-width: 768px) {
+  .board-wrap {
+    margin-top: 50px;
+  }
+}
+/* The source site's own narrow breakpoints. Zoom is right here where it is
+   wrong in `useFitBoard`: these barely scale at all, so the smallest text on a
+   card — the 10px grid reference — still lands at 9px and clears WebKit's floor
+   for drawing text, which is the thing that rules zoom out on a board scaled to
+   two-fifths. A board wide enough for `useFitBoard` has already been fitted to
+   the viewport and overrides these from its inline style. */
+/* The board is 363px across (4 cards of 87px, 3 gaps of 5px) and `.game` adds a
+   1rem gutter either side, so it wants 395px and a phone has less. These steps
+   are that arithmetic: 363 * zoom + 32 <= the width each one covers. Inherited
+   at two steps, 369px and 344px, which left 370-394px unscaled — the board ran
+   about 4px off the right of a 375px phone, taking the right-hand column's mark
+   picker with it. Zoom rather than transform: it scales the layout, so the page
+   reserves what it draws, and everything inside the wrapper (the pause dim, the
+   pickers) keeps its position against the board. */
+@media (max-width: 394px) {
+  .board-wrap {
+    zoom: 0.95;
+  }
+}
+@media (max-width: 376px) {
+  .board-wrap {
+    zoom: 0.9;
+  }
+}
+@media (max-width: 358px) {
+  .board-wrap {
+    zoom: 0.85;
+  }
+}
+@media (max-width: 340px) {
+  .board-wrap {
+    zoom: 0.8;
+  }
+}
+.archive-link {
+  text-align: left;
+  margin: 1rem 0 0;
+}
+/* Shrinks to the button row's width so the date line aligns to its edges. */
+.controls {
+  display: inline-flex;
+  flex-direction: column;
+}
+.button-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+  position: relative;
+  z-index: 16; /* stays clickable above the pause dim */
+}
+.button-row button {
+  width: 88px;
+  height: 35px;
+  padding: 5px;
+  font-family: "Chalkboard SE", "Comic Sans MS", "Comic Sans", sans-serif;
+  font-size: 0.95em;
+}
+/* Narrow square pause button; the drawn icon keeps rendering consistent
+   across platforms (emoji fonts vary, e.g. on Android). */
+.button-row .btn-pause {
+  width: 40px;
+  flex: none;
+  padding: 0;
+}
+.button-row .btn-pause svg {
+  display: block;
+  margin: 0 auto;
+}
+/* "💡Show hint" is the longest label; give it the leftover room. */
+.button-row .btn-hint {
+  width: 112px;
+}
+.date-line {
+  display: flex;
+  justify-content: space-between;
+  font-family: "Chalkboard SE", "Comic Sans MS", "Comic Sans", sans-serif;
+  font-weight: 700;
+  font-size: 1.05em;
+  margin: 0.9rem 0 0.25rem;
+}
+.timer {
+  cursor: pointer;
+  user-select: none;
+}
+.pause-overlay {
+  /* Absolute, not fixed: a scaled ancestor becomes the containing block for
+     fixed descendants too, so `fixed` would size this to a zoomed `.board-wrap`
+     on wide boards and to the viewport on narrow ones. Absolute covers the
+     wrapper either way. `.button-row` sits above it on z-index. */
+  position: absolute;
+  inset: 0;
+  /* Heavy dim: the board should be barely visible while paused. */
+  background: rgba(26, 29, 36, 0.93);
+  z-index: 15;
+}
+.reset-modal {
+  padding: 18px 0;
+}
+.reset-question {
+  font-weight: 700;
+  font-size: 1.1em;
+  margin: 6px 0;
+}
+
+.grid {
+  display: grid;
+  /* The board is 4 wide, always, so the column count is the stylesheet's rather
+     than a prop read off the puzzle. */
+  grid-template-columns: repeat(4, auto);
+  gap: 5px;
+  justify-content: center;
+  padding-top: 2px; /* Added by Dan */
+}
+
+.card {
+  box-sizing: border-box;
+  width: 87px;
+  height: 118px;
+  background: var(--card-unsolved);
+  color: var(--card-unsolved-text);
+  border: 1px solid var(--card-unsolved-border);
+  border-radius: 6px;
+  box-shadow: 0 1px 6px #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  /* Untagged, on the unsolved gray: a shade up from the card, not a mark. */
+  --tag-neutral: #4a4655;
+  transition: transform 0.05s linear;
+  font-family: "Chalkboard SE", "Comic Sans MS", "Comic Sans", sans-serif;
+}
+/* No mobile tap-highlight flash on cards (matches the real site). */
+.card,
+.card *,
+.timer {
+  -webkit-tap-highlight-color: transparent;
+}
+@media (hover: hover) {
+  .card:not(.flipped):hover {
+    transform: scale(0.98);
+  }
+}
+/* Corner tag: click to cycle none -> yellow -> red -> green -> none. The
+   source site's wedge at the source site's size (22px legs), moved to the
+   bottom-left, where it is out of the way of the number, the band and the clue.
+   The hitbox around it stays finger-sized. */
+.tag {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 30px;
+  height: 30px;
+  z-index: 2;
+  cursor: pointer;
+}
+.tag::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 100%, 22px 100%, 0 calc(100% - 22px));
+  /* Untagged shade follows the card state (gray/green/red on the real site). */
+  background: var(--tag-neutral);
+}
+.tag.tag-yellow::before {
+  background: #ffff54;
+}
+.tag.tag-red::before {
+  background: #ea3323;
+}
+.tag.tag-green::before {
+  background: #75fb4d;
+}
+
+/* Bottom-right corner mark: long-press opens the color picker.
+   Invisible until a color is chosen (unlike the top-right tag). */
+.mark {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 30px;
+  height: 30px;
+  z-index: 2;
+  cursor: pointer;
+}
+.mark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(calc(100% - 22px) 100%, 100% calc(100% - 22px), 100% 100%);
+}
+.mark.mark-yellow::before {
+  background: #ffff54;
+}
+.mark.mark-red::before {
+  background: #ea3323;
+}
+.mark.mark-green::before {
+  background: #75fb4d;
+}
+.mark.mark-orange::before {
+  background: #ef8e34;
+}
+.mark.mark-magenta::before {
+  background: #ea33f7;
+}
+.mark.mark-cyan::before {
+  background: #75fbfd;
+}
+
+/* Mark color picker (real site's color strip, tap-to-pick). */
+.card-container {
+  position: relative;
+}
+.tag-picker {
+  position: absolute;
+  top: 50%;
+  right: -12px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgb(51, 50, 56);
+  border: 1px solid #fff;
+  border-radius: 6px;
+  padding: 4px;
+  z-index: 30;
+  box-shadow: 0 2px 8px #000a;
+}
+.tag-swatch {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.tag-swatch.active {
+  outline: 2px solid #fff;
+}
+.tag-swatch.swatch-none {
+  background: #333238;
+}
+.tag-swatch.swatch-yellow {
+  background: #ffff54;
+}
+.tag-swatch.swatch-red {
+  background: #ea3323;
+}
+.tag-swatch.swatch-green {
+  background: #75fb4d;
+}
+.tag-swatch.swatch-orange {
+  background: #ef8e34;
+}
+.tag-swatch.swatch-magenta {
+  background: #ea33f7;
+}
+.tag-swatch.swatch-cyan {
+  background: #75fbfd;
+}
+.card.flipped {
+  cursor: default;
+  justify-content: flex-start;
+  padding-top: 5px;
+  border-width: 1px;
+  box-shadow: 0 1px 2px #000;
+}
+.card.numberwang {
+  background: var(--card-numberwang);
+  color: var(--card-numberwang-text);
+  border-color: var(--card-numberwang-edge);
+  --tag-neutral: #395446;
+}
+.card.wangernumb {
+  background: var(--card-wangernumb);
+  color: var(--card-wangernumb-text);
+  /* The page ground is #1a1d24, so the card needs an edge or it dissolves into
+     the gap between cards. */
+  border-color: var(--card-wangernumb-edge);
+  --tag-neutral: #5c303e;
+}
+
+/* Confetti: six gradient dots rather than six elements, offset per card by
+   --confetti-seed so twenty solved cards are not twenty identical stamps. The
+   dots are a background layer under the number, which sits at z-index 3, and
+   under the clue, which sits at 2. `pointer-events: none` because this covers
+   the whole card below the band: a pseudo-element is still a hit target, and
+   with it left on, every click meant for the clue text of a Numberwang card
+   landed on the confetti instead and the clue would not dim. */
+.card.numberwang::before {
+  content: '';
+  position: absolute;
+  inset: 14px 0 0 0;   /* below the band */
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image:
+    radial-gradient(circle 2px at 50% 50%, var(--confetti-blue) 99%, transparent 100%),
+    radial-gradient(circle 2px at 50% 50%, var(--confetti-pink) 99%, transparent 100%),
+    radial-gradient(circle 2px at 50% 50%, var(--confetti-pink) 99%, transparent 100%),
+    radial-gradient(circle 2px at 50% 50%, var(--confetti-blue) 99%, transparent 100%),
+    radial-gradient(circle 2px at 50% 50%, var(--confetti-pink) 99%, transparent 100%),
+    radial-gradient(circle 2px at 50% 50%, var(--confetti-blue) 99%, transparent 100%);
+  background-repeat: no-repeat;
+  /* Each layer is a 5px box holding one 4px dot. Without a size every layer
+     would be the whole card and background-position would shift the dot from
+     the card's centre rather than place it. */
+  background-size: 5px 5px;
+  /* Both axes move with the seed, and at different rates per dot: at one pixel
+     per card the numbers 11 and 12 sitting side by side were the same stamp. */
+  background-position:
+    calc(8px + var(--confetti-seed) * 3px) calc(12px + var(--confetti-seed) * 2px),
+    calc(76px - var(--confetti-seed) * 3px) calc(20px + var(--confetti-seed) * 3px),
+    calc(12px + var(--confetti-seed) * 2px) calc(95px - var(--confetti-seed) * 2px),
+    calc(78px - var(--confetti-seed) * 2px) calc(100px - var(--confetti-seed) * 3px),
+    calc(30px + var(--confetti-seed) * 1px) calc(30px + var(--confetti-seed) * 3px),
+    calc(70px - var(--confetti-seed) * 2px) calc(60px + var(--confetti-seed) * 2px);
+}
+.card.rejected {
+  animation: shake 0.3s;
+}
+/* The grid reference, in the top left but clear of the band: level with the
+   number a solved card draws, so the two read as one line. Against the band it
+   was part of the band. */
+.card-pos {
+  position: absolute;
+  top: 20px;
+  left: 3px;
+  color: var(--text-muted);
+  font-size: 10px;
+  line-height: 10px;
+}
+/* The muted gray is a colour for the dark unsolved card. On a solved one the
+   card's own ink, stepped back, is the same idea in a way that works on both
+   the green and the red. */
+.card.flipped .card-pos {
+  color: inherit;
+  opacity: 0.5;
+}
+/* A plain strip the card background never reaches, so the colour survives both
+   solved states — clues name colour groups constantly, and losing the group the
+   moment you learn something about it is losing the reason to reason about it. */
+.colour-band {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 14px;
+  z-index: 2;
+}
+
+.card-number {
+  position: relative;
+  z-index: 3;
+  font-size: 30px;
+  line-height: 30px;
+  font-weight: 700;
+  margin-top: 7px;
+}
+/* An unsolved card is nothing but its number and its band, so the number is
+   the card: as large as the card will hold, and drawn in the band's colour so
+   the two agree at a glance. Solved cards hand the space to the clue and keep
+   the colour on the number, lifted where the card underneath is dark. */
+.card:not(.flipped) .card-number {
+  font-size: 52px;
+  line-height: 52px;
+  color: var(--card-colour);
+  margin-top: 10px;
+}
+/* The solved card keeps the colour on its number too, and sits clear of the
+   band, which is tall enough now to crowd it. */
+.card.flipped .card-number {
+  font-size: 17px;
+  line-height: 17px;
+  color: var(--card-colour);
+  margin-top: 12px;
+  margin-bottom: 2px;
+}
+/* The group colours were picked to sit on a dark band as a 14px strip, not to
+   be read as ink on one. Every card state is a dark ground, so the darker half
+   of them need lifting on all three; on the red card the red and pink groups
+   need it most. */
+.card-number {
+  filter: brightness(1.35);
+}
+.card.wangernumb .card-number {
+  filter: brightness(1.5);
+}
+/* The bar a clue draws after a colour word. Sized in em so it tracks whatever
+   text it sits in — 11px on a card, larger in the hint modal. */
+.clue-swatch {
+  display: inline-block;
+  width: 1.1em;
+  height: 0.5em;
+  border-radius: 1px;
+  margin-left: 0.22em;
+  vertical-align: 0.05em;
+}
+
+.card-clue {
+  font-size: 11px;
+  line-height: 0.9;
+  opacity: 0.87;
+  padding: 0 2px;
+  margin: auto 0;
+  cursor: pointer;
+  transition: opacity 0.1s ease-in-out;
+  /* Above the confetti, which would otherwise speckle the words. */
+  position: relative;
+  z-index: 2;
+}
+/* The fact cards. Not a clue, and shaped like one — the italic is the only
+   thing that separates them at card size. */
+.card-clue.flavour {
+  font-style: italic;
+}
+.card.consumed .card-clue {
+  opacity: 0.2;
+}
+/* An active clue's references. The number gets a halo of its own colour; the
+   band, which has no text to glow, gets a ring instead. The bounce itself only
+   plays when a clue newly reveals the reference (see .bounce). */
+.card-number.referenced {
+  text-shadow: 0 0 6px currentColor;
+}
+.colour-band.referenced {
+  box-shadow: inset 0 0 0 2px #fff;
+}
+.card-number.bounce,
+.colour-band.bounce {
+  animation: bounce-ref 0.27s ease-in-out;
+}
+@keyframes bounce-ref {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-1px) scale(1.35);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+/* Completion: the board settles with the real site's gentle scale-down while
+   the results popup waits out its 2.7s delay. */
+.grid.completed {
+  transform: scale(0.98);
+  transition: all 0.7s ease-in-out;
+  transition-delay: 0.25s;
+}
+/* Active hint: solid outline on the clue card(s); once the player asks for
+   more, a dotted outline marks the cards that clue pins down. */
+.card.hint-clue {
+  outline: 2px solid white;
+  z-index: 1;
+}
+.card.hint-card {
+  outline: 2px dotted white;
+  z-index: 1;
+}
+/* Wrong-guess popup, inherited from the real site's "Not enough evidence!". */
+.not-proven-modal {
+  padding: 0 0 20px;
+  font-family: "Chalkboard SE", "Comic Sans MS", "Comic Sans", sans-serif;
+}
+.not-proven-title {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 20px 12px;
+  background: #2d3038;
+  border-radius: 6px 6px 0 0;
+  font-size: 1.3em;
+}
+.not-proven-text {
+  margin: 14px 0 0;
+  padding: 0 22px;
+  line-height: 1.6;
+}
+.not-proven-text .card-ref {
+  text-transform: capitalize;
+}
+.btn-continue {
+  border: 2px solid #b59430;
+  color: #b59430;
+  margin-top: 22px;
+}
+.completed {
+  color: var(--accent-green);
+  font-weight: 700;
+}
+
+/* Height rather than `inset: 0`, because on a phone `bottom: 0` on a fixed box
+   is the bottom of the *large* viewport — behind the browser's own bottom bar.
+   The modal then centres against a taller box than the one you can see and sits
+   low on the screen. `dvh` is the visible height, with `vh` behind it for
+   anything that does not know the unit. */
+.overlay {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+.modal {
+  width: 300px;
+  max-width: 85vw;
+  background: var(--modal-bg);
+  border: 4px solid var(--border-neutral);
+  border-radius: 10px;
+  padding: 10px 0 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+  box-shadow: 0 6px 12px #0000001a;
+}
+.modal-number {
+  font-size: 44px;
+  line-height: 44px;
+  font-weight: 700;
+}
+.modal-colour {
+  width: 64px;
+  height: 14px;
+  border-radius: 2px;
+  margin: 8px auto 4px;
+}
+/* The two verdicts stack rather than sitting side by side: at the inherited
+   horizontal layout neither button gets enough width to read on a phone. */
+.modal-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+.modal-choices button {
+  margin-top: 0;
+}
+.modal button {
+  background: transparent;
+  font-weight: 700;
+  min-width: 100px;
+}
+/* The two verdicts are cued by their border, not by a fill: two solid buttons
+   either side of the card's own number read as two cards rather than as two
+   choices about one. The border is the verdict at its `-accent` lift, since the
+   card grounds themselves are too near the modal's own to outline anything. */
+.btn-numberwang,
+.btn-wangernumb {
+  border-width: 2px;
+  transition: background-color 0.15s, color 0.15s;
+}
+.btn-numberwang {
+  color: var(--card-numberwang-accent);
+  border-color: var(--card-numberwang-accent);
+}
+.btn-wangernumb {
+  color: var(--card-wangernumb-accent);
+  border-color: var(--card-wangernumb-accent);
+}
+/* Popup buttons fill with their color on hover, like the real site, and on
+   press as well: a phone has no hover, so without the `:active` half of this
+   tapping a verdict looked like nothing had happened at all. The dim on top of
+   the fill is what reads as the press. */
+.btn-numberwang:hover:not(:disabled),
+.btn-numberwang:active:not(:disabled) {
+  background: var(--card-numberwang-accent);
+  color: #fff;
+}
+.btn-wangernumb:hover:not(:disabled),
+.btn-wangernumb:active:not(:disabled) {
+  background: var(--card-wangernumb-accent);
+  color: #fff;
+}
+.btn-numberwang:active:not(:disabled),
+.btn-wangernumb:active:not(:disabled) {
+  filter: brightness(0.8);
+}
+.btn-continue {
+  transition: background-color 0.15s, color 0.15s;
+}
+.btn-continue:hover {
+  background: #b59430;
+  color: var(--modal-bg);
+}
+.btn-close {
+  transition: background-color 0.15s;
+}
+.btn-close:hover {
+  background: #7f818c;
+}
+/* A rejected verdict stays disabled until the next card is revealed. */
+.modal button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.btn-close {
+  border: 1px solid #7f818c;
+  color: var(--text);
+  font-weight: 500;
+  margin-top: 12px;
+  min-width: 110px;
+}
+.start-modal {
+  padding: 20px 0 24px;
+  gap: 6px;
+  font-family: "Chalkboard SE", "Comic Sans MS", "Comic Sans", sans-serif;
+}
+.start-title {
+  margin: 6px 0 2px;
+  font-size: 1.25em;
+}
+.start-date {
+  font-weight: 700;
+  font-size: 1.1em;
+  margin: 0 0 10px;
+}
+.start-difficulty {
+  margin: 6px 0;
+}
+/* .modal button sets transparent backgrounds; out-specify it for the filled Start. */
+.modal button.btn-start {
+  background: var(--accent-green);
+  border-color: var(--accent-green);
+  color: #fff;
+  font-weight: 700;
+  font-family: inherit;
+  width: 130px;
+  margin-top: 12px;
+}
+.btn-copy {
+  border: 1px solid var(--accent-green);
+  color: var(--accent-green);
+  margin-top: 10px;
+  width: 230px;
+  max-width: 80%;
+}
+.btn-results {
+  font-size: 0.8em;
+  padding: 0.2em 0.8em;
+  margin-left: 6px;
+}
+.results-title {
+  margin: 8px 0 4px;
+  font-size: 1.2em;
+}
+.solved-in {
+  font-weight: 700;
+  font-size: 1.1em;
+  margin: 6px 0 2px;
+}
+.share-grid {
+  margin: 6px 0;
+  filter: drop-shadow(0 0 2px #000);
+}
+.share-row {
+  line-height: 0;
+}
+.share-cell {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin: 1px;
+  border-radius: 3px;
+  background-color: #6a6a6a;
+}
+.share-cell.share-green {
+  background-color: #5ac110;
+}
+.share-cell.share-yellow {
+  background-color: #ffee00;
+}
+/* Hinted flips are circles: yellow for a plain hint, orange for its reveal level. */
+.share-cell.share-hint {
+  background-color: #ffee00;
+  border-radius: 100%;
+}
+.share-cell.share-second-hint {
+  background-color: #f89315;
+  border-radius: 100%;
+}
+
+.archive {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+.archive h1 {
+  font-size: 1.3rem;
+  text-align: center;
+}
+.archive h2 {
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+.archive-filters {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+}
+.archive-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  color: var(--text-muted);
+}
+.archive-filters select {
+  border: 1px solid var(--border-neutral);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: inherit;
+  padding: 0.3rem 0.4rem;
+  font-size: 0.85rem;
+}
+.archive summary {
+  font-size: 1.05rem;
+  font-weight: 600;
+  padding: 0.4rem 0;
+  cursor: pointer;
+}
+.archive ul {
+  list-style: none;
+  padding: 0;
+}
+.archive li a {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid var(--border-neutral);
+  border-radius: 6px;
+  margin-bottom: 0.4rem;
+  background: var(--card-bg);
+  font-size: 0.9rem;
+}
+.archive li a:hover {
+  border-color: var(--text-muted);
+}
+.arch-title {
+  flex: 1;
+}
+/* The line under the archive's heading. What the label on a row means, since
+   nothing here was ever set by a person. */
+.arch-note {
+  margin: 0 0 14px;
+  font-size: 12px;
+  opacity: 0.62;
+}
+.arch-status.status-done {
+  color: var(--accent-green);
+}
+.arch-status.status-in-progress {
+  color: #bc9300;
+}
+.arch-status.status-unplayed {
+  color: var(--text-muted);
+}
+
+/* "Correct!" bubble, verbatim from the real stylesheet (dark theme values). */
+.speech-bubble {
+  position: absolute;
+  top: 23px;
+  left: 50%;
+  transform: translate(-50%);
+  background: #262626;
+  border: 2px solid rgb(172, 172, 172);
+  color: rgb(221, 221, 221);
+  padding: 0.3em 0.6em;
+  border-radius: 1rem;
+  font-weight: 700;
+  /* "That's Numberwang!" is twice the width of "Correct!", and the card clips
+     what overflows it, so the bubble wraps inside the card rather than losing
+     its ends. */
+  max-width: calc(100% - 14px);
+  font-size: 12px;
+  line-height: 1.15;
+  text-align: center;
+  box-shadow: 0 0 5px #0003;
+  animation: pop-fade 1.2s ease-out;
+  animation-fill-mode: forwards;
+  pointer-events: none;
+  z-index: 10;
+}
+@keyframes pop-fade {
+  0% {
+    opacity: 0.5;
+    transform: translate(-50%) translateY(0) scale(0.8);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%) translateY(-5px) scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: translate(-50%) translateY(-5px) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%) translateY(-10px) scale(0.9);
+  }
+}
+@keyframes shake {
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}

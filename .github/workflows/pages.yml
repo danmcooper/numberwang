@@ -1,0 +1,47 @@
+name: Deploy to Pages
+
+on:
+  push:
+    branches: [main]
+  # The nightly generator commits to `puzzles/`, which is a push to main and so
+  # redeploys on its own. This is here for a deploy without a commit behind it.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# A deploy that started earlier is still the right one to finish: it carries a
+# real archive, and the next push will redeploy anyway.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      # In dev the `servePuzzles` plugin in vite.config.ts serves the repo-root
+      # `puzzles/` at <base>puzzles/; in production nothing does. The app fetches
+      # that same path, so the archive has to be copied in beside the build or
+      # the site deploys clean and then fails to load a single board.
+      - name: Copy the archive into the artifact
+        run: |
+          mkdir -p site/dist/puzzles
+          cp puzzles/*.json site/dist/puzzles/
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/dist
+      - id: deployment
+        uses: actions/deploy-pages@v4
