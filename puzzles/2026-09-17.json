@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
-  "id": "ab2893b2491d",
+  "id": "93b2491d1fc8",
   "date": "2026-09-17",
-  "title": "Round Three: Wangernumb",
+  "title": "The Quiet Half of the Board",
   "difficulty": "Hard",
   "width": 4,
   "height": 5,
@@ -27,7 +27,7 @@
       "number": 3,
       "colour": "purple",
       "numberwang": false,
-      "clue": "Only one person neighboring #NAME:12 has exactly 6 Not Numberwang neighbors",
+      "clue": "Only one card neighboring #NAME:12 has exactly 6 Not Numberwang neighbors",
       "origHint": "only_one_person_in_unit_has_exactly_n_trait_neighbors(unit(neighbor,12),not_numberwang,6)",
       "paths": [
         [
@@ -52,7 +52,7 @@
       "number": 2,
       "colour": "green",
       "numberwang": false,
-      "clue": "That is a matter for the adjudicator.",
+      "clue": "A googol is a 1 with a hundred zeroes, more than the atoms in the visible universe.",
       "origHint": null,
       "paths": [
         [
@@ -65,7 +65,7 @@
       "number": 10,
       "colour": "orange",
       "numberwang": true,
-      "clue": "Nobody explained the colours to me.",
+      "clue": "Euclid proved there is no largest prime more than two thousand years ago.",
       "origHint": null,
       "paths": [
         [
@@ -77,7 +77,7 @@
       "number": 17,
       "colour": "pink",
       "numberwang": true,
-      "clue": "I am here to make up the board.",
+      "clue": "A teaspoon of neutron star would weigh something like a billion tonnes.",
       "origHint": null,
       "paths": [
         [
@@ -124,7 +124,7 @@
       "number": 5,
       "colour": "red",
       "numberwang": false,
-      "clue": "I would rather not commit to a number.",
+      "clue": "Honey sealed in Egyptian tombs was still edible thousands of years later.",
       "origHint": null,
       "paths": [
         [
@@ -157,7 +157,7 @@
       "number": 19,
       "colour": "blue",
       "numberwang": true,
-      "clue": "I only play for the prizes.",
+      "clue": "A day on Venus lasts longer than a year on Venus.",
       "origHint": null,
       "paths": [
         [
@@ -183,7 +183,7 @@
       "number": 1,
       "colour": "red",
       "numberwang": false,
-      "clue": "I did not catch the rules either.",
+      "clue": "A shuffled deck of cards has more possible orders than the Earth has atoms.",
       "origHint": null,
       "paths": [
         [
@@ -215,7 +215,7 @@
       "number": 16,
       "colour": "yellow",
       "numberwang": false,
-      "clue": "Do not look at me, I am terrible at this.",
+      "clue": "Add up the digits of any multiple of 9 and you eventually get back to 9.",
       "origHint": null,
       "paths": [
         [
@@ -267,7 +267,7 @@
       "number": 6,
       "colour": "pink",
       "numberwang": false,
-      "clue": "The lights were in my eyes.",
+      "clue": "Fold a sheet of paper 42 times and it would be thick enough to reach the Moon.",
       "origHint": null,
       "paths": [
         [

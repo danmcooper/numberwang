@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
-  "id": "c3bbfea5157d",
+  "id": "fea5157d59cb",
   "date": "2026-09-13",
-  "title": "A Perfectly Ordinary Total",
+  "title": "Let Us Move to the Next Round",
   "difficulty": "Tricky",
   "width": 4,
   "height": 5,
@@ -15,7 +15,7 @@
       "number": 12,
       "colour": "teal",
       "numberwang": true,
-      "clue": "I was reading my card the whole time.",
+      "clue": "The ratio of neighbouring Fibonacci numbers closes in on 1.618, the golden ratio.",
       "origHint": null,
       "paths": [
         [
@@ -55,7 +55,7 @@
       "number": 2,
       "colour": "green",
       "numberwang": false,
-      "clue": "I have never been good with totals.",
+      "clue": "Water is one of the few things that expands as it freezes, which is why ice floats.",
       "origHint": null,
       "paths": [
         [
@@ -98,7 +98,7 @@
       "number": 6,
       "colour": "green",
       "numberwang": false,
-      "clue": "Nobody explained the colours to me.",
+      "clue": "Forty digits of pi would measure the observable universe to within an atom.",
       "origHint": null,
       "paths": [
         [
@@ -134,7 +134,7 @@
       "number": 14,
       "colour": "yellow",
       "numberwang": false,
-      "clue": "I would rather not commit to a number.",
+      "clue": "In a room of just 23 people, there is a 50% chance that two share a birthday.",
       "origHint": null,
       "paths": [
         [
@@ -154,7 +154,7 @@
       "number": 13,
       "colour": "green",
       "numberwang": false,
-      "clue": "The lights were in my eyes.",
+      "clue": "Honey sealed in Egyptian tombs was still edible thousands of years later.",
       "origHint": null,
       "paths": [
         [
@@ -178,7 +178,7 @@
       "number": 15,
       "colour": "yellow",
       "numberwang": false,
-      "clue": "That is a matter for the adjudicator.",
+      "clue": "Octopuses have three hearts, and their blood is blue.",
       "origHint": null,
       "paths": [
         [
@@ -221,7 +221,7 @@
       "number": 4,
       "colour": "blue",
       "numberwang": false,
-      "clue": "Ask the one next to me.",
+      "clue": "A teaspoon of neutron star would weigh something like a billion tonnes.",
       "origHint": null,
       "paths": [
         [
@@ -278,7 +278,7 @@
       "number": 18,
       "colour": "red",
       "numberwang": false,
-      "clue": "I only play for the prizes.",
+      "clue": "Any map can be coloured with four colours so that no two neighbours match.",
       "origHint": null,
       "paths": [
         [

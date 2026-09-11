@@ -106,21 +106,31 @@ export const TITLES: string[] = [
   'An Even Number, Obviously',
 ];
 
+/**
+ * Text for the cards that carry no logical clue. Clues by Sam fills those with
+ * suspect patter ("The lights were in my eyes"); a card is not a suspect and has
+ * nothing to be evasive about, so it offers a true maths or science fact
+ * instead — pleasant to read, and no help whatsoever in solving the board.
+ */
 export const FLAVOUR: string[] = [
-  'I did not catch the rules either.',
-  'I only play for the prizes.',
-  'Do not look at me, I am terrible at this.',
-  'I was told there would be a buzzer.',
-  'My round was earlier.',
-  'I have never been good with totals.',
-  'Ask the one next to me.',
-  'I would rather not commit to a number.',
-  'The lights were in my eyes.',
-  'I am here to make up the board.',
-  'I lost count somewhere around the middle.',
-  'They do not tell us anything backstage.',
-  'I was reading my card the whole time.',
-  'Nobody explained the colours to me.',
-  'I have a system, but it is not working.',
-  'That is a matter for the adjudicator.',
+  'In a room of just 23 people, there is a 50% chance that two share a birthday.',
+  'A shuffled deck of cards has more possible orders than the Earth has atoms.',
+  'Any map can be coloured with four colours so that no two neighbours match.',
+  'Add up the digits of any multiple of 9 and you eventually get back to 9.',
+  '0.999… recurring is not nearly 1. It is exactly 1.',
+  'Euclid proved there is no largest prime more than two thousand years ago.',
+  'Every even number yet checked is the sum of two primes; nobody has proved them all.',
+  'A googol is a 1 with a hundred zeroes, more than the atoms in the visible universe.',
+  'Forty digits of pi would measure the observable universe to within an atom.',
+  'The ratio of neighbouring Fibonacci numbers closes in on 1.618, the golden ratio.',
+  'Fold a sheet of paper 42 times and it would be thick enough to reach the Moon.',
+  'A teaspoon of neutron star would weigh something like a billion tonnes.',
+  'Sunlight takes eight minutes and twenty seconds to get here.',
+  'A day on Venus lasts longer than a year on Venus.',
+  'Helium was found in the Sun before anyone found any of it on Earth.',
+  'Bananas are faintly radioactive, on account of the potassium in them.',
+  'Octopuses have three hearts, and their blood is blue.',
+  'Sharks were swimming about for millions of years before the first tree grew.',
+  'Water is one of the few things that expands as it freezes, which is why ice floats.',
+  'Honey sealed in Egyptian tombs was still edible thousands of years later.',
 ];

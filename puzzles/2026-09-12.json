@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
-  "id": "c9fc1cd3a50b",
+  "id": "1cd3a50b0eee",
   "date": "2026-09-12",
-  "title": "That's Numberwang!",
+  "title": "Nobody Asked How the Scoring Works",
   "difficulty": "Tricky",
   "width": 4,
   "height": 5,
@@ -15,7 +15,7 @@
       "number": 3,
       "colour": "teal",
       "numberwang": false,
-      "clue": "I am here to make up the board.",
+      "clue": "In a room of just 23 people, there is a 50% chance that two share a birthday.",
       "origHint": null,
       "paths": [
         [
@@ -32,7 +32,7 @@
       "number": 15,
       "colour": "purple",
       "numberwang": false,
-      "clue": "The lights were in my eyes.",
+      "clue": "Sunlight takes eight minutes and twenty seconds to get here.",
       "origHint": null,
       "paths": [
         [
@@ -52,7 +52,7 @@
       "number": 4,
       "colour": "yellow",
       "numberwang": false,
-      "clue": "I lost count somewhere around the middle.",
+      "clue": "Honey sealed in Egyptian tombs was still edible thousands of years later.",
       "origHint": null,
       "paths": [
         [
@@ -69,7 +69,7 @@
       "number": 14,
       "colour": "yellow",
       "numberwang": true,
-      "clue": "They do not tell us anything backstage.",
+      "clue": "Any map can be coloured with four colours so that no two neighbours match.",
       "origHint": null,
       "paths": [
         [
@@ -81,7 +81,7 @@
       "number": 11,
       "colour": "teal",
       "numberwang": true,
-      "clue": "Do not look at me, I am terrible at this.",
+      "clue": "Helium was found in the Sun before anyone found any of it on Earth.",
       "origHint": null,
       "paths": [
         [
@@ -210,7 +210,7 @@
       "number": 10,
       "colour": "teal",
       "numberwang": false,
-      "clue": "I did not catch the rules either.",
+      "clue": "The ratio of neighbouring Fibonacci numbers closes in on 1.618, the golden ratio.",
       "origHint": null,
       "paths": [
         [
@@ -224,7 +224,7 @@
       "number": 18,
       "colour": "orange",
       "numberwang": true,
-      "clue": "My round was earlier.",
+      "clue": "Fold a sheet of paper 42 times and it would be thick enough to reach the Moon.",
       "origHint": null,
       "paths": [
         [
@@ -270,7 +270,7 @@
       "number": 7,
       "colour": "purple",
       "numberwang": false,
-      "clue": "I would rather not commit to a number.",
+      "clue": "Add up the digits of any multiple of 9 and you eventually get back to 9.",
       "origHint": null,
       "paths": [
         [

@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
-  "id": "4e6520f7bfa3",
+  "id": "20f7bfa3de1d",
   "date": "2026-09-16",
-  "title": "Every Total Tells",
+  "title": "An Even Number, Obviously",
   "difficulty": "Tricky",
   "width": 4,
   "height": 5,
@@ -15,7 +15,7 @@
       "number": 1,
       "colour": "red",
       "numberwang": false,
-      "clue": "I have never been good with totals.",
+      "clue": "Any map can be coloured with four colours so that no two neighbours match.",
       "origHint": null,
       "paths": [
         [
@@ -28,7 +28,7 @@
       "number": 5,
       "colour": "blue",
       "numberwang": true,
-      "clue": "I only play for the prizes.",
+      "clue": "In a room of just 23 people, there is a 50% chance that two share a birthday.",
       "origHint": null,
       "paths": [
         [
@@ -55,7 +55,7 @@
       "number": 17,
       "colour": "yellow",
       "numberwang": true,
-      "clue": "Nobody explained the colours to me.",
+      "clue": "Euclid proved there is no largest prime more than two thousand years ago.",
       "origHint": null,
       "paths": [
         [
@@ -69,7 +69,7 @@
       "number": 20,
       "colour": "green",
       "numberwang": true,
-      "clue": "That is a matter for the adjudicator.",
+      "clue": "Sharks were swimming about for millions of years before the first tree grew.",
       "origHint": null,
       "paths": [
         [
@@ -83,7 +83,7 @@
       "number": 9,
       "colour": "teal",
       "numberwang": true,
-      "clue": "I am here to make up the board.",
+      "clue": "The ratio of neighbouring Fibonacci numbers closes in on 1.618, the golden ratio.",
       "origHint": null,
       "paths": [
         [
@@ -100,7 +100,7 @@
       "number": 12,
       "colour": "pink",
       "numberwang": false,
-      "clue": "I did not catch the rules either.",
+      "clue": "Fold a sheet of paper 42 times and it would be thick enough to reach the Moon.",
       "origHint": null,
       "paths": [
         [
@@ -113,7 +113,7 @@
       "number": 6,
       "colour": "red",
       "numberwang": true,
-      "clue": "My round was earlier.",
+      "clue": "Honey sealed in Egyptian tombs was still edible thousands of years later.",
       "origHint": null,
       "paths": [
         [
@@ -140,7 +140,7 @@
       "number": 11,
       "colour": "blue",
       "numberwang": true,
-      "clue": "I would rather not commit to a number.",
+      "clue": "Every even number yet checked is the sum of two primes; nobody has proved them all.",
       "origHint": null,
       "paths": [
         [
@@ -152,7 +152,7 @@
       "number": 3,
       "colour": "yellow",
       "numberwang": true,
-      "clue": "I was reading my card the whole time.",
+      "clue": "A day on Venus lasts longer than a year on Venus.",
       "origHint": null,
       "paths": [
         [
@@ -219,7 +219,7 @@
       "number": 4,
       "colour": "purple",
       "numberwang": false,
-      "clue": "I lost count somewhere around the middle.",
+      "clue": "A shuffled deck of cards has more possible orders than the Earth has atoms.",
       "origHint": null,
       "paths": [
         [

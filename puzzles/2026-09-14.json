@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
-  "id": "714e58dd9444",
+  "id": "58dd9444d744",
   "date": "2026-09-14",
-  "title": "Not All Numbers Are Numberwang",
+  "title": "The Numbers Were Always There",
   "difficulty": "Tricky",
   "width": 4,
   "height": 5,
@@ -27,7 +27,7 @@
       "number": 17,
       "colour": "purple",
       "numberwang": true,
-      "clue": "I have never been good with totals.",
+      "clue": "Forty digits of pi would measure the observable universe to within an atom.",
       "origHint": null,
       "paths": [
         [
@@ -61,7 +61,7 @@
       "number": 10,
       "colour": "orange",
       "numberwang": true,
-      "clue": "I only play for the prizes.",
+      "clue": "Octopuses have three hearts, and their blood is blue.",
       "origHint": null,
       "paths": [
         [
@@ -85,7 +85,7 @@
       "number": 9,
       "colour": "red",
       "numberwang": false,
-      "clue": "I did not catch the rules either.",
+      "clue": "Honey sealed in Egyptian tombs was still edible thousands of years later.",
       "origHint": null,
       "paths": [
         [
@@ -106,7 +106,7 @@
       "number": 15,
       "colour": "blue",
       "numberwang": false,
-      "clue": "The lights were in my eyes.",
+      "clue": "In a room of just 23 people, there is a 50% chance that two share a birthday.",
       "origHint": null,
       "paths": [
         [
@@ -126,7 +126,7 @@
       "number": 20,
       "colour": "teal",
       "numberwang": true,
-      "clue": "They do not tell us anything backstage.",
+      "clue": "Any map can be coloured with four colours so that no two neighbours match.",
       "origHint": null,
       "paths": [
         [
@@ -148,7 +148,7 @@
       "number": 11,
       "colour": "red",
       "numberwang": true,
-      "clue": "My round was earlier.",
+      "clue": "Sunlight takes eight minutes and twenty seconds to get here.",
       "origHint": null,
       "paths": [
         [
@@ -177,7 +177,7 @@
       "number": 6,
       "colour": "teal",
       "numberwang": true,
-      "clue": "That is a matter for the adjudicator.",
+      "clue": "A shuffled deck of cards has more possible orders than the Earth has atoms.",
       "origHint": null,
       "paths": [
         [
@@ -208,7 +208,7 @@
       "number": 3,
       "colour": "yellow",
       "numberwang": true,
-      "clue": "I lost count somewhere around the middle.",
+      "clue": "Every even number yet checked is the sum of two primes; nobody has proved them all.",
       "origHint": null,
       "paths": [
         [
@@ -241,7 +241,7 @@
       "number": 13,
       "colour": "yellow",
       "numberwang": false,
-      "clue": "I was told there would be a buzzer.",
+      "clue": "0.999… recurring is not nearly 1. It is exactly 1.",
       "origHint": null,
       "paths": [
         [
@@ -254,7 +254,7 @@
       "number": 8,
       "colour": "green",
       "numberwang": false,
-      "clue": "Do not look at me, I am terrible at this.",
+      "clue": "A googol is a 1 with a hundred zeroes, more than the atoms in the visible universe.",
       "origHint": null,
       "paths": [
         [
@@ -281,7 +281,7 @@
       "number": 2,
       "colour": "orange",
       "numberwang": true,
-      "clue": "I have a system, but it is not working.",
+      "clue": "Helium was found in the Sun before anyone found any of it on Earth.",
       "origHint": null,
       "paths": [
         [

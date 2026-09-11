@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
-  "id": "3baeac883a72",
+  "id": "ac883a72c9de",
   "date": "2026-09-11",
-  "title": "One Row Gives It Away",
+  "title": "Nineteen Was Never in Doubt",
   "difficulty": "Medium",
   "width": 4,
   "height": 5,
@@ -15,7 +15,7 @@
       "number": 13,
       "colour": "pink",
       "numberwang": true,
-      "clue": "I am here to make up the board.",
+      "clue": "Helium was found in the Sun before anyone found any of it on Earth.",
       "origHint": null,
       "paths": [
         [
@@ -74,7 +74,7 @@
       "number": 7,
       "colour": "orange",
       "numberwang": true,
-      "clue": "I have a system, but it is not working.",
+      "clue": "Forty digits of pi would measure the observable universe to within an atom.",
       "origHint": null,
       "paths": [
         [
@@ -102,7 +102,7 @@
       "number": 3,
       "colour": "red",
       "numberwang": false,
-      "clue": "I did not catch the rules either.",
+      "clue": "A shuffled deck of cards has more possible orders than the Earth has atoms.",
       "origHint": null,
       "paths": [
         [
@@ -172,7 +172,7 @@
       "number": 4,
       "colour": "red",
       "numberwang": false,
-      "clue": "They do not tell us anything backstage.",
+      "clue": "A day on Venus lasts longer than a year on Venus.",
       "origHint": null,
       "paths": [
         [
@@ -232,7 +232,7 @@
       "number": 6,
       "colour": "teal",
       "numberwang": false,
-      "clue": "I only play for the prizes.",
+      "clue": "Water is one of the few things that expands as it freezes, which is why ice floats.",
       "origHint": null,
       "paths": [
         [
@@ -270,7 +270,7 @@
       "number": 5,
       "colour": "yellow",
       "numberwang": true,
-      "clue": "Ask the one next to me.",
+      "clue": "Honey sealed in Egyptian tombs was still edible thousands of years later.",
       "origHint": null,
       "paths": [
         [
@@ -294,7 +294,7 @@
       "number": 20,
       "colour": "yellow",
       "numberwang": false,
-      "clue": "That is a matter for the adjudicator.",
+      "clue": "In a room of just 23 people, there is a 50% chance that two share a birthday.",
       "origHint": null,
       "paths": [
         [
@@ -332,7 +332,7 @@
       "number": 10,
       "colour": "yellow",
       "numberwang": false,
-      "clue": "2 persons #BETWEEN:pair(0,3) have a Numberwang card directly to the right of them",
+      "clue": "2 cards #BETWEEN:pair(0,3) have a Numberwang card directly to the right of them",
       "origHint": "n_in_unit_have_trait_in_dir(unit(between,pair(0,3)),numberwang,1,0,2)",
       "paths": [
         [

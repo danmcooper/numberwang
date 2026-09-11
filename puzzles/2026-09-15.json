@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
-  "id": "4cf17b7ed0f2",
+  "id": "7b7ed0f24704",
   "date": "2026-09-15",
-  "title": "Rotate the Board",
+  "title": "Nobody Asked How the Scoring Works",
   "difficulty": "Hard",
   "width": 4,
   "height": 5,
@@ -15,7 +15,7 @@
       "number": 19,
       "colour": "purple",
       "numberwang": true,
-      "clue": "I lost count somewhere around the middle.",
+      "clue": "0.999… recurring is not nearly 1. It is exactly 1.",
       "origHint": null,
       "paths": [
         [
@@ -73,7 +73,7 @@
       "number": 2,
       "colour": "blue",
       "numberwang": false,
-      "clue": "I did not catch the rules either.",
+      "clue": "In a room of just 23 people, there is a 50% chance that two share a birthday.",
       "origHint": null,
       "paths": [
         [
@@ -159,7 +159,7 @@
       "number": 10,
       "colour": "green",
       "numberwang": false,
-      "clue": "I have never been good with totals.",
+      "clue": "Euclid proved there is no largest prime more than two thousand years ago.",
       "origHint": null,
       "paths": [
         [
@@ -194,7 +194,7 @@
       "number": 9,
       "colour": "green",
       "numberwang": false,
-      "clue": "Only one person neighboring #NAME:7 has exactly 4 Not Numberwang neighbors",
+      "clue": "Only one card neighboring #NAME:7 has exactly 4 Not Numberwang neighbors",
       "origHint": "only_one_person_in_unit_has_exactly_n_trait_neighbors(unit(neighbor,7),not_numberwang,4)",
       "paths": [
         [
@@ -233,7 +233,7 @@
       "number": 11,
       "colour": "yellow",
       "numberwang": false,
-      "clue": "I would rather not commit to a number.",
+      "clue": "A teaspoon of neutron star would weigh something like a billion tonnes.",
       "origHint": null,
       "paths": [
         [
@@ -267,7 +267,7 @@
       "number": 20,
       "colour": "orange",
       "numberwang": true,
-      "clue": "The lights were in my eyes.",
+      "clue": "A shuffled deck of cards has more possible orders than the Earth has atoms.",
       "origHint": null,
       "paths": [
         [
@@ -303,7 +303,7 @@
       "number": 4,
       "colour": "teal",
       "numberwang": true,
-      "clue": "I was told there would be a buzzer.",
+      "clue": "Fold a sheet of paper 42 times and it would be thick enough to reach the Moon.",
       "origHint": null,
       "paths": [
         [
@@ -363,7 +363,7 @@
       "number": 15,
       "colour": "teal",
       "numberwang": true,
-      "clue": "I was reading my card the whole time.",
+      "clue": "A googol is a 1 with a hundred zeroes, more than the atoms in the visible universe.",
       "origHint": null,
       "paths": [
         [
