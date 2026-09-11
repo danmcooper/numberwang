@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
-  "id": "7b7ed0f24704",
+  "id": "4326228b8d0e",
   "date": "2026-09-15",
-  "title": "Nobody Asked How the Scoring Works",
+  "title": "Every Total Tells",
   "difficulty": "Hard",
   "width": 4,
   "height": 5,
@@ -15,7 +15,7 @@
       "number": 19,
       "colour": "purple",
       "numberwang": true,
-      "clue": "0.999… recurring is not nearly 1. It is exactly 1.",
+      "clue": "Light goes round the Earth seven and a half times in a second.",
       "origHint": null,
       "paths": [
         [
@@ -73,7 +73,7 @@
       "number": 2,
       "colour": "blue",
       "numberwang": false,
-      "clue": "In a room of just 23 people, there is a 50% chance that two share a birthday.",
+      "clue": "Of all the shapes enclosing the same area, the circle needs the shortest fence.",
       "origHint": null,
       "paths": [
         [
@@ -159,7 +159,7 @@
       "number": 10,
       "colour": "green",
       "numberwang": false,
-      "clue": "Euclid proved there is no largest prime more than two thousand years ago.",
+      "clue": "Some infinities are bigger than others: no list can hold every decimal between 0 and 1.",
       "origHint": null,
       "paths": [
         [
@@ -233,7 +233,7 @@
       "number": 11,
       "colour": "yellow",
       "numberwang": false,
-      "clue": "A teaspoon of neutron star would weigh something like a billion tonnes.",
+      "clue": "Neptune has completed one orbit since it was discovered in 1846.",
       "origHint": null,
       "paths": [
         [
@@ -267,7 +267,7 @@
       "number": 20,
       "colour": "orange",
       "numberwang": true,
-      "clue": "A shuffled deck of cards has more possible orders than the Earth has atoms.",
+      "clue": "The deepest trench in the ocean is deeper than Everest is tall.",
       "origHint": null,
       "paths": [
         [
@@ -303,7 +303,7 @@
       "number": 4,
       "colour": "teal",
       "numberwang": true,
-      "clue": "Fold a sheet of paper 42 times and it would be thick enough to reach the Moon.",
+      "clue": "A honeybee tells the others the direction and distance of flowers by dancing.",
       "origHint": null,
       "paths": [
         [
@@ -363,7 +363,7 @@
       "number": 15,
       "colour": "teal",
       "numberwang": true,
-      "clue": "A googol is a 1 with a hundred zeroes, more than the atoms in the visible universe.",
+      "clue": "Almost every atom in your body was made inside a star.",
       "origHint": null,
       "paths": [
         [

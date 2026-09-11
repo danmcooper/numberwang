@@ -89,6 +89,28 @@ describe('Card', () => {
     expect(screen.getByText('Correct!')).toBeTruthy();
   });
 
+  it('leans a fact card over, and leaves a real clue upright', () => {
+    const fact = { ...person(17, 'teal'), origHint: null };
+    const clue = { ...person(17, 'teal'), origHint: 'numberwang_count(2)' };
+    const { container, unmount } = render(
+      <Card {...base} flipped person={fact} clueNode={<span>Octopuses have three hearts.</span>} />,
+    );
+    expect(container.querySelector('.card-clue')!.classList.contains('flavour')).toBe(true);
+    unmount();
+    const second = render(
+      <Card {...base} flipped person={clue} clueNode={<span>17 is Numberwang</span>} />,
+    );
+    expect(second.container.querySelector('.card-clue')!.classList.contains('flavour')).toBe(false);
+  });
+
+  it('takes the unsolved number colour from the same custom property as the band', () => {
+    const { container } = render(<Card {...base} person={person(17, 'teal')} />);
+    expect((cardEl() as HTMLElement).style.getPropertyValue('--card-colour')).toBe(
+      'var(--colour-teal)',
+    );
+    expect(container.querySelector('.card-number')).toBeTruthy();
+  });
+
   it('highlights the number and the band independently', () => {
     const { container } = render(
       <Card {...base} numberReferenced colourReferenced person={person(17, 'teal')} />,

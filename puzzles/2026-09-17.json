@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
-  "id": "93b2491d1fc8",
+  "id": "ccd7a504501a",
   "date": "2026-09-17",
-  "title": "The Quiet Half of the Board",
+  "title": "The Numbers Were Always There",
   "difficulty": "Hard",
   "width": 4,
   "height": 5,
@@ -52,7 +52,7 @@
       "number": 2,
       "colour": "green",
       "numberwang": false,
-      "clue": "A googol is a 1 with a hundred zeroes, more than the atoms in the visible universe.",
+      "clue": "Bamboo can grow the better part of a metre in one day.",
       "origHint": null,
       "paths": [
         [
@@ -65,7 +65,7 @@
       "number": 10,
       "colour": "orange",
       "numberwang": true,
-      "clue": "Euclid proved there is no largest prime more than two thousand years ago.",
+      "clue": "You are made of about seven octillion atoms, nearly all of it empty space.",
       "origHint": null,
       "paths": [
         [
@@ -77,7 +77,7 @@
       "number": 17,
       "colour": "pink",
       "numberwang": true,
-      "clue": "A teaspoon of neutron star would weigh something like a billion tonnes.",
+      "clue": "1 is not a prime number, by agreement rather than by accident.",
       "origHint": null,
       "paths": [
         [
@@ -124,7 +124,7 @@
       "number": 5,
       "colour": "red",
       "numberwang": false,
-      "clue": "Honey sealed in Egyptian tombs was still edible thousands of years later.",
+      "clue": "Add 1/2, then 1/4, then 1/8, and keep going for ever: the total is exactly 1.",
       "origHint": null,
       "paths": [
         [
@@ -157,7 +157,7 @@
       "number": 19,
       "colour": "blue",
       "numberwang": true,
-      "clue": "A day on Venus lasts longer than a year on Venus.",
+      "clue": "0.999… recurring is not nearly 1. It is exactly 1.",
       "origHint": null,
       "paths": [
         [
@@ -183,7 +183,7 @@
       "number": 1,
       "colour": "red",
       "numberwang": false,
-      "clue": "A shuffled deck of cards has more possible orders than the Earth has atoms.",
+      "clue": "About half the oxygen you breathe was made in the sea, not by trees.",
       "origHint": null,
       "paths": [
         [
@@ -215,7 +215,7 @@
       "number": 16,
       "colour": "yellow",
       "numberwang": false,
-      "clue": "Add up the digits of any multiple of 9 and you eventually get back to 9.",
+      "clue": "In a room of just 23 people, there is a 50% chance that two share a birthday.",
       "origHint": null,
       "paths": [
         [
@@ -267,7 +267,7 @@
       "number": 6,
       "colour": "pink",
       "numberwang": false,
-      "clue": "Fold a sheet of paper 42 times and it would be thick enough to reach the Moon.",
+      "clue": "Octopuses have three hearts, and their blood is blue.",
       "origHint": null,
       "paths": [
         [

@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
-  "id": "97f5c39222e8",
+  "id": "824e3de58ce4",
   "date": "2026-09-10",
-  "title": "The Board Does Not Explain Itself",
+  "title": "Two of These Add Up",
   "difficulty": "Tricky",
   "width": 4,
   "height": 5,
@@ -15,7 +15,7 @@
       "number": 17,
       "colour": "red",
       "numberwang": false,
-      "clue": "Fold a sheet of paper 42 times and it would be thick enough to reach the Moon.",
+      "clue": "Butterflies taste things by standing on them.",
       "origHint": null,
       "paths": [
         [
@@ -44,7 +44,7 @@
       "number": 20,
       "colour": "pink",
       "numberwang": true,
-      "clue": "Sunlight takes eight minutes and twenty seconds to get here.",
+      "clue": "Any map can be coloured with four colours so that no two neighbours match.",
       "origHint": null,
       "paths": [
         [
@@ -59,7 +59,7 @@
       "number": 14,
       "colour": "green",
       "numberwang": false,
-      "clue": "Helium was found in the Sun before anyone found any of it on Earth.",
+      "clue": "There are more bacteria in a spoonful of soil than there are people on Earth.",
       "origHint": null,
       "paths": [
         [
@@ -96,7 +96,7 @@
       "number": 18,
       "colour": "green",
       "numberwang": false,
-      "clue": "Add up the digits of any multiple of 9 and you eventually get back to 9.",
+      "clue": "Nerve signals reach speeds of over a hundred metres a second.",
       "origHint": null,
       "paths": [
         [
@@ -149,7 +149,7 @@
       "number": 8,
       "colour": "pink",
       "numberwang": true,
-      "clue": "A googol is a 1 with a hundred zeroes, more than the atoms in the visible universe.",
+      "clue": "A teaspoon of neutron star would weigh something like a billion tonnes.",
       "origHint": null,
       "paths": [
         [
@@ -173,7 +173,7 @@
       "number": 13,
       "colour": "blue",
       "numberwang": false,
-      "clue": "Bananas are faintly radioactive, on account of the potassium in them.",
+      "clue": "Glass is not a very slow liquid. Old windows are uneven because they were made that way.",
       "origHint": null,
       "paths": [
         [
@@ -212,7 +212,7 @@
       "number": 2,
       "colour": "orange",
       "numberwang": true,
-      "clue": "Sharks were swimming about for millions of years before the first tree grew.",
+      "clue": "In lists of real-world numbers, about a third of them begin with the digit 1.",
       "origHint": null,
       "paths": [
         [
@@ -224,7 +224,7 @@
       "number": 12,
       "colour": "blue",
       "numberwang": true,
-      "clue": "A teaspoon of neutron star would weigh something like a billion tonnes.",
+      "clue": "Any scrambled Rubik’s cube can be solved in twenty moves or fewer.",
       "origHint": null,
       "paths": [
         [
@@ -271,7 +271,7 @@
       "number": 4,
       "colour": "teal",
       "numberwang": false,
-      "clue": "The ratio of neighbouring Fibonacci numbers closes in on 1.618, the golden ratio.",
+      "clue": "A day on Venus lasts longer than a year on Venus.",
       "origHint": null,
       "paths": [
         [
@@ -294,7 +294,7 @@
       "number": 9,
       "colour": "red",
       "numberwang": false,
-      "clue": "In a room of just 23 people, there is a 50% chance that two share a birthday.",
+      "clue": "Lightning strikes the Earth roughly forty times every second.",
       "origHint": null,
       "paths": [
         [

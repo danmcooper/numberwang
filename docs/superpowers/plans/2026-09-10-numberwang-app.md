@@ -21,6 +21,15 @@
   - Wangernumb — `#111` ground, `#fff` number
 - **The colour band is a plain strip across the top of the card and carries no text.** It is present in all three states and the card background never touches it.
 - **The trait is spoken as "Numberwang" and "Wangernumb"** in every player-facing string. Never "numberwangs", never "criminal". Wangernumb is the show's own reversed round, and the nearest thing it has to an opposite; Numberwang is only ever declared, never denied. Renamed after Task 3, so Tasks 1-3 below still say "Not Numberwang" and `not-numberwang` where the code now says Wangernumb and `wangernumb` — they record what was done at the time. The DSL trait token stays `not_numberwang` everywhere: in hints, in puzzle JSON, and in `Guess`.
+- **The number on a card is drawn in that card's group colour**, and on an
+  unsolved card it is as large as the card will hold. Asked for after Task 4,
+  and it supersedes the numbers named in the card-state constraint above: the
+  three grounds and the confetti stand, the number's colour does not. The band
+  went to 14px in the same round, the tag moved from a triangle in the top-right
+  to a square flush into the bottom-left corner, a clue that names a colour
+  group draws a small bar of it after the word (eight groups is more than a
+  player can hold by name), and a card whose text is a fact rather than a clue
+  sets that text in italic.
 - **No analytics.** `cbsbd`'s `index.html` carries a umami script with cbsbd's own website id; it does not come along.
 - **Deploy base path is `/numberwang/`**, with no UUID and no `config/site.json`.
 - **Local-storage keys are namespaced `nw:`**, so a browser that has played `cbsbd` on the same host cannot collide.
@@ -1582,7 +1591,9 @@ Replace the note with what is true, above the year sections:
 Delete the `.arch-source` rule from `styles.css` — Task 1 deleted the only element
 that ever carried the class.
 
-- [ ] **Step 4: Rewrite the document head**
+- [x] **Step 4: Rewrite the document head**  *(done early, out of task order:
+the player asked for the title while Task 4 was in hand, and the umami script
+went with it rather than being left pointing at cbsbd for another commit.)*
 
 Replace `site/index.html`'s head, keeping the module script tag and the root div:
 

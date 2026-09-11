@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
-  "id": "ac883a72c9de",
+  "id": "c33ffecb82ab",
   "date": "2026-09-11",
-  "title": "Nineteen Was Never in Doubt",
+  "title": "A Perfectly Ordinary Total",
   "difficulty": "Medium",
   "width": 4,
   "height": 5,
@@ -15,7 +15,7 @@
       "number": 13,
       "colour": "pink",
       "numberwang": true,
-      "clue": "Helium was found in the Sun before anyone found any of it on Earth.",
+      "clue": "The chance of tossing ten heads in a row is one in 1024.",
       "origHint": null,
       "paths": [
         [
@@ -74,7 +74,7 @@
       "number": 7,
       "colour": "orange",
       "numberwang": true,
-      "clue": "Forty digits of pi would measure the observable universe to within an atom.",
+      "clue": "Mercury is the only metal that is liquid at room temperature.",
       "origHint": null,
       "paths": [
         [
@@ -102,7 +102,7 @@
       "number": 3,
       "colour": "red",
       "numberwang": false,
-      "clue": "A shuffled deck of cards has more possible orders than the Earth has atoms.",
+      "clue": "Every whole number is the sum of at most four square numbers.",
       "origHint": null,
       "paths": [
         [
@@ -172,7 +172,7 @@
       "number": 4,
       "colour": "red",
       "numberwang": false,
-      "clue": "A day on Venus lasts longer than a year on Venus.",
+      "clue": "A day on Mars is about forty minutes longer than a day here.",
       "origHint": null,
       "paths": [
         [
@@ -232,7 +232,7 @@
       "number": 6,
       "colour": "teal",
       "numberwang": false,
-      "clue": "Water is one of the few things that expands as it freezes, which is why ice floats.",
+      "clue": "Under enough pressure, water at the sea bed stays liquid well past boiling point.",
       "origHint": null,
       "paths": [
         [
@@ -270,7 +270,7 @@
       "number": 5,
       "colour": "yellow",
       "numberwang": true,
-      "clue": "Honey sealed in Egyptian tombs was still edible thousands of years later.",
+      "clue": "Your brain runs on about a fifth of everything you eat.",
       "origHint": null,
       "paths": [
         [
@@ -294,7 +294,7 @@
       "number": 20,
       "colour": "yellow",
       "numberwang": false,
-      "clue": "In a room of just 23 people, there is a 50% chance that two share a birthday.",
+      "clue": "Any map can be coloured with four colours so that no two neighbours match.",
       "origHint": null,
       "paths": [
         [

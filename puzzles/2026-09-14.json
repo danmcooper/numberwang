@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
-  "id": "58dd9444d744",
+  "id": "e711cf9f6d2b",
   "date": "2026-09-14",
-  "title": "The Numbers Were Always There",
+  "title": "The Difference of Two Cards",
   "difficulty": "Tricky",
   "width": 4,
   "height": 5,
@@ -27,7 +27,7 @@
       "number": 17,
       "colour": "purple",
       "numberwang": true,
-      "clue": "Forty digits of pi would measure the observable universe to within an atom.",
+      "clue": "Add up the digits of any multiple of 9 and you eventually get back to 9.",
       "origHint": null,
       "paths": [
         [
@@ -61,7 +61,7 @@
       "number": 10,
       "colour": "orange",
       "numberwang": true,
-      "clue": "Octopuses have three hearts, and their blood is blue.",
+      "clue": "Trees pass food and warnings to each other through fungus threads underground.",
       "origHint": null,
       "paths": [
         [
@@ -85,7 +85,7 @@
       "number": 9,
       "colour": "red",
       "numberwang": false,
-      "clue": "Honey sealed in Egyptian tombs was still edible thousands of years later.",
+      "clue": "Euclid proved there is no largest prime more than two thousand years ago.",
       "origHint": null,
       "paths": [
         [
@@ -106,7 +106,7 @@
       "number": 15,
       "colour": "blue",
       "numberwang": false,
-      "clue": "In a room of just 23 people, there is a 50% chance that two share a birthday.",
+      "clue": "Absolute zero is minus 273.15 degrees, and nothing anywhere can be colder.",
       "origHint": null,
       "paths": [
         [
@@ -126,7 +126,7 @@
       "number": 20,
       "colour": "teal",
       "numberwang": true,
-      "clue": "Any map can be coloured with four colours so that no two neighbours match.",
+      "clue": "The equals sign was invented in 1557 by a man tired of writing \"is equal to\".",
       "origHint": null,
       "paths": [
         [
@@ -148,7 +148,7 @@
       "number": 11,
       "colour": "red",
       "numberwang": true,
-      "clue": "Sunlight takes eight minutes and twenty seconds to get here.",
+      "clue": "Wombats produce droppings that come out as neat little cubes.",
       "origHint": null,
       "paths": [
         [
@@ -177,7 +177,7 @@
       "number": 6,
       "colour": "teal",
       "numberwang": true,
-      "clue": "A shuffled deck of cards has more possible orders than the Earth has atoms.",
+      "clue": "The Earth’s core is roughly as hot as the surface of the Sun.",
       "origHint": null,
       "paths": [
         [
@@ -208,7 +208,7 @@
       "number": 3,
       "colour": "yellow",
       "numberwang": true,
-      "clue": "Every even number yet checked is the sum of two primes; nobody has proved them all.",
+      "clue": "The deepest trench in the ocean is deeper than Everest is tall.",
       "origHint": null,
       "paths": [
         [
@@ -241,7 +241,7 @@
       "number": 13,
       "colour": "yellow",
       "numberwang": false,
-      "clue": "0.999… recurring is not nearly 1. It is exactly 1.",
+      "clue": "Thunder takes about three seconds to travel a kilometre. Count, and you have the distance.",
       "origHint": null,
       "paths": [
         [
@@ -254,7 +254,7 @@
       "number": 8,
       "colour": "green",
       "numberwang": false,
-      "clue": "A googol is a 1 with a hundred zeroes, more than the atoms in the visible universe.",
+      "clue": "A 50p piece is the same width whichever way you measure it, which is why it rolls.",
       "origHint": null,
       "paths": [
         [
@@ -281,7 +281,7 @@
       "number": 2,
       "colour": "orange",
       "numberwang": true,
-      "clue": "Helium was found in the Sun before anyone found any of it on Earth.",
+      "clue": "The digits of pi never settle into a repeating pattern, and it is proved they never will.",
       "origHint": null,
       "paths": [
         [

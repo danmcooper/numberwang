@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
-  "id": "20f7bfa3de1d",
+  "id": "77c17838bdf0",
   "date": "2026-09-16",
-  "title": "An Even Number, Obviously",
+  "title": "Round Three: Wangernumb",
   "difficulty": "Tricky",
   "width": 4,
   "height": 5,
@@ -15,7 +15,7 @@
       "number": 1,
       "colour": "red",
       "numberwang": false,
-      "clue": "Any map can be coloured with four colours so that no two neighbours match.",
+      "clue": "In a room of just 23 people, there is a 50% chance that two share a birthday.",
       "origHint": null,
       "paths": [
         [
@@ -28,7 +28,7 @@
       "number": 5,
       "colour": "blue",
       "numberwang": true,
-      "clue": "In a room of just 23 people, there is a 50% chance that two share a birthday.",
+      "clue": "Euclid proved there is no largest prime more than two thousand years ago.",
       "origHint": null,
       "paths": [
         [
@@ -55,7 +55,7 @@
       "number": 17,
       "colour": "yellow",
       "numberwang": true,
-      "clue": "Euclid proved there is no largest prime more than two thousand years ago.",
+      "clue": "A snail’s mouth can carry thousands of tiny teeth.",
       "origHint": null,
       "paths": [
         [
@@ -69,7 +69,7 @@
       "number": 20,
       "colour": "green",
       "numberwang": true,
-      "clue": "Sharks were swimming about for millions of years before the first tree grew.",
+      "clue": "A sloth can take a month to digest a single leaf.",
       "origHint": null,
       "paths": [
         [
@@ -83,7 +83,7 @@
       "number": 9,
       "colour": "teal",
       "numberwang": true,
-      "clue": "The ratio of neighbouring Fibonacci numbers closes in on 1.618, the golden ratio.",
+      "clue": "Lightning is about five times hotter than the surface of the Sun.",
       "origHint": null,
       "paths": [
         [
@@ -100,7 +100,7 @@
       "number": 12,
       "colour": "pink",
       "numberwang": false,
-      "clue": "Fold a sheet of paper 42 times and it would be thick enough to reach the Moon.",
+      "clue": "There are more bacteria in a spoonful of soil than there are people on Earth.",
       "origHint": null,
       "paths": [
         [
@@ -113,7 +113,7 @@
       "number": 6,
       "colour": "red",
       "numberwang": true,
-      "clue": "Honey sealed in Egyptian tombs was still edible thousands of years later.",
+      "clue": "Lower the pressure enough and water will boil at room temperature.",
       "origHint": null,
       "paths": [
         [
@@ -140,7 +140,7 @@
       "number": 11,
       "colour": "blue",
       "numberwang": true,
-      "clue": "Every even number yet checked is the sum of two primes; nobody has proved them all.",
+      "clue": "Switching doors in Monty Hall doubles your chances. Most people refuse to believe it.",
       "origHint": null,
       "paths": [
         [
@@ -152,7 +152,7 @@
       "number": 3,
       "colour": "yellow",
       "numberwang": true,
-      "clue": "A day on Venus lasts longer than a year on Venus.",
+      "clue": "A 50p piece is the same width whichever way you measure it, which is why it rolls.",
       "origHint": null,
       "paths": [
         [
@@ -219,7 +219,7 @@
       "number": 4,
       "colour": "purple",
       "numberwang": false,
-      "clue": "A shuffled deck of cards has more possible orders than the Earth has atoms.",
+      "clue": "A teaspoon of neutron star would weigh something like a billion tonnes.",
       "origHint": null,
       "paths": [
         [

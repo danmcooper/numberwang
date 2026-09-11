@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import type { Person } from '../../../shared/puzzle';
 import { tokenizeClue, type ClueSegment } from './tokenize';
 
@@ -126,7 +127,9 @@ function rawToken(seg: ClueSegment): string {
   }
 }
 
-function segmentText(seg: ClueSegment, props: ClueTextProps): string {
+type PlainSegment = Exclude<ClueSegment, { kind: 'colour' }>;
+
+function segmentText(seg: PlainSegment, props: ClueTextProps): string {
   switch (seg.kind) {
     case 'name': {
       const p = props.people[seg.index];
@@ -134,21 +137,6 @@ function segmentText(seg: ClueSegment, props: ClueTextProps): string {
       const n = String(p.number);
       // A number never ends in "s", so the possessive is always "'s".
       return seg.possessive ? `${n}'s` : n;
-    }
-    case 'colour': {
-      // A counted group takes its number from the board, and its plural from
-      // that number rather than from the token — a group of one reads "1 pink
-      // card".
-      const n = seg.counted
-        ? props.people.filter((p) => p.colour === seg.word).length
-        : null;
-      const plural = n === null ? seg.plural : n !== 1;
-      const noun = plural ? 'cards' : 'card';
-      // Never an article: the clue text around the token supplies one where it
-      // wants one ("among the teal cards"), and most phrasings do not
-      // ("more Numberwang teal cards than …", "2 teal cards have …").
-      if (n !== null) return `${n} ${seg.word} ${noun}`;
-      return `${seg.word} ${noun}`;
     }
     case 'column':
       // #C:n is 1-based ("column #C:1" is column A); the word "column" is in the source text.
@@ -160,9 +148,57 @@ function segmentText(seg: ClueSegment, props: ClueTextProps): string {
   }
 }
 
-export default function ClueText(props: ClueTextProps) {
-  const segments = tokenizeClue(prepass(props.clue, props.selfIndex));
+/** A piece of finished clue text; `swatch` is a colour group's name, and asks
+ * for that colour's bar to be drawn directly after the piece. */
+interface CluePiece {
+  text: string;
+  swatch?: string;
+}
+
+function cluePieces(props: ClueTextProps): CluePiece[] {
+  const pieces: CluePiece[] = [];
+  for (const seg of tokenizeClue(prepass(props.clue, props.selfIndex))) {
+    if (seg.kind !== 'colour') {
+      pieces.push({ text: segmentText(seg, props) });
+      continue;
+    }
+    // A counted group takes its number from the board, and its plural from
+    // that number rather than from the token — a group of one reads "1 pink
+    // card".
+    const n = seg.counted ? props.people.filter((p) => p.colour === seg.word).length : null;
+    const plural = n === null ? seg.plural : n !== 1;
+    // Never an article: the clue text around the token supplies one where it
+    // wants one ("among the teal cards"), and most phrasings do not
+    // ("more Numberwang teal cards than …", "2 teal cards have …"). The noun
+    // is split off so the swatch lands against the colour word itself.
+    pieces.push({ text: n !== null ? `${n} ${seg.word}` : seg.word, swatch: seg.word });
+    pieces.push({ text: plural ? ' cards' : ' card' });
+  }
   // The real renderer capitalizes the first letter of the finished clue.
-  const text = capitalize(segments.map((seg) => segmentText(seg, props)).join(''));
-  return <span className="clue-text">{text}</span>;
+  const first = pieces.findIndex((piece) => piece.text.length > 0);
+  if (first !== -1) pieces[first] = { ...pieces[first], text: capitalize(pieces[first].text) };
+  return pieces;
+}
+
+export default function ClueText(props: ClueTextProps) {
+  return (
+    <span className="clue-text">
+      {cluePieces(props).map((piece, i) => (
+        <Fragment key={i}>
+          {piece.text}
+          {/* Eight colour groups is more than a player can keep straight by
+              name — teal against blue, orange against yellow — so every clue
+              that names one shows it. Decoration only: the word is still there
+              for anyone who cannot see the bar. */}
+          {piece.swatch && (
+            <i
+              className="clue-swatch"
+              style={{ background: `var(--colour-${piece.swatch})` }}
+              aria-hidden="true"
+            />
+          )}
+        </Fragment>
+      ))}
+    </span>
+  );
 }

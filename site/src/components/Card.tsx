@@ -99,7 +99,12 @@ export default function Card({
       <div
         role="group"
         className={classes}
-        style={{ ["--confetti-seed" as string]: String(person.number) }}
+        style={{
+          ["--confetti-seed" as string]: String(person.number),
+          // The card's group colour, for the rules that want it as ink rather
+          // than as a band (the big unsolved number).
+          ["--card-colour" as string]: `var(--colour-${person.colour})`,
+        }}
         onClick={flipped ? undefined : onOpen}
       >
         <div
@@ -152,7 +157,14 @@ export default function Card({
           {person.number}
         </div>
         {flipped && clueNode && (
-          <div className="card-clue" onClick={onToggleClue}>
+          // A card with no logical clue carries a maths or science fact
+          // instead, and says so by leaning over: the player should be able to
+          // tell at a glance which cards are worth reasoning about. `origHint`
+          // is the deduction the clue came from, so a null one is a fact.
+          <div
+            className={person.origHint === null ? "card-clue flavour" : "card-clue"}
+            onClick={onToggleClue}
+          >
             {clueNode}
           </div>
         )}

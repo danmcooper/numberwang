@@ -7,8 +7,10 @@
   --text: #f3f3f3;
   --text-muted: #a6acb8;
   --border-neutral: #4a4b55;
-  --innocent: #58a284;
-  --criminal: #c66464;
+  /* The one green: Start, the completed line, the hint affordance. It was
+     called --innocent in the game this forked from, where it meant a verdict;
+     here it is only ever a highlight. */
+  --accent-green: #58a284;
   --overlay: rgba(26, 29, 36, 0.5);
 
   /* The eight colour groups. A band is a small strip on a dark card, so these
@@ -232,11 +234,12 @@ a {
   }
 }
 /* Corner tag: click to cycle none -> yellow -> red -> green -> none.
-   Visible triangle matches the real site (22px legs); hitbox is larger. */
+   A small square in the bottom-left, where it is out of the way of the number,
+   the band and the clue. The hitbox around it stays finger-sized. */
 .tag {
   position: absolute;
-  top: 0;
-  right: 0;
+  bottom: 0;
+  left: 0;
   width: 30px;
   height: 30px;
   z-index: 2;
@@ -245,8 +248,12 @@ a {
 .tag::before {
   content: "";
   position: absolute;
-  inset: 0;
-  clip-path: polygon(calc(100% - 22px) 0, 100% 0, 100% 22px);
+  left: 0;
+  bottom: 0;
+  width: 13px;
+  height: 13px;
+  /* Flush into the corner, where the card's own rounding trims it — the same
+     way the bottom-right mark meets the edge. */
   /* Untagged shade follows the card state (gray/green/red on the real site). */
   background: var(--tag-neutral);
 }
@@ -419,7 +426,7 @@ a {
   top: 0;
   left: 0;
   right: 0;
-  height: 9px;
+  height: 14px;
   z-index: 2;
 }
 
@@ -431,12 +438,42 @@ a {
   font-weight: 700;
   margin-top: 7px;
 }
+/* An unsolved card is nothing but its number and its band, so the number is
+   the card: as large as the card will hold, and drawn in the band's colour so
+   the two agree at a glance. Solved cards hand the space to the clue and leave
+   the number in the card's text colour, which is the only readable ink on
+   peach or on black. */
+.card:not(.flipped) .card-number {
+  font-size: 52px;
+  line-height: 52px;
+  color: var(--card-colour);
+  margin-top: 10px;
+}
+/* The solved card keeps the colour on its number too, and sits clear of the
+   band, which is tall enough now to crowd it. */
 .card.flipped .card-number {
   font-size: 17px;
   line-height: 17px;
-  margin-top: 5px;
+  color: var(--card-colour);
+  margin-top: 12px;
   margin-bottom: 2px;
 }
+/* The group colours were picked to sit on a dark band, so on the black
+   Wangernumb card the darker four of them need lifting to stay legible. */
+.card.wangernumb .card-number {
+  filter: brightness(1.45);
+}
+/* The bar a clue draws after a colour word. Sized in em so it tracks whatever
+   text it sits in — 11px on a card, larger in the hint modal. */
+.clue-swatch {
+  display: inline-block;
+  width: 1.1em;
+  height: 0.5em;
+  border-radius: 1px;
+  margin-left: 0.22em;
+  vertical-align: 0.05em;
+}
+
 .card-clue {
   font-size: 11px;
   line-height: 0.9;
@@ -446,14 +483,19 @@ a {
   cursor: pointer;
   transition: opacity 0.1s ease-in-out;
 }
+/* The fact cards. Not a clue, and shaped like one — the italic is the only
+   thing that separates them at card size. */
+.card-clue.flavour {
+  font-style: italic;
+}
 .card.consumed .card-clue {
   opacity: 0.2;
 }
-/* An active clue's references. The number brightens; the band, which has no text
-   to brighten, gets a ring instead. The bounce itself only plays when a clue
-   newly reveals the reference (see .bounce). */
+/* An active clue's references. The number gets a halo of its own colour; the
+   band, which has no text to glow, gets a ring instead. The bounce itself only
+   plays when a clue newly reveals the reference (see .bounce). */
 .card-number.referenced {
-  text-decoration: underline;
+  text-shadow: 0 0 6px currentColor;
 }
 .colour-band.referenced {
   box-shadow: inset 0 0 0 2px #fff;
@@ -518,7 +560,7 @@ a {
   margin-top: 22px;
 }
 .completed {
-  color: var(--innocent);
+  color: var(--accent-green);
   font-weight: 700;
 }
 
@@ -552,24 +594,23 @@ a {
   text-align: center;
   box-shadow: 0 6px 12px #0000001a;
 }
-.modal-face {
-  font-size: 52px;
-  line-height: 1.1;
-  margin: 2px;
-  text-shadow: 0 0 10px #aeaeae4c;
-}
-.modal-name {
-  font-size: 1.17em;
+.modal-number {
+  font-size: 44px;
+  line-height: 44px;
   font-weight: 700;
-  text-transform: capitalize;
 }
-.modal-prof {
-  opacity: 0.8;
+.modal-colour {
+  width: 64px;
+  height: 14px;
+  border-radius: 2px;
+  margin: 8px auto 4px;
 }
+/* The two verdicts stack rather than sitting side by side: at the inherited
+   horizontal layout neither button gets enough width to read on a phone. */
 .modal-choices {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: 8px;
   margin-top: 12px;
 }
 .modal-choices button {
@@ -580,27 +621,35 @@ a {
   font-weight: 700;
   min-width: 100px;
 }
-.btn-innocent {
-  border-color: var(--innocent);
-  color: var(--innocent);
-}
-.btn-criminal {
-  border-color: var(--criminal);
-  color: var(--criminal);
-}
-/* Popup buttons fill with their color on hover, like the real site. */
-.btn-innocent,
-.btn-criminal,
-.btn-continue {
+/* The two verdicts are cued by their border, not by a fill: a solid peach and a
+   solid black button either side of the card's own number read as two cards
+   rather than as two choices about one. The border is the colour the card will
+   become — black is invisible on this modal, so Wangernumb borrows its white
+   text colour instead. */
+.btn-numberwang,
+.btn-wangernumb {
+  border-width: 2px;
   transition: background-color 0.15s, color 0.15s;
 }
-.btn-innocent:hover:not(:disabled) {
-  background: var(--innocent);
-  color: #fff;
+.btn-numberwang {
+  color: var(--card-numberwang);
+  border-color: var(--card-numberwang);
 }
-.btn-criminal:hover:not(:disabled) {
-  background: var(--criminal);
-  color: #fff;
+.btn-wangernumb {
+  color: var(--card-wangernumb-text);
+  border-color: var(--card-wangernumb-text);
+}
+/* Popup buttons fill with their color on hover, like the real site. */
+.btn-numberwang:hover:not(:disabled) {
+  background: var(--card-numberwang);
+  color: var(--card-numberwang-text);
+}
+.btn-wangernumb:hover:not(:disabled) {
+  background: var(--card-wangernumb);
+  color: var(--card-wangernumb-text);
+}
+.btn-continue {
+  transition: background-color 0.15s, color 0.15s;
 }
 .btn-continue:hover {
   background: #b59430;
@@ -643,8 +692,8 @@ a {
 }
 /* .modal button sets transparent backgrounds; out-specify it for the filled Start. */
 .modal button.btn-start {
-  background: var(--innocent);
-  border-color: var(--innocent);
+  background: var(--accent-green);
+  border-color: var(--accent-green);
   color: #fff;
   font-weight: 700;
   font-family: inherit;
@@ -652,8 +701,8 @@ a {
   margin-top: 12px;
 }
 .btn-copy {
-  border: 1px solid var(--innocent);
-  color: var(--innocent);
+  border: 1px solid var(--accent-green);
+  color: var(--accent-green);
   margin-top: 10px;
   width: 230px;
   max-width: 80%;
@@ -776,7 +825,7 @@ a {
   color: var(--text-muted);
 }
 .arch-status.status-done {
-  color: var(--innocent);
+  color: var(--accent-green);
 }
 .arch-status.status-in-progress {
   color: #bc9300;

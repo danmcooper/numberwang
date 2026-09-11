@@ -172,6 +172,23 @@ describe('numbers and colours', () => {
     );
   });
 
+  it('draws a bar of the colour immediately after the colour word', () => {
+    const { container } = render(
+      <ClueText clue="Only one #COLOUR:teal is Numberwang" people={board} width={4} />,
+    );
+    const swatch = container.querySelector('.clue-swatch')!;
+    expect(swatch.getAttribute('style')).toContain('var(--colour-teal)');
+    // Against the word, not after the whole phrase: "teal [bar] card".
+    expect(swatch.previousSibling!.textContent).toBe('teal');
+    expect(swatch.nextSibling!.textContent).toBe(' card');
+    // Decoration only — the reading of the clue is unchanged.
+    expect(container.textContent).toBe('Only one teal card is Numberwang');
+  });
+
+  it('capitalizes a clue that opens on a colour word', () => {
+    expect(say('#COLOURS:teal are Numberwang')).toBe('Teal cards are Numberwang');
+  });
+
   it('expands a column token to its letter', () => {
     expect(say('The Numberwang cards in column #C:2 add to an even number')).toBe(
       'The Numberwang cards in column B add to an even number',

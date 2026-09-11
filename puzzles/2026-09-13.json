@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
-  "id": "fea5157d59cb",
+  "id": "26eb4ab396ab",
   "date": "2026-09-13",
-  "title": "Let Us Move to the Next Round",
+  "title": "Sum of the Parts",
   "difficulty": "Tricky",
   "width": 4,
   "height": 5,
@@ -15,7 +15,7 @@
       "number": 12,
       "colour": "teal",
       "numberwang": true,
-      "clue": "The ratio of neighbouring Fibonacci numbers closes in on 1.618, the golden ratio.",
+      "clue": "Lightning is about five times hotter than the surface of the Sun.",
       "origHint": null,
       "paths": [
         [
@@ -55,7 +55,7 @@
       "number": 2,
       "colour": "green",
       "numberwang": false,
-      "clue": "Water is one of the few things that expands as it freezes, which is why ice floats.",
+      "clue": "Every even number yet checked is the sum of two primes; nobody has proved them all.",
       "origHint": null,
       "paths": [
         [
@@ -98,7 +98,7 @@
       "number": 6,
       "colour": "green",
       "numberwang": false,
-      "clue": "Forty digits of pi would measure the observable universe to within an atom.",
+      "clue": "1 + 2 + 3 + … + 100 is 5050, which Gauss is said to have spotted as a schoolboy.",
       "origHint": null,
       "paths": [
         [
@@ -134,7 +134,7 @@
       "number": 14,
       "colour": "yellow",
       "numberwang": false,
-      "clue": "In a room of just 23 people, there is a 50% chance that two share a birthday.",
+      "clue": "A pizza of radius z and thickness a has a volume of pi times z times z times a.",
       "origHint": null,
       "paths": [
         [
@@ -154,7 +154,7 @@
       "number": 13,
       "colour": "green",
       "numberwang": false,
-      "clue": "Honey sealed in Egyptian tombs was still edible thousands of years later.",
+      "clue": "There are as many even numbers as whole numbers, despite half of them missing.",
       "origHint": null,
       "paths": [
         [
@@ -178,7 +178,7 @@
       "number": 15,
       "colour": "yellow",
       "numberwang": false,
-      "clue": "Octopuses have three hearts, and their blood is blue.",
+      "clue": "A shuffled deck of cards has more possible orders than the Earth has atoms.",
       "origHint": null,
       "paths": [
         [
@@ -221,7 +221,7 @@
       "number": 4,
       "colour": "blue",
       "numberwang": false,
-      "clue": "A teaspoon of neutron star would weigh something like a billion tonnes.",
+      "clue": "Venus is hotter than Mercury, despite being further from the Sun.",
       "origHint": null,
       "paths": [
         [
@@ -278,7 +278,7 @@
       "number": 18,
       "colour": "red",
       "numberwang": false,
-      "clue": "Any map can be coloured with four colours so that no two neighbours match.",
+      "clue": "You share roughly half your DNA with a banana.",
       "origHint": null,
       "paths": [
         [
