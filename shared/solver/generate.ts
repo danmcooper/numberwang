@@ -22,7 +22,7 @@ import {
   minimalPaths,
   solveChain,
 } from './solve';
-import { FLAVOUR, TITLES, type VocabPerson, faceOf, namesFor, coloursFor } from './vocab';
+import { FLAVOUR, TITLES, colourShapeFor, coloursFor, numbersFor } from './vocab';
 
 /** Every archived puzzle is 4x5, and so is every puzzle we ship. */
 const DEFAULT_WIDTH = 4;
@@ -288,232 +288,6 @@ function hexId(rng: () => number): string {
   return out;
 }
 
-export interface Cast {
-  names: string[];
-  genders: ('male' | 'female')[];
-  colours: string[];
-  faces: string[];
-  /** A shuffled 1..size, one number per card. */
-  numbers: number[];
-}
-
-/**
- * Every archived puzzle names its cast in alphabetical reading order, with a
- * distinct initial on each of the twenty cards. That is a playability
- * constraint, not decoration: clues name people ("#NAME:10 has only one
- * numberwang neighbor"), and the player has to find that person on the board.
- * Sorted, uniquely-lettered names turn that lookup into a glance at roughly
- * where the letter falls; an arbitrary order forces a scan of all twenty
- * cards for every name in every clue.
- *
- * So pick one name per initial from `NAMES` (which stocks two candidates for
- * most letters) rather than twenty names outright, then lay them out sorted.
- * Sorting by initial is enough to sort the names because the initials are
- * distinct.
- *
- * Colours come from a whole colour shape sampled out of the archive
- * (`ClueMix.colourShapes`): a list of group sizes summing to `size`, e.g.
- * [3,3,3,2,2,2,2,2,1]. This used to be five colours dealt round-robin,
- * which gave every Dan puzzle the same rigid five-groups-of-four cast — visible
- * at a glance, and a silent constraint on the clues, since a `#COLOURS:` unit was
- * then always exactly four people. Real casts run 7 to 11 colours in groups
- * of mostly two and three.
- */
-const sum = (xs: readonly number[]) => xs.reduce((a, b) => a + b, 0);
-
-/**
- * Shrink one archive shape onto a smaller board, keeping its character.
- *
- * Cards come off the largest group each time, so the raggedness and the group
- * count survive: a shape that named nine colours still names about nine,
- * which is what makes a `#COLOURS:` unit worth reading. Taking whole groups off
- * the end instead would leave a tidier, flatter cast than the archive has.
- *
- * That holds only while there is fat to trim. Shaving alone took every group
- * down to one on a deep shrink — a 3x3 board came out nine colours over
- * nine cards, where `#COLOURS:cook` names exactly one card and the unit says
- * nothing a clue naming that card would not. So a group is never shaved below a
- * pair: past that point whole groups come off the small end instead, and only
- * when even that would overshoot does a single pair break down into one.
- */
-function shrunkShape(base: readonly number[], size: number): number[] {
-  const out = [...base].sort((a, b) => b - a);
-  let total = sum(out);
-  while (total > size) {
-    const smallest = out[out.length - 1];
-    if (out[0] > 2) {
-      out[0]--;
-      total--;
-    } else if (out.length > 1 && total - smallest >= size) {
-      out.pop();
-      total -= smallest;
-    } else {
-      out[0]--;
-      total--;
-      if (out[0] === 0) out.shift();
-    }
-    out.sort((a, b) => b - a);
-  }
-  return out;
-}
-
-/**
- * Grow one archive shape until it covers `size`, keeping its character.
- *
- * New groups are drawn from `pool` — every group size the archive has ever
- * used, with its multiplicity, so the draw is the archive's own distribution of
- * twos and threes rather than a tidy average. When the remainder is smaller than
- * the group drawn, or the cast has already run out of colours to name, the
- * remainder goes onto the smallest existing group instead: that is where an
- * extra card changes the shape least, and it keeps the largest group where the
- * archive left it.
- */
-function grownShape(
-  rng: () => number,
-  base: readonly number[],
-  size: number,
-  pool: readonly number[],
-  maxGroup: number,
-  colourCount: number,
-): number[] {
-  const out = [...base];
-  let total = sum(out);
-  while (total < size) {
-    const draw = pool[randInt(rng, 0, pool.length - 1)];
-    if (out.length < colourCount && draw <= size - total) {
-      out.push(draw);
-      total += draw;
-      continue;
-    }
-    let at = -1;
-    for (let i = 0; i < out.length; i++) {
-      if (out[i] < maxGroup && (at === -1 || out[i] < out[at])) at = i;
-    }
-    if (at === -1) {
-      if (out.length >= colourCount) {
-        throw new GenerationError(
-          `cannot cover ${size} cards with ${colourCount} groups of at most ${maxGroup}`,
-        );
-      }
-      out.push(1);
-      total++;
-      continue;
-    }
-    out[at]++;
-    total++;
-  }
-  return out.sort((a, b) => b - a);
-}
-
-/**
- * Colour shapes that cover a `size`-card board.
- *
- * The archive only ever measured 4x5 boards, so every shape it offers sums to
- * twenty. At that size this hands them straight back, and `castOf` deals a real
- * puzzle's real cast. At any other size there is nothing to hand back and
- * `castOf` would rather throw than deal a cast with holes in it, so the shapes
- * are refitted from the archive's rather than invented: one per archive shape,
- * each keeping its own group count and raggedness, so a 5x6 cast still runs the
- * seven to eleven colours in groups of mostly two and three that make a
- * `#COLOURS:` clue worth reading.
- *
- * Deterministic, because it is a table derived from a corpus rather than part of
- * any one puzzle's draw — two calls with the same archive and size give the same
- * shapes, and `castOf` does the sampling.
- */
-export function colourShapesFor(
-  colourShapes: readonly number[][],
-  size: number,
-): number[][] {
-  const colourCount = coloursFor(size).length;
-  const fits = colourShapes.filter((s) => s.length <= colourCount && sum(s) === size);
-  if (fits.length > 0) return fits.map((s) => [...s]);
-
-  const usable = colourShapes.filter((s) => s.length > 0);
-  if (usable.length === 0) return [];
-  const pool = usable.flat();
-  const maxGroup = Math.max(...pool);
-  const rng = makeRng(size * 1009 + usable.length);
-  return usable.map((s) =>
-    sum(s) > size ? shrunkShape(s, size) : grownShape(rng, s, size, pool, maxGroup, colourCount),
-  );
-}
-
-export function castOf(
-  rng: () => number,
-  colourShapes: readonly number[][],
-  size: number = DEFAULT_SIZE,
-): Cast {
-  // `namesFor`, not `NAMES`: the extra passes only come out for a board the
-  // base list cannot seat, so every board that fitted in 52 names deals exactly
-  // the cast it always did — adding to a bucket would otherwise change which
-  // name that bucket deals first, on every board at every size.
-  const vocabularyNames = namesFor(size);
-  const buckets = new Map<string, VocabPerson[]>();
-  for (const person of vocabularyNames) {
-    const initial = person.name[0];
-    const bucket = buckets.get(initial);
-    if (bucket) bucket.push(person);
-    else buckets.set(initial, [person]);
-  }
-  const letters = shuffled(rng, [...buckets.keys()]);
-  for (const [letter, bucket] of buckets) buckets.set(letter, shuffled(rng, bucket));
-
-  // Round-robin over the letters, so the distinct-initial rule holds for as long
-  // as the alphabet can hold it and degrades one letter at a time after that. A
-  // 4x5 board never leaves the first pass; a 5x6 one wants thirty cards from
-  // twenty-six letters, and takes its four extras from whichever letters the
-  // shuffle put first.
-  const people: VocabPerson[] = [];
-  for (let round = 0; people.length < size; round++) {
-    const available = letters.filter((l) => (buckets.get(l) as VocabPerson[]).length > round);
-    if (available.length === 0) {
-      throw new GenerationError(
-        `only ${vocabularyNames.length} names in the vocabulary for ${size} cards`,
-      );
-    }
-    for (const letter of available) {
-      if (people.length >= size) break;
-      people.push((buckets.get(letter) as VocabPerson[])[round]);
-    }
-  }
-  // Sorting by initial is no longer enough once a letter carries two names, so
-  // sort the names themselves; the cast is still in alphabetical reading order.
-  people.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
-
-  // A usable shape has to cover every card and name no more colours than the
-  // vocabulary stocks. Both hold for the real archive on a 4x5 board — its
-  // shapes all sum to twenty and its widest cast needs exactly as many
-  // colours as we have — so say so plainly rather than dealing a cast with
-  // holes in it when the shapes and the board disagree. For a board the archive
-  // has no shape for, `colourShapesFor` builds some first.
-  // Which colours are on the table depends on the board: the extras only
-  // come out for boards bigger than the archive's own, where the base sixteen
-  // would otherwise be stretched three-to-a-colour. See `coloursFor`.
-  const vocabulary = coloursFor(size);
-  const fits = colourShapes.filter(
-    (s) => s.length <= vocabulary.length && sum(s) === size,
-  );
-  if (fits.length === 0) {
-    throw new GenerationError(
-      `no archived colour shape covers ${size} cards with ${vocabulary.length} colours`,
-    );
-  }
-  const shape = fits[randInt(rng, 0, fits.length - 1)];
-  const chosen = shuffled(rng, vocabulary).slice(0, shape.length);
-  const slots: string[] = [];
-  shape.forEach((size, i) => {
-    for (let j = 0; j < size; j++) slots.push(chosen[i].key);
-  });
-  const colours = shuffled(rng, slots);
-  return {
-    names: people.map((p) => p.name),
-    genders: people.map((p) => p.gender),
-    colours,
-    faces: colours.map((key, i) => faceOf(key, people[i].gender)),
-    numbers: shuffled(rng, Array.from({ length: size }, (_, i) => i + 1)),
-  };
-}
 
 /**
  * How many times a chain will reach for the same predicate before it starts
@@ -631,23 +405,23 @@ export function generatePuzzle(input: GenerateInput): GenerateResult {
   const maxAttempts = input.maxAttempts ?? 25;
   const trialsPerStep = input.trialsPerStep ?? 80;
   const grid = makeGrid(input.width ?? DEFAULT_WIDTH, input.height ?? DEFAULT_HEIGHT);
-  // The mix and the bands are both measured on the archive's 4x5 board whatever
-  // board we are filling, so refit them once, up front, rather than asking
-  // every caller to. Both are the identity at 4x5.
-  const shapes = colourShapesFor(input.mix.colourShapes, grid.size);
+  // The bands are measured on the archive's 4x5 board whatever board we are
+  // filling, so refit them once, up front, rather than asking every caller to.
+  // The identity at 4x5.
   const band = bandsFor({ b: input.band }, grid.size).b;
   const failures: string[] = [];
 
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const rng = makeRng(input.seed + attempt * 7919);
-    const cast = castOf(rng, shapes, grid.size);
-    const shape: Shape = { grid, colours: cast.colours, numbers: cast.numbers };
+    const numbers = numbersFor(grid.size, rng);
+    const colours = coloursFor(grid.size, colourShapeFor(input.mix, grid.size, rng), rng);
+    const shape: Shape = { grid, colours, numbers };
 
     const numberwangs = randInt(rng, band.numberwangs.min, band.numberwangs.max);
     const numberwangSet = new Set(pickNumberwangs(rng, grid, numberwangs));
     const truth = Array.from({ length: grid.size }, (_, i) => numberwangSet.has(i));
 
-    const board = makeBoard(grid, cast.colours, cast.numbers, truth);
+    const board = makeBoard(grid, colours, numbers, truth);
     const pool = orderPool(rng, board, candidateHints(board), input.mix);
     const initialReveals = [randInt(rng, 0, grid.size - 1)];
 
@@ -693,8 +467,8 @@ export function generatePuzzle(input: GenerateInput): GenerateResult {
     const people: Person[] = truth.map((numberwang, i) => {
       const hint = built.clues[i];
       return {
-        number: cast.numbers[i],
-        colour: cast.colours[i],
+        number: numbers[i],
+        colour: colours[i],
         numberwang: numberwang,
         // A generated board runs to 49 cards and twenty-one colours, where
         // "Exactly 1 cook has …" leaves you counting cooks before you can use it.

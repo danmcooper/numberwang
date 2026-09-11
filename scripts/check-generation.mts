@@ -20,7 +20,8 @@ import mixData from '../config/clue-mix.json' with { type: 'json' };
 import { validatePuzzle } from '../shared/puzzle.ts';
 import { loadMix } from '../shared/solver/mix.ts';
 import { bandsFor, classify, loadBands, measure } from '../shared/solver/difficulty.ts';
-import { generatePuzzle, colourShapesFor } from '../shared/solver/generate.ts';
+import { generatePuzzle } from '../shared/solver/generate.ts';
+import { offeredShapes } from '../shared/solver/vocab.ts';
 import { makeGrid } from '../shared/solver/grid.ts';
 import { parseHint } from '../shared/solver/hint.ts';
 import { forcedGiven, isUniquelySolvable, parseClues, solveChain } from '../shared/solver/solve.ts';
@@ -132,15 +133,12 @@ const remeasured = measure({
 });
 check(classify(boardBands, remeasured) === puzzle.difficulty, 'label does not survive re-measuring the written puzzle');
 
-// The cast's colour grouping has to be one the generator was offered. Every
-// archived shape covers exactly twenty cards, so at 4x5 that is the archive's
-// own set; on any other board it is what `colourShapesFor` refitted from it.
+// The cast's colour grouping has to be one the generator was offered: an
+// archived shape that seats this board in eight colours or fewer.
 const groups = new Map<string, number>();
 for (const person of puzzle.people) groups.set(person.colour, (groups.get(person.colour) ?? 0) + 1);
 const castShape = [...groups.values()].sort((a, b) => b - a).join(',');
-const offered = new Set(
-  colourShapesFor(mix.colourShapes, width * height).map((s) => s.join(',')),
-);
+const offered = new Set(offeredShapes(mix, width * height).map((s) => s.join(',')));
 check(offered.has(castShape), `colour shape [${castShape}] is not one of the offered shapes`);
 
 // Numbers are how a clue points at a card, and the arithmetic clues add them

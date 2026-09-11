@@ -1,262 +1,126 @@
-export interface VocabPerson {
-  name: string;
-  gender: 'male' | 'female';
-}
+/**
+ * The numbers, the colours and the incidental copy a puzzle is dressed in.
+ *
+ * Clues by Sam's `NAMES` came in size tiers, because `castOf` dealt round-robin
+ * from shuffled alphabetical buckets and appending a name would have re-rolled
+ * the cast of every puzzle already generated. A `1..N` pool has no such problem:
+ * it scales with the board by definition and there is nothing to append. The
+ * tiers, the buckets and `castOf` are all gone.
+ */
+import type { ClueMix } from './mix';
 
-export interface VocabColour {
-  key: string;
-  male: string;
-  female: string;
-}
-
-export const NAMES: VocabPerson[] = [
-  { name: 'Ada', gender: 'female' }, { name: 'Bram', gender: 'male' },
-  { name: 'Cleo', gender: 'female' }, { name: 'Desmond', gender: 'male' },
-  { name: 'Elin', gender: 'female' }, { name: 'Fabio', gender: 'male' },
-  { name: 'Greta', gender: 'female' }, { name: 'Hugo', gender: 'male' },
-  { name: 'Ines', gender: 'female' }, { name: 'Jonas', gender: 'male' },
-  { name: 'Kira', gender: 'female' }, { name: 'Lorenzo', gender: 'male' },
-  { name: 'Mira', gender: 'female' }, { name: 'Nils', gender: 'male' },
-  { name: 'Odette', gender: 'female' }, { name: 'Piet', gender: 'male' },
-  { name: 'Quinn', gender: 'female' }, { name: 'Rafael', gender: 'male' },
-  { name: 'Suri', gender: 'female' }, { name: 'Tomas', gender: 'male' },
-  { name: 'Ulla', gender: 'female' }, { name: 'Viktor', gender: 'male' },
-  { name: 'Wren', gender: 'female' }, { name: 'Xavi', gender: 'male' },
-  { name: 'Yara', gender: 'female' }, { name: 'Zeno', gender: 'male' },
-  { name: 'Anouk', gender: 'female' }, { name: 'Boris', gender: 'male' },
-  { name: 'Carys', gender: 'female' }, { name: 'Dmitri', gender: 'male' },
-  { name: 'Esme', gender: 'female' }, { name: 'Ferran', gender: 'male' },
-  { name: 'Golda', gender: 'female' }, { name: 'Hamish', gender: 'male' },
-  { name: 'Iris', gender: 'female' }, { name: 'Janko', gender: 'male' },
-  { name: 'Katia', gender: 'female' }, { name: 'Lucian', gender: 'male' },
-  { name: 'Maud', gender: 'female' }, { name: 'Novak', gender: 'male' },
-  { name: 'Orla', gender: 'female' }, { name: 'Pavel', gender: 'male' },
-  { name: 'Rosa', gender: 'female' }, { name: 'Stefan', gender: 'male' },
-  // A third pass through the alphabet, to cover the largest board a generated
-  // puzzle can draw: 7x7 is 49 cards, and every card needs its own name.
-  { name: 'Tessa', gender: 'female' }, { name: 'Ulrich', gender: 'male' },
-  { name: 'Vera', gender: 'female' }, { name: 'Wim', gender: 'male' },
-  { name: 'Xenia', gender: 'female' }, { name: 'Yusuf', gender: 'male' },
-  { name: 'Zola', gender: 'female' }, { name: 'Anton', gender: 'male' },
+/**
+ * Eight colours, in the order a clue would list them.
+ *
+ * Eight because that is what the source averages in professions — measured over
+ * cbs2's 66 scraped puzzles, mean 8.29, median 8, mode 8 — and every name here
+ * is one a clue can say without explaining ("teal", not "vermillion").
+ */
+export const PALETTE: string[] = [
+  'red', 'orange', 'yellow', 'green', 'teal', 'blue', 'purple', 'pink',
 ];
 
-/**
- * Two more passes through the alphabet, held back the way `EXTRA_PALETTE`
- * is and for a stronger reason.
- *
- * `castOf` shuffles each initial's bucket and deals round-robin, so a name
- * added to a bucket changes which name that bucket deals first — on every
- * board, at every size. Appending these to `NAMES` outright would therefore
- * re-roll the cast of every puzzle already generated, for no gain on any board
- * that never needed them. Gated by `namesFor`, a board of 52 cards or fewer
- * draws exactly the cast it always did, bit for bit.
- *
- * 104 names covers a 10x10, which is the largest board the rest of the
- * pipeline will build.
- */
-export const EXTRA_NAMES: VocabPerson[] = [
-  { name: 'Bea', gender: 'female' }, { name: 'Ciaran', gender: 'male' },
-  { name: 'Delia', gender: 'female' }, { name: 'Emre', gender: 'male' },
-  { name: 'Fenna', gender: 'female' }, { name: 'Gustav', gender: 'male' },
-  { name: 'Hilde', gender: 'female' }, { name: 'Ivo', gender: 'male' },
-  { name: 'Juno', gender: 'female' }, { name: 'Kai', gender: 'male' },
-  { name: 'Lise', gender: 'female' }, { name: 'Marek', gender: 'male' },
-  { name: 'Nadia', gender: 'female' }, { name: 'Oskar', gender: 'male' },
-  { name: 'Petra', gender: 'female' }, { name: 'Radek', gender: 'male' },
-  { name: 'Sanna', gender: 'female' }, { name: 'Tibor', gender: 'male' },
-  { name: 'Ursa', gender: 'female' }, { name: 'Vasco', gender: 'male' },
-  { name: 'Willa', gender: 'female' }, { name: 'Xander', gender: 'male' },
-  { name: 'Yelena', gender: 'female' }, { name: 'Zoran', gender: 'male' },
-  { name: 'Alma', gender: 'female' }, { name: 'Balint', gender: 'male' },
-  { name: 'Cora', gender: 'female' }, { name: 'Dario', gender: 'male' },
-  { name: 'Edda', gender: 'female' }, { name: 'Felix', gender: 'male' },
-  { name: 'Gwen', gender: 'female' }, { name: 'Henrik', gender: 'male' },
-  { name: 'Ilse', gender: 'female' }, { name: 'Jarek', gender: 'male' },
-  { name: 'Kaisa', gender: 'female' }, { name: 'Lasse', gender: 'male' },
-  { name: 'Mette', gender: 'female' }, { name: 'Nuno', gender: 'male' },
-  { name: 'Oona', gender: 'female' }, { name: 'Prosper', gender: 'male' },
-  { name: 'Renata', gender: 'female' }, { name: 'Sander', gender: 'male' },
-  { name: 'Thea', gender: 'female' }, { name: 'Umberto', gender: 'male' },
-  { name: 'Vanja', gender: 'female' }, { name: 'Wolfe', gender: 'male' },
-  { name: 'Ximena', gender: 'female' }, { name: 'Yannick', gender: 'male' },
-  { name: 'Zuza', gender: 'female' }, { name: 'Arno', gender: 'male' },
-  { name: 'Britt', gender: 'female' }, { name: 'Casper', gender: 'male' },
-];
-
-/** Every name that can appear in a file, for the same reason as `ALL_PALETTE`. */
-export const ALL_NAMES: VocabPerson[] = [...NAMES, ...EXTRA_NAMES];
-
-/**
- * The names a board of `size` cards may draw from: the original 52 unless the
- * board has more cards than that, in which case all of them. The threshold is
- * `NAMES.length` rather than a number written out, because the only thing that
- * should ever pull in the extras is a board the base list cannot seat.
- */
-export function namesFor(size: number): VocabPerson[] {
-  return size > NAMES.length ? ALL_NAMES : NAMES;
+/** Fisher-Yates against a seeded rng, so a board is reproducible from its seed. */
+function shuffle<T>(items: T[], rng: () => number): T[] {
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
 }
 
-/** Keys and emoji taken from the colour face map the site already ships
- * (`site/src/faces.ts`); each pluralises with a plain -s. */
-export const PALETTE: VocabColour[] = [
-  { key: 'cop', male: '👮‍♂️', female: '👮‍♀️' },
-  { key: 'sleuth', male: '🕵️‍♂️', female: '🕵️‍♀️' },
-  { key: 'guard', male: '💂‍♂️', female: '💂‍♀️' },
-  { key: 'builder', male: '👷‍♂️', female: '👷‍♀️' },
-  { key: 'farmer', male: '👨‍🌾', female: '👩‍🌾' },
-  { key: 'cook', male: '👨‍🍳', female: '👩‍🍳' },
-  { key: 'doctor', male: '👨‍⚕️', female: '👩‍⚕️' },
-  { key: 'clerk', male: '👨‍💼', female: '👩‍💼' },
-  { key: 'coder', male: '👨‍💻', female: '👩‍💻' },
-  { key: 'singer', male: '👨‍🎤', female: '👩‍🎤' },
-  { key: 'teacher', male: '👨‍🏫', female: '👩‍🏫' },
-  { key: 'painter', male: '👨‍🎨', female: '👩‍🎨' },
-  { key: 'pilot', male: '👨‍✈️', female: '👩‍✈️' },
-  { key: 'judge', male: '👨‍⚖️', female: '👩‍⚖️' },
-  { key: 'mechanic', male: '👨‍🔧', female: '👩‍🔧' },
-  { key: 'student', male: '👨‍🎓', female: '👩‍🎓' },
-];
-
-/**
- * Held back for the boards that actually need them. Sixteen colours covers
- * every board size on its own, but from eighteen cards up the widest cast uses
- * all of them, so a 7x7 runs three-to-a-colour and leans on the same
- * colour clue over and over. Adding these to every board would change the
- * feel of the archive-sized ones for no reason, so `coloursFor` only deals
- * them in above the source site's own twenty cards.
- *
- * All of them are in `site/src/faces.ts` too, so a file that predates them
- * still renders.
- */
-export const EXTRA_PALETTE: VocabColour[] = [
-  { key: 'scientist', male: '👨‍🔬', female: '👩‍🔬' },
-  { key: 'firefighter', male: '👨‍🚒', female: '👩‍🚒' },
-  { key: 'astronaut', male: '👨‍🚀', female: '👩‍🚀' },
-  { key: 'ninja', male: '🥷', female: '🥷' },
-  { key: 'superhero', male: '🦸‍♂️', female: '🦸' },
-];
-
-/**
- * A third tier, for boards past anything the daily schedule reaches.
- *
- * Twenty-one colours is plenty up to a 6x6, and badly short of enough on a
- * 10x10: a hundred cards divided twenty-one ways is a cast of five to a
- * colour, against roughly two on the source site's own board. Every
- * colour clue then talks about a fifth of the grid at once, which is both
- * duller to read and weaker to deduce from. Thirty-six brings a hundred cards
- * back to under three each, near where the archive sits.
- *
- * All of these are in `site/src/faces.ts` already and all take a plain -s, so
- * they render and pluralise without a special case. The source site itself
- * dresses its cast up like this for themed puzzles, so it is not out of
- * character — but they only come out on a board no daily puzzle can be.
- */
-export const WIDE_PALETTE: VocabColour[] = [
-  { key: 'clown', male: '🤡', female: '🤡' },
-  { key: 'vampire', male: '🧛‍♂️', female: '🧛‍♀️' },
-  { key: 'zombie', male: '🧟', female: '🧟' },
-  { key: 'ghost', male: '👻', female: '👻' },
-  { key: 'skeleton', male: '💀', female: '💀' },
-  { key: 'bride', male: '👰', female: '👰' },
-  { key: 'santa', male: '🎅', female: '🤶' },
-  { key: 'snowboarder', male: '🏂', female: '🏂' },
-  { key: 'skier', male: '⛷️', female: '⛷️' },
-  { key: 'robot', male: '🤖', female: '🤖' },
-  { key: 'alien', male: '👽', female: '👽' },
-  { key: 'koala', male: '🐨', female: '🐨' },
-  { key: 'owl', male: '🦉', female: '🦉' },
-  { key: 'dolphin', male: '🐬', female: '🐬' },
-  { key: 'elephant', male: '🐘', female: '🐘' },
-];
-
-/** The base sixteen plus the extras: what a board bigger than the source's draws from. */
-export const WIDER_PALETTE: VocabColour[] = [...PALETTE, ...EXTRA_PALETTE];
-
-/** Every colour that can appear in a file, for lookups like `faceOf`. */
-export const ALL_PALETTE: VocabColour[] = [...WIDER_PALETTE, ...WIDE_PALETTE];
-
-/**
- * The board the source site ships is 4x5. At or below that, the cast is drawn
- * from exactly the colours it always was; above it, the wider set.
- */
-export const BASE_PROFESSION_LIMIT = 20;
-
-/**
- * The largest board that ever shipped here — the old 7x7 ceiling, and well
- * above the 6x6 the weekday schedule tops out at. Only a deliberate one-off
- * goes past it, so pinning the third tier here means no puzzle that exists or
- * can be scheduled changes its cast.
- */
-export const WIDE_PROFESSION_LIMIT = 49;
-
-/** The colours a board of `size` cards may draw from. */
-export function coloursFor(size: number): VocabColour[] {
-  if (size > WIDE_PROFESSION_LIMIT) return ALL_PALETTE;
-  return size > BASE_PROFESSION_LIMIT ? WIDER_PALETTE : PALETTE;
+/** `1..size`, one of each, shuffled. */
+export function numbersFor(size: number, rng: () => number): number[] {
+  return shuffle(
+    Array.from({ length: size }, (_, i) => i + 1),
+    rng,
+  );
 }
 
-export function faceOf(colour: string, gender: 'male' | 'female'): string {
-  const entry = ALL_PALETTE.find((p) => p.key === colour);
-  if (!entry) return '😬';
-  return gender === 'female' ? entry.female : entry.male;
+/**
+ * Every recorded colour shape that fits a `size`-card board in this palette.
+ *
+ * Exported because `audit.mts` and `check-generation.mts` both have to answer
+ * "was this board's grouping one the generator could have dealt?", and they
+ * exist to re-derive rather than to trust.
+ */
+export function offeredShapes(mix: ClueMix, size: number): number[][] {
+  return mix.colourShapes.filter(
+    (s) => s.reduce((a, b) => a + b, 0) === size && s.length <= PALETTE.length,
+  );
 }
 
+/**
+ * How many colour groups a board gets and how big each is.
+ *
+ * Drawn from the shapes the archive actually produced rather than divided
+ * evenly, for the same reason `mix.ts` exists at all: an even split of 20 cards
+ * into 8 groups never yields the singleton group that makes
+ * `only_trait_in_unit_is_in_unit` say anything, and the archive has 44 of them.
+ */
+export function colourShapeFor(mix: ClueMix, size: number, rng: () => number): number[] {
+  const usable = offeredShapes(mix, size);
+  if (usable.length === 0) {
+    throw new Error(`no recorded colour shape seats ${size} cards in ${PALETTE.length} colours`);
+  }
+  return usable[Math.floor(rng() * usable.length)];
+}
+
+/** One colour per card: the shape's groups filled from a shuffled palette, then
+ * scattered across the board. */
+export function coloursFor(size: number, shape: number[], rng: () => number): string[] {
+  const chosen = shuffle(PALETTE, rng).slice(0, shape.length);
+  const flat: string[] = [];
+  shape.forEach((n, gi) => {
+    for (let k = 0; k < n; k++) flat.push(chosen[gi]);
+  });
+  if (flat.length !== size) throw new Error(`shape seats ${flat.length} cards, not ${size}`);
+  return shuffle(flat, rng);
+}
+
+/**
+ * Clues by Sam's titles are a crime scene and count the board out loud. This is
+ * a quiz show, so its titles are rewritten rather than ported.
+ */
 export const TITLES: string[] = [
-  'The Lantern Street Lineup',
-  'Twenty Faces, Five Lies',
-  'A Quiet Morning at the Depot',
-  'Nobody Left the Courtyard',
-  'The Ferry Was Late',
-  'Someone Signed the Ledger Twice',
-  'Four Rows, One Confession',
-  'The Greenhouse Roster',
-  'Names Called at Dawn',
-  'The Second Shift',
-  'Everyone Says They Were Reading',
-  'A Draft in the Archive Room',
-  'The Bell Rang Anyway',
-  'Chalk Marks on the Platform',
-  'Whose Coat Is on the Hook',
-  'The Corner Table Knows',
-  'Nine Alibis and a Gap',
-  'Sunday Inventory',
-  'The Stairwell Census',
-  'One Story Does Not Fit',
-  'The Kettle Was Still Warm',
-  'Line Up by the Fence',
+  "That's Numberwang!",
+  'Round Three: Wangernumb',
+  'Twenty Cards, Eight Colours',
+  'The Board Does Not Explain Itself',
+  'Nobody Asked How the Scoring Works',
+  'Rotate the Board',
+  'A Perfectly Ordinary Total',
+  'Two of These Add Up',
+  'The Numbers Were Always There',
+  'Let Us Move to the Next Round',
+  'Somebody Has Miscounted',
+  'The Colours Are Not a Hint',
+  'Sum of the Parts',
+  'Nineteen Was Never in Doubt',
+  'The Quiet Half of the Board',
+  'One Row Gives It Away',
+  'Every Total Tells',
+  'Not All Numbers Are Numberwang',
+  'The Difference of Two Cards',
+  'An Even Number, Obviously',
 ];
 
 export const FLAVOUR: string[] = [
-  'I was tying my shoelace the whole time.',
-  'I only work weekends, so ask someone on shift.',
-  'I have nothing useful to add, sorry.',
-  'Ask someone with a better view.',
-  'I was facing the other way.',
-  'My glasses were in my pocket.',
-  'I heard something, but that is all.',
-  'I keep out of other people’s business.',
-  'You will have to ask the others.',
-  'I lost track of everyone after lunch.',
-  'It was too loud to notice anything.',
-  'I had my hands full at the time.',
-  'I only just got here myself.',
-  'I never remember faces.',
-  'I was counting crates, not people.',
-  'Somebody moved my chair, that is all I know.',
-  'I would rather not guess.',
-  'Nothing to report from where I stood.',
-  'I was halfway out the door.',
-  'My shift had already ended.',
-  'I was looking for my keys.',
-  'The window was fogged over.',
-  'I stepped outside for some air.',
-  'I was on the phone with my sister.',
-  'Everyone looks the same in that light.',
-  'I did not check the clock once.',
-  'I stayed where I was told to stay.',
-  'I was reading the noticeboard.',
-  'I had a headache and closed my eyes.',
-  'The kettle needed watching.',
-  'I was sorting the post.',
-  'I could not hear a thing over the fan.',
+  'I did not catch the rules either.',
+  'I only play for the prizes.',
+  'Do not look at me, I am terrible at this.',
+  'I was told there would be a buzzer.',
+  'My round was earlier.',
+  'I have never been good with totals.',
+  'Ask the one next to me.',
+  'I would rather not commit to a number.',
+  'The lights were in my eyes.',
+  'I am here to make up the board.',
+  'I lost count somewhere around the middle.',
+  'They do not tell us anything backstage.',
+  'I was reading my card the whole time.',
+  'Nobody explained the colours to me.',
+  'I have a system, but it is not working.',
+  'That is a matter for the adjudicator.',
 ];

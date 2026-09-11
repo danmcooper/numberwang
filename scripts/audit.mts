@@ -19,7 +19,7 @@ import { namedCards } from '../shared/solver/candidates.ts';
 import type { Bands } from '../shared/solver/difficulty.ts';
 import { bandsFor, classify, loadBands, measure } from '../shared/solver/difficulty.ts';
 import type { Shape } from '../shared/solver/enumerate.ts';
-import { colourShapesFor } from '../shared/solver/generate.ts';
+import { offeredShapes } from '../shared/solver/vocab.ts';
 import { makeGrid, neighbors } from '../shared/solver/grid.ts';
 import { loadMix } from '../shared/solver/mix.ts';
 import { makeBoard, unitMembers } from '../shared/solver/predicates.ts';
@@ -286,7 +286,7 @@ export async function auditAll(
   const shapesFor = (size: number) => {
     let set = shapeCache.get(size);
     if (!set) {
-      set = new Set(colourShapesFor(mix.colourShapes, size).map((s) => s.join(',')));
+      set = new Set(offeredShapes(mix, size).map((s) => s.join(',')));
       shapeCache.set(size, set);
     }
     return set;
