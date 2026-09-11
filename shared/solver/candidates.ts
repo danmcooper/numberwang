@@ -1,6 +1,7 @@
 import { neighbors, offsetIndex } from './grid';
 import { type Hint, type HintArg, type Trait, type Unit, formatHint } from './hint';
 import { type Board, countTrait, evaluate, hasTrait, unitMembers, unitsOfKind } from './predicates';
+import { arithCandidates } from './arith';
 import { canRender } from './render';
 
 const TRAITS: Trait[] = ['numberwang', 'not_numberwang'];
@@ -349,6 +350,12 @@ export function candidateHints(b: Board): Hint[] {
       }
     }
   }
+
+  // The arithmetic families build their own arguments off the board's numbers,
+  // so they arrive as whole hints rather than as pred-and-args. They still go
+  // through `push`: it dedupes, re-checks the evaluator, and drops anything
+  // `render.ts` has no template for.
+  for (const hint of arithCandidates(b, units)) push(hint.pred, hint.args);
 
   return out;
 }

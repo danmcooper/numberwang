@@ -128,3 +128,61 @@ export function encodeArith(cnf: Cnf, board: Board, vars: number[], hint: Hint):
     cnf.add(scope.map((card, k) => (((combo >> k) & 1) === 1 ? -vars[card] : vars[card])));
   }
 }
+
+const TRAITS: Trait[] = ['numberwang', 'not_numberwang'];
+
+const u = (unit: Unit): HintArg => ({ t: 'unit', unit });
+const t = (trait: Trait): HintArg => ({ t: 'trait', trait });
+const n = (value: number): HintArg => ({ t: 'num', n: value });
+
+/**
+ * Every arithmetic clue that is true of this board.
+ *
+ * Candidates are read off the solution — a clue that is false of the board is
+ * not a clue — so each family proposes the value the board actually has rather
+ * than searching a range.
+ */
+export function arithCandidates(b: Board, units: Unit[]): Hint[] {
+  const out: Hint[] = [];
+  const membersOf = (unit: Unit) => unitMembers(b, unit);
+
+  for (const trait of TRAITS) {
+    for (const unit of units) {
+      const mem = membersOf(unit);
+      if (mem.length > MAX_ENUMERATED_UNIT) continue;
+      const held = mem.filter((i) => hasTrait(b, i, trait));
+
+      // A sum of 0 means the unit holds none of the trait, which
+      // number_of_traits_in_unit says more plainly. Skip it.
+      if (held.length > 0) {
+        const sum = traitSum(b, mem, trait);
+        out.push({ pred: 'sum_of_trait_in_unit', args: [u(unit), t(trait), n(sum)] });
+        out.push({ pred: 'sum_parity_in_unit', args: [u(unit), t(trait), n(sum % 2)] });
+      }
+
+      // Every distinct gap between two of the trait's members.
+      const nums = held.map((i) => b.numbers[i]);
+      const gaps = new Set<number>();
+      for (let x = 0; x < nums.length; x++) {
+        for (let y = x + 1; y < nums.length; y++) gaps.add(Math.abs(nums[x] - nums[y]));
+      }
+      for (const gap of [...gaps].sort((p, q) => p - q)) {
+        out.push({ pred: 'diff_of_two_traits_in_unit', args: [u(unit), t(trait), n(gap)] });
+      }
+    }
+
+    // Comparisons, in the direction that holds, between units of one kind. A
+    // cross-kind comparison ("row 1 against the red cards") reads as a riddle
+    // rather than a clue, which is why the counting comparisons are same-kind too.
+    for (const a of units) {
+      for (const c of units) {
+        if (a.kind !== c.kind) continue;
+        if (JSON.stringify(a) === JSON.stringify(c)) continue;
+        if (traitSum(b, membersOf(a), trait) <= traitSum(b, membersOf(c), trait)) continue;
+        if (new Set([...membersOf(a), ...membersOf(c)]).size > MAX_ENUMERATED_UNIT) continue;
+        out.push({ pred: 'more_sum_in_unit_than_unit', args: [u(a), u(c), t(trait)] });
+      }
+    }
+  }
+  return out;
+}

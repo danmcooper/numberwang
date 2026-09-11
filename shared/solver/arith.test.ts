@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { parseHint } from './hint';
+import { type Unit, formatHint, parseHint } from './hint';
 import { makeGrid } from './grid';
 import { makeBoard } from './predicates';
-import { ARITH_EVALUATORS, traitSum } from './arith';
+import { ARITH_EVALUATORS, arithCandidates, traitSum } from './arith';
 
 // A 4x2 board. Row 1 is cards 0..3, row 2 is cards 4..7.
 //   numbers  17  4  23   8        (row 1)
@@ -95,5 +95,53 @@ describe('sum_parity_in_unit', () => {
   });
   it('treats an empty sum of 0 as even', () => {
     expect(ev('sum_parity_in_unit(unit(between,pair(1,2)),numberwang,0)')).toBe(true);
+  });
+});
+
+describe('arithCandidates', () => {
+  const units: Unit[] = [
+    { kind: 'row', n: 1 },
+    { kind: 'row', n: 2 },
+    { kind: 'colour', name: 'red' },
+  ];
+  const srcs = () => arithCandidates(board(), units).map(formatHint);
+
+  it('proposes only clues that are true of the board', () => {
+    const b = board();
+    for (const h of arithCandidates(b, units)) {
+      expect(ARITH_EVALUATORS[h.pred](b, h.args), formatHint(h)).toBe(true);
+    }
+  });
+
+  it("proposes the unit's actual sum", () => {
+    expect(srcs()).toContain('sum_of_trait_in_unit(unit(row,1),numberwang,25)');
+  });
+
+  it('proposes a pair difference that exists', () => {
+    expect(srcs()).toContain('diff_of_two_traits_in_unit(unit(row,1),numberwang,9)');
+  });
+
+  it('proposes the comparison in the direction that holds', () => {
+    expect(srcs()).toContain('more_sum_in_unit_than_unit(unit(row,2),unit(row,1),numberwang)');
+    expect(srcs()).not.toContain('more_sum_in_unit_than_unit(unit(row,1),unit(row,2),numberwang)');
+  });
+
+  it('proposes the parity the sum actually has', () => {
+    expect(srcs()).toContain('sum_parity_in_unit(unit(row,1),numberwang,1)');
+    expect(srcs()).not.toContain('sum_parity_in_unit(unit(row,1),numberwang,0)');
+  });
+
+  it('does not compare units of different kinds', () => {
+    for (const s of srcs()) {
+      if (!s.startsWith('more_sum')) continue;
+      const kinds = [...s.matchAll(/unit\((\w+),/g)].map((m) => m[1]);
+      expect(new Set(kinds).size).toBe(1);
+    }
+  });
+
+  it('does not propose a sum over a unit with none of the trait', () => {
+    // A sum of 0 tells a player the unit is empty of the trait, which the
+    // counting predicates already say better.
+    expect(srcs()).not.toContain('sum_of_trait_in_unit(unit(colour,red),numberwang,0)');
   });
 });
