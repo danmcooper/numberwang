@@ -9,13 +9,31 @@
   --border-neutral: #4a4b55;
   --innocent: #58a284;
   --criminal: #c66464;
-  --background-innocent: rgb(38, 77, 59);
-  --background-highlight-innocent: rgb(29, 64, 48);
-  --border-innocent: rgb(46, 102, 76);
-  --background-criminal: #5c2235;
-  --background-highlight-criminal: #501d2e;
-  --border-criminal: #8b2a53;
   --overlay: rgba(26, 29, 36, 0.5);
+
+  /* The eight colour groups. A band is a small strip on a dark card, so these
+     are the mockup's measured values rather than named CSS colours, which are
+     too light (yellow) or too dark (purple) at this size. */
+  --colour-red: #d6453f;
+  --colour-orange: #de7a28;
+  --colour-yellow: #c9a21b;
+  --colour-green: #3e9b62;
+  --colour-teal: #2b9a9a;
+  --colour-blue: #2f6fb5;
+  --colour-purple: #8e5aa8;
+  --colour-pink: #db6fa4;
+
+  /* The three card states. */
+  --card-unsolved: #f4f1ec;
+  --card-unsolved-text: #2a2724;
+  --card-unsolved-border: #ddd6cc;
+  --card-numberwang: #ffd9b8;
+  --card-numberwang-text: #3a2a1c;
+  --card-not: #111;
+  --card-not-text: #fff;
+  --confetti-blue: #7fb2e5;
+  --confetti-pink: #f2a6c4;
+
   color-scheme: dark;
 }
 
@@ -184,8 +202,9 @@ a {
   box-sizing: border-box;
   width: 87px;
   height: 118px;
-  background: var(--card-bg);
-  border: 2px solid var(--border-neutral);
+  background: var(--card-unsolved);
+  color: var(--card-unsolved-text);
+  border: 1px solid var(--card-unsolved-border);
   border-radius: 6px;
   box-shadow: 0 1px 6px #000;
   display: flex;
@@ -197,8 +216,7 @@ a {
   position: relative;
   overflow: hidden;
   text-align: center;
-  --band: var(--background-highlight);
-  --tag-neutral: #3b3943;
+  --tag-neutral: #e2dcd2;
   transition: transform 0.05s linear;
   font-family: "Chalkboard SE", "Comic Sans MS", "Comic Sans", sans-serif;
 }
@@ -336,19 +354,51 @@ a {
   border-width: 1px;
   box-shadow: 0 1px 2px #000;
 }
-.card.innocent {
-  background: var(--background-innocent);
-  border-color: var(--border-innocent);
-  --band: var(--background-highlight-innocent);
-  --tag-neutral: #395446;
-  color: #fff;
+.card.numberwang {
+  background: var(--card-numberwang);
+  color: var(--card-numberwang-text);
+  border-color: #e8bd93;
+  --tag-neutral: #f0c9a6;
 }
-.card.criminal {
-  background: var(--background-criminal);
-  border-color: var(--border-criminal);
-  --band: var(--background-highlight-criminal);
-  --tag-neutral: #5c303e;
-  color: #fff;
+.card.not-numberwang {
+  background: var(--card-not);
+  color: var(--card-not-text);
+  /* The page ground is #1a1d24, so a #111 card needs an edge or it dissolves
+     into the gap between cards. */
+  border-color: #3a3a3a;
+  --tag-neutral: #2e2e2e;
+}
+
+/* Confetti: six gradient dots rather than six elements, offset per card by
+   --confetti-seed so twenty solved cards are not twenty identical stamps. The
+   dots are a background layer under the number, which sits at z-index 3. */
+.card.numberwang::before {
+  content: '';
+  position: absolute;
+  inset: 9px 0 0 0;   /* below the band */
+  z-index: 1;
+  opacity: 0.5;
+  background-image:
+    radial-gradient(circle 2px at 50% 50%, var(--confetti-blue) 99%, transparent 100%),
+    radial-gradient(circle 2px at 50% 50%, var(--confetti-pink) 99%, transparent 100%),
+    radial-gradient(circle 2px at 50% 50%, var(--confetti-pink) 99%, transparent 100%),
+    radial-gradient(circle 2px at 50% 50%, var(--confetti-blue) 99%, transparent 100%),
+    radial-gradient(circle 2px at 50% 50%, var(--confetti-pink) 99%, transparent 100%),
+    radial-gradient(circle 2px at 50% 50%, var(--confetti-blue) 99%, transparent 100%);
+  background-repeat: no-repeat;
+  /* Each layer is a 5px box holding one 4px dot. Without a size every layer
+     would be the whole card and background-position would shift the dot from
+     the card's centre rather than place it. */
+  background-size: 5px 5px;
+  /* Both axes move with the seed, and at different rates per dot: at one pixel
+     per card the numbers 11 and 12 sitting side by side were the same stamp. */
+  background-position:
+    calc(8px + var(--confetti-seed) * 3px) calc(12px + var(--confetti-seed) * 2px),
+    calc(76px - var(--confetti-seed) * 3px) calc(20px + var(--confetti-seed) * 3px),
+    calc(12px + var(--confetti-seed) * 2px) calc(95px - var(--confetti-seed) * 2px),
+    calc(78px - var(--confetti-seed) * 2px) calc(100px - var(--confetti-seed) * 3px),
+    calc(30px + var(--confetti-seed) * 1px) calc(30px + var(--confetti-seed) * 3px),
+    calc(70px - var(--confetti-seed) * 2px) calc(60px + var(--confetti-seed) * 2px);
 }
 .card.rejected {
   animation: shake 0.3s;
@@ -361,36 +411,31 @@ a {
   font-size: 10px;
   line-height: 10px;
 }
-.card-face {
+/* A plain strip the card background never reaches, so the colour survives both
+   solved states — clues name colour groups constantly, and losing the group the
+   moment you learn something about it is losing the reason to reason about it. */
+.colour-band {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 9px;
+  z-index: 2;
+}
+
+.card-number {
+  position: relative;
+  z-index: 3;
   font-size: 30px;
   line-height: 30px;
-  margin-bottom: 3px;
-  text-shadow: 0 0 10px #aeaeae4c;
+  font-weight: 700;
+  margin-top: 7px;
 }
-.card.flipped .card-face {
+.card.flipped .card-number {
   font-size: 17px;
   line-height: 17px;
+  margin-top: 5px;
   margin-bottom: 2px;
-}
-.card-name {
-  background: var(--band);
-  width: 100%;
-  padding: 0 0 3px;
-  font-size: 16px;
-  line-height: 16px;
-  font-weight: 700;
-  text-transform: capitalize;
-  opacity: 0.9;
-}
-.card.flipped .card-name {
-  font-size: 14px;
-  line-height: 14px;
-}
-.card-prof {
-  font-size: 11px;
-  line-height: 11px;
-  opacity: 0.7;
-  /* margin-top: 3px; */
 }
 .card-clue {
   font-size: 11px;
@@ -404,17 +449,17 @@ a {
 .card.consumed .card-clue {
   opacity: 0.2;
 }
-/* Cards mentioned by an active clue get the real site's emphasis. The bounce
-   itself only plays when a clue newly reveals the reference (see .bounce). */
-.card-name.referenced {
-  opacity: 1;
+/* An active clue's references. The number brightens; the band, which has no text
+   to brighten, gets a ring instead. The bounce itself only plays when a clue
+   newly reveals the reference (see .bounce). */
+.card-number.referenced {
+  text-decoration: underline;
 }
-.card-prof.referenced {
-  opacity: 0.95;
-  font-weight: 700;
+.colour-band.referenced {
+  box-shadow: inset 0 0 0 2px #fff;
 }
-.card-name.bounce,
-.card-prof.bounce {
+.card-number.bounce,
+.colour-band.bounce {
   animation: bounce-ref 0.27s ease-in-out;
 }
 @keyframes bounce-ref {
@@ -752,6 +797,13 @@ a {
   padding: 0.3em 0.6em;
   border-radius: 1rem;
   font-weight: 700;
+  /* "That's Numberwang!" is twice the width of "Correct!", and the card clips
+     what overflows it, so the bubble wraps inside the card rather than losing
+     its ends. */
+  max-width: calc(100% - 14px);
+  font-size: 12px;
+  line-height: 1.15;
+  text-align: center;
   box-shadow: 0 0 5px #0003;
   animation: pop-fade 1.2s ease-out;
   animation-fill-mode: forwards;

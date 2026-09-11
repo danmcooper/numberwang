@@ -452,7 +452,7 @@ and .innocent. The next commit is the card."
 - Consumes: `Person` from `shared/puzzle.ts`; `Tag`, `TAG_COLORS` from `game/reducer.ts`
 - Produces: `Card` props gain `colourReferenced: boolean` and `colourBounce: boolean`, replacing `profReferenced`/`profBounce`; `numberReferenced`/`numberBounce` replace `nameReferenced`/`nameBounce`; CSS classes `.card.numberwang`, `.card.not-numberwang`, `.colour-band`, `.card-number`, and `--colour-<name>` custom properties for the eight palette colours
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `site/src/components/Card.test.tsx`:
 
@@ -572,13 +572,13 @@ Note `classList.contains` rather than `className.includes`: `numberwang` is a
 substring of `not-numberwang`, so a substring test cannot tell the two states
 apart.
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `npx vitest run site/src/components/Card.test.tsx`
 Expected: FAIL — the props are still `nameReferenced`/`profReferenced`, there is
 no `.colour-band` and no `.card-number`.
 
-- [ ] **Step 3: Rebuild the card's markup**
+- [x] **Step 3: Rebuild the card's markup**
 
 In `Card.tsx`, rename the four reference props and replace the face/name/prof
 elements. The prop block becomes:
@@ -664,13 +664,13 @@ And on the card element itself, the confetti offset:
 The number is the seed because it is already unique per card and already known
 here — no index needs threading down for it.
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `npx vitest run site/src/components/Card.test.tsx`
 Expected: PASS. `Grid.tsx` still passes the old prop names, so `tsc` will
 complain — that is Task 3.
 
-- [ ] **Step 5: Restyle the card**
+- [x] **Step 5: Restyle the card**
 
 In `styles.css`, add the palette to `:root`. These are the mockup's hexes, chosen
 to stay distinguishable as small strips on a dark ground:
@@ -801,7 +801,7 @@ grep -n 'innocent\|criminal\|card-face\|card-name\|card-prof' site/src/styles.cs
 Every hit is either a card rule handled above or a button/modal rule Task 4 owns.
 Rename the card ones now; leave the modal ones for Task 4.
 
-- [ ] **Step 6: Look at all three states at once**
+- [x] **Step 6: Look at all three states at once**
 
 Run: `npm run dev`, open the day's board, and solve four or five cards on purpose
 — getting some wrong so both solved states are on screen together.
@@ -810,7 +810,7 @@ Check, and fix what fails: the band is legible on all three grounds; the peach
 card's number is readable over the confetti; the black card does not dissolve into
 the page; two adjacent solved Numberwang cards do not have identical confetti.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add site/src/components/Card.tsx site/src/components/Card.test.tsx site/src/styles.css

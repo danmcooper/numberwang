@@ -16,12 +16,13 @@ interface CardProps {
   consumed: boolean;
   /** Just flipped from a correct guess; shows the Correct! bubble. */
   justFlipped: boolean;
-  /** An active (unconsumed) clue mentions this card's name / colour. */
-  nameReferenced: boolean;
-  profReferenced: boolean;
-  /** A clue newly revealed this reference (not on mount, not the clue's own card): play the bounce. */
-  nameBounce: boolean;
-  profBounce: boolean;
+  /** An active (unconsumed) clue mentions this card's number / colour group. */
+  numberReferenced: boolean;
+  colourReferenced: boolean;
+  /** A clue newly revealed this reference (not on mount, not the clue's own
+   * card): play the bounce. */
+  numberBounce: boolean;
+  colourBounce: boolean;
   /** The color picker for this card's mark is open. */
   pickerOpen: boolean;
   /** The active hint points at this card's clue (solid outline). */
@@ -51,10 +52,10 @@ export default function Card({
   mark,
   consumed,
   justFlipped,
-  nameReferenced,
-  profReferenced,
-  nameBounce,
-  profBounce,
+  numberReferenced,
+  colourReferenced,
+  numberBounce,
+  colourBounce,
   pickerOpen,
   hintClue,
   hintCard,
@@ -80,7 +81,10 @@ export default function Card({
   const classes = [
     "card",
     flipped ? "flipped" : "",
-    flipped ? (person.numberwang ? "numberwang" : "not_numberwang") : "",
+    // `not-numberwang` with a hyphen, not the DSL's underscore: this is a class
+    // name for a state, not a trait token. `numberwang` is a substring of
+    // `not-numberwang`, so read the specific class rather than the whole string.
+    flipped ? (person.numberwang ? "numberwang" : "not-numberwang") : "",
     rejected ? "rejected" : "",
     consumed ? "consumed" : "",
     hintClue ? "hint-clue" : "",
@@ -91,7 +95,12 @@ export default function Card({
 
   return (
     <div className="card-container">
-      <div role="group" className={classes} onClick={flipped ? undefined : onOpen}>
+      <div
+        role="group"
+        className={classes}
+        style={{ ["--confetti-seed" as string]: String(person.number) }}
+        onClick={flipped ? undefined : onOpen}
+      >
         <div
           className={tag ? `tag tag-${tag}` : "tag"}
           onClick={(e) => {
@@ -110,29 +119,36 @@ export default function Card({
           onContextMenu={(e) => e.preventDefault()}
           onClick={(e) => e.stopPropagation()}
         />
-        <div className="card-pos">{label}</div>
-        {justFlipped && <div className="speech-bubble">Correct!</div>}
+        {/* The band carries no text — eight colours were chosen over a named
+            band deliberately. So the name goes where a screen reader can still
+            reach it, since nothing else on the card says which group this is. */}
         <div
           className={[
-            "card-name",
-            nameReferenced ? "referenced" : "",
-            nameBounce ? "bounce" : "",
+            "colour-band",
+            colourReferenced ? "referenced" : "",
+            colourBounce ? "bounce" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+          style={{ background: `var(--colour-${person.colour})` }}
+          aria-label={person.colour}
+        />
+        <div className="card-pos">{label}</div>
+        {justFlipped && (
+          <div className="speech-bubble">
+            {person.numberwang ? "That's Numberwang!" : "Correct!"}
+          </div>
+        )}
+        <div
+          className={[
+            "card-number",
+            numberReferenced ? "referenced" : "",
+            numberBounce ? "bounce" : "",
           ]
             .filter(Boolean)
             .join(" ")}
         >
           {person.number}
-        </div>
-        <div
-          className={[
-            "card-prof",
-            profReferenced ? "referenced" : "",
-            profBounce ? "bounce" : "",
-          ]
-            .filter(Boolean)
-            .join(" ")}
-        >
-          {person.colour}
         </div>
         {flipped && clueNode && (
           <div className="card-clue" onClick={onToggleClue}>
