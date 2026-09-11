@@ -138,7 +138,8 @@ describe('Game', () => {
     await user.click(screen.getByText('4'));
     const modal = screen.getByRole('dialog');
     expect(modal.textContent).toContain('4');
-    expect(modal.textContent).toContain('red');
+    // The colour is a band now, not a word, so it is named rather than written.
+    expect(modal.querySelector('.modal-colour')!.getAttribute('aria-label')).toBe('red');
     await user.click(screen.getByRole('button', { name: 'Close' }));
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(screen.getAllByRole('group')[2].className).not.toContain('flipped');
@@ -156,21 +157,24 @@ describe('Game', () => {
     expect(card.textContent).toContain('Clue of me');
   });
 
-  it('shows the same "Not enough evidence!" popup for wrong trait and non-deducible guesses', async () => {
+  it('shows the same "Not enough information!" popup for wrong trait and non-deducible guesses', async () => {
     const user = userEvent.setup();
     await renderGame();
     await user.click(screen.getByText('1'));
     await user.click(screen.getByRole('button', { name: 'Wangernumb' })); // wrong trait
     let dialog = screen.getByRole('dialog');
-    expect(dialog.textContent).toContain('Not enough evidence!');
-    expect(dialog.textContent).toContain("1 can't be logically identified as not_numberwang");
-    expect(dialog.textContent).toContain('1 could be numberwang');
+    expect(dialog.textContent).toContain('Not enough information!');
+    // The verdicts are spoken, never the DSL's own token for them.
+    expect(dialog.textContent).toContain("1 can't be logically identified as Wangernumb");
+    expect(dialog.textContent).toContain('1 could be Numberwang');
+    expect(dialog.textContent).not.toContain('not_numberwang');
     await user.click(screen.getByRole('button', { name: 'Continue' }));
     expect(screen.queryByRole('dialog')).toBeNull();
     await user.click(screen.getByText('2'));
     await user.click(screen.getByRole('button', { name: 'Numberwang' })); // correct but not deducible
     dialog = screen.getByRole('dialog');
-    expect(dialog.textContent).toContain("2 can't be logically identified as numberwang");
+    expect(dialog.textContent).toContain("2 can't be logically identified as Numberwang");
+    expect(dialog.textContent).toContain('2 could be Wangernumb');
     await user.click(screen.getByRole('button', { name: 'Continue' }));
     expect(screen.queryByRole('dialog')).toBeNull();
   });
@@ -212,6 +216,26 @@ describe('Game', () => {
     vi.stubGlobal('fetch', vi.fn(async () => new Response('gone', { status: 404 })));
     render(<Game slug="2026-07-07" />);
     expect(await screen.findByRole('button', { name: /retry/i })).toBeTruthy();
+  });
+});
+
+describe('the guess modal', () => {
+  it('identifies the card by its number and its colour', async () => {
+    const user = userEvent.setup();
+    await renderGame(user);
+    await user.click(screen.getAllByRole('group')[2]); // card 4, unrevealed
+    const modal = screen.getByRole('dialog');
+    expect(modal.getAttribute('aria-label')).toBe('4');
+    expect(modal.textContent).toContain('4');
+    expect(modal.querySelector('.modal-colour')!.getAttribute('aria-label')).toBe('red');
+  });
+
+  it('offers the two verdicts by name', async () => {
+    const user = userEvent.setup();
+    await renderGame(user);
+    await user.click(screen.getAllByRole('group')[2]);
+    expect(screen.getByRole('button', { name: 'Numberwang' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Wangernumb' })).toBeTruthy();
   });
 });
 
@@ -292,9 +316,9 @@ describe('revisiting a completed puzzle', () => {
     const dialog = screen.getByRole('dialog');
     expect(dialog.querySelectorAll('.share-cell')).toHaveLength(4);
     expect(dialog.textContent).toMatch(/Solved in 01:05/);
-    // Close leaves the solved banner in place.
+    // Close leaves the solved banner in place, counting in English.
     await userEvent.click(screen.getByRole('button', { name: 'Close' }));
-    expect(screen.getByText(/solved!/i)).toBeTruthy();
+    expect(screen.getByText(/Solved! 1 mistake ·/)).toBeTruthy();
   });
 });
 

@@ -490,12 +490,12 @@ a {
   outline: 2px dotted white;
   z-index: 1;
 }
-/* Wrong-guess popup: real site's "Not enough evidence!" modal. */
-.evidence-modal {
+/* Wrong-guess popup, inherited from the real site's "Not enough evidence!". */
+.not-proven-modal {
   padding: 0 0 20px;
   font-family: "Chalkboard SE", "Comic Sans MS", "Comic Sans", sans-serif;
 }
-.evidence-title {
+.not-proven-title {
   width: 100%;
   box-sizing: border-box;
   margin: 0;
@@ -504,12 +504,12 @@ a {
   border-radius: 6px 6px 0 0;
   font-size: 1.3em;
 }
-.evidence-text {
+.not-proven-text {
   margin: 14px 0 0;
   padding: 0 22px;
   line-height: 1.6;
 }
-.evidence-text .suspect {
+.not-proven-text .card-ref {
   text-transform: capitalize;
 }
 .btn-continue {

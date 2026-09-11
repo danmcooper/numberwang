@@ -1177,8 +1177,8 @@ describe('the guess modal', () => {
     await renderGame(user);
     await user.click(screen.getAllByRole('group')[2]); // card 2, unrevealed
     const modal = screen.getByRole('dialog');
-    expect(modal.getAttribute('aria-label')).toBe('12');
-    expect(modal.textContent).toContain('12');
+    expect(modal.getAttribute('aria-label')).toBe('4');
+    expect(modal.textContent).toContain('4');
     expect(modal.querySelector('.modal-colour')!.getAttribute('aria-label')).toBe('red');
   });
 
@@ -1242,11 +1242,11 @@ Then the body:
             Numberwang
           </button>
           <button
-            className="btn-not-numberwang"
+            className="btn-wangernumb"
             disabled={blocked.includes('not_numberwang')}
             onClick={() => onGuess('not_numberwang')}
           >
-            Not Numberwang
+            Wangernumb
           </button>
         </div>
 ```
@@ -1278,8 +1278,8 @@ In `styles.css`, replace the `.modal-face` / `.modal-name` / `.modal-prof` and
   border-radius: 2px;
   margin: 8px auto 4px;
 }
-/* "Not Numberwang" is two words and will not fit beside "Numberwang" on a phone
-   at the inherited horizontal layout, so the two verdicts stack. */
+/* The two verdicts stack rather than sitting side by side: at the inherited
+   horizontal layout neither button gets enough width to read on a phone. */
 .modal-choices {
   display: flex;
   flex-direction: column;
@@ -1306,7 +1306,7 @@ In `styles.css`, replace the `.modal-face` / `.modal-name` / `.modal-prof` and
 Each verdict button wears the colour of the card it will produce, so the choice
 and its consequence look the same — which the two buttons in `cbsbd` also do.
 
-- [ ] **Step 5: Fix the player-facing copy**
+- [x] **Step 5: Fix the player-facing copy**
 
 The verdict copy is already right; what is left is the rest of the sed's output
 from Task 1, which needs reading as English:
@@ -1322,31 +1322,45 @@ evidence!" rejection, the completion line, the share text.
 The share grid's cell classes (`.share-green`, `.share-yellow`, …) encode *how* a
 card was solved, not what it was, so they are unchanged.
 
-- [ ] **Step 6: Run the tests to verify they pass**
+*Done:* the first grep was clean; every hit was in the wrong-guess popup.
+`EvidenceModal` is now `NotProvenModal`, its heading "Not enough information!"
+(it fires for a wrong call and for a correct-but-undeducible one alike, and must
+not leak which), `.suspect` is `.card-ref`, and — the actual defect — the two
+`<b>` tags printed the DSL's own `not_numberwang` at the player. A `VERDICT`
+map now speaks them. The completion banner also read "1 mistakes"; it counts in
+English now.
+
+- [x] **Step 6: Run the tests to verify they pass**
 
 Run: `npx vitest run site/src/screens/Game.test.tsx`
 Expected: PASS
 
-- [ ] **Step 7: Run the whole suite**
+- [x] **Step 7: Run the whole suite**
 
 Run: `npx tsc --noEmit && npm test`
 Expected: PASS
 
-- [ ] **Step 8: Play a board to the end**
+- [x] **Step 8: Play a board to the end**
 
 Run: `npm run dev`, solve a whole puzzle including at least one wrong call and one
 hint. Check the modal, the rejection popup, the completion screen and the copied
 share text all read as this game.
 
-- [ ] **Step 9: Commit**
+*Done* through the headless screenshot loop rather than `npm run dev`: seeded
+2026-09-11 nineteen cards deep, called the last one, and read the results popup
+("Solved in 04:02", the share grid, the solved banner) off the screenshot.
+
+- [x] **Step 9: Commit**
 
 ```bash
 git add -A
 git commit -m "Call it Numberwang or Wangernumb
 
-Each verdict button wears the colour of the card it produces, and the two stack
-rather than sitting side by side, which leaves each of them a full row to be
-read in.
+Each verdict button is cued by a border in the colour of the card it produces,
+and the two stack rather than sitting side by side, which leaves each of them a
+full row to be read in. (Written here as a fill; filled buttons either side of
+the card's number read as two more cards rather than as two choices about one,
+so the fill moved to the hover state in the round of tweaks after this task.)
 
 The modal repeats the card's colour band. It covers the board while it is open,
 so without it a clue about a colour group cannot be checked against the card you

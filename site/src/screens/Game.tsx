@@ -275,10 +275,19 @@ function ResultsModal({
   );
 }
 
-// Wrong-guess popup: the real site's "Not enough evidence!" modal (sans the
-// share-scenario option). Shown for both wrong-trait and non-deducible
-// guesses, so it never leaks which one happened.
-function EvidenceModal({
+/** The spoken name of a verdict. `Guess` is the DSL's token, which no player
+ * should ever be shown — "not_numberwang" in a sentence is a leak. */
+const VERDICT: Record<Guess, string> = {
+  numberwang: "Numberwang",
+  not_numberwang: "Wangernumb",
+};
+
+// Wrong-guess popup, inherited from the real site's "Not enough evidence!"
+// modal (sans the share-scenario option). Shown for both wrong-verdict and
+// non-deducible guesses, so its wording has to cover the two without leaking
+// which one happened — which is why it talks about what is provable rather
+// than about what is true.
+function NotProvenModal({
   name,
   guess,
   onClose,
@@ -292,18 +301,18 @@ function EvidenceModal({
     <div className="overlay" onClick={onClose}>
       <div
         role="dialog"
-        aria-label="not enough evidence"
-        className="modal evidence-modal"
+        aria-label="not enough information"
+        className="modal not-proven-modal"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="evidence-title">⚠️ Not enough evidence!</h2>
-        <p className="evidence-text">
-          <b className="suspect">{name}</b> can't be logically identified as{" "}
-          <b>{guess}</b> from the available info.
+        <h2 className="not-proven-title">⚠️ Not enough information!</h2>
+        <p className="not-proven-text">
+          <b className="card-ref">{name}</b> can't be logically identified as{" "}
+          <b>{VERDICT[guess]}</b> from the clues on the board.
         </p>
-        <p className="evidence-text">
+        <p className="not-proven-text">
           This means there exists at least one other logical scenario where{" "}
-          <b className="suspect">{name}</b> could be <b>{other}</b>
+          <b className="card-ref">{name}</b> could be <b>{VERDICT[other]}</b>
         </p>
         <button className="btn-continue" onClick={onClose}>
           Continue
@@ -336,22 +345,29 @@ function GuessModal({
         className="modal"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="modal-name">{person.number}</div>
-        <div className="modal-prof">{person.colour}</div>
+        <div className="modal-number">{person.number}</div>
+        {/* The card's band, repeated: the modal covers the board, so without it
+            a clue about a colour group cannot be checked against the card being
+            called. */}
+        <div
+          className="modal-colour"
+          style={{ background: `var(--colour-${person.colour})` }}
+          aria-label={person.colour}
+        />
         <div className="modal-choices">
-          <button
-            className="btn-wangernumb"
-            disabled={blocked.includes("not_numberwang")}
-            onClick={() => onGuess("not_numberwang")}
-          >
-            Wangernumb
-          </button>
           <button
             className="btn-numberwang"
             disabled={blocked.includes("numberwang")}
             onClick={() => onGuess("numberwang")}
           >
             Numberwang
+          </button>
+          <button
+            className="btn-wangernumb"
+            disabled={blocked.includes("not_numberwang")}
+            onClick={() => onGuess("not_numberwang")}
+          >
+            Wangernumb
           </button>
         </div>
         <button className="btn-close" onClick={onClose}>
@@ -652,7 +668,8 @@ function Board({ puzzle, slug }: { puzzle: Puzzle; slug: string }) {
           </div>
           {postComplete && (
             <p className="completed">
-              Solved! {state.mistakes} mistakes · {formatTime(state.elapsedMs)}{" "}
+              Solved! {state.mistakes} mistake{state.mistakes === 1 ? "" : "s"} ·{" "}
+              {formatTime(state.elapsedMs)}{" "}
               <button
                 className="btn-results"
                 onClick={() => setResultsOpen(true)}
@@ -667,7 +684,7 @@ function Board({ puzzle, slug }: { puzzle: Puzzle; slug: string }) {
         </div>
       </div>
       {state.rejectedIndex !== null && state.rejectedGuess !== null && (
-        <EvidenceModal
+        <NotProvenModal
           name={String(puzzle.people[state.rejectedIndex].number)}
           guess={state.rejectedGuess}
           onClose={() => dispatch({ type: "clearRejection" })}
