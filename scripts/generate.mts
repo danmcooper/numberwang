@@ -16,7 +16,7 @@ import type { Puzzle } from '../shared/puzzle.ts';
 import type { Band, Bands, LabelBand } from '../shared/solver/difficulty.ts';
 import { bandsFor, classify, loadBands } from '../shared/solver/difficulty.ts';
 import { GenerationError, generatePuzzle } from '../shared/solver/generate.ts';
-import { loadMix, withArithBudgets } from '../shared/solver/mix.ts';
+import { loadMix, withBudgets } from '../shared/solver/mix.ts';
 import { regenerateManifest } from './manifest.mts';
 
 /** Four wide, five high, every day. See the design's board section. */
@@ -97,7 +97,7 @@ export function buildPuzzle(date: string): Puzzle {
     seed: seedFor(date),
     // The budgets, not the bare archive shares: the archive wrote no
     // arithmetic clue, so without them the eight are generated never.
-    mix: withArithBudgets(loadMix(mixData)),
+    mix: withBudgets(loadMix(mixData)),
     labelOf: (metrics) => classify(boardBands, metrics),
   }).puzzle;
 }

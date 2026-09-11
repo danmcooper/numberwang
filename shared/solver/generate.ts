@@ -1,6 +1,6 @@
 import { type Person, type Puzzle, validatePuzzle } from '../puzzle';
 import { candidateHints, namedCards } from './candidates';
-import type { ClueMix } from './mix';
+import { ARITH_RATE, type ClueMix } from './mix';
 import {
   ABSTRACT_PREDICATES,
   type LabelBand,
@@ -333,6 +333,94 @@ const SINGLE_REVEAL_BONUS = 1;
  * later in the pool can beat it, so the search for this step can stop. */
 const TOP_SCORE = 3 * 2 + SINGLE_REVEAL_BONUS;
 
+/**
+ * How many cards a finished board may leave carrying a fact instead of a clue.
+ *
+ * The chain only ever puts a clue on a card it deduces something *from*, so on
+ * a twenty-card board it leaves a handful holding nothing. A maths or science
+ * fact was the first answer to that and it was the wrong one: read three of
+ * them and you stop reading the cards. So the spares get a real clue instead —
+ * true of this board, redundant to the solution, and indistinguishable from the
+ * rest until you try to use it.
+ *
+ * Not zero. Three cards of flavour is the joke landing once a board rather than
+ * six times, and a board with a clue on every single card has nowhere left to
+ * put one at all.
+ */
+export const MAX_FACT_CARDS = 3;
+
+/**
+ * Fill the cards the chain never hosted from with true, redundant clues,
+ * leaving `MAX_FACT_CARDS` of them for a fact.
+ *
+ * Safe by construction. Every hint in the pool is true of this board —
+ * `candidateHints` evaluates before it emits — so adding one cannot make the
+ * puzzle unsolvable or ambiguous; it can only rule out assignments that were
+ * already wrong. Everything downstream (`paths`, `hints`, the metrics, the
+ * uniqueness check) is derived after this runs, so it all sees the full set.
+ *
+ * The colour pass runs first because a spare card is the one place a clue can be
+ * chosen for how it reads rather than for what it forces, and colour is the one
+ * budget the chain cannot be made to hit: a colour group is scattered over the
+ * board and two or three cards big, so it is a poor thing to deduce from and the
+ * chain passes over it however hard `orderPool` pushes.
+ */
+function fillSpareCards(
+  rng: () => number,
+  board: Board,
+  pool: readonly Hint[],
+  clues: Clues,
+  maxFacts: number,
+): void {
+  const spare = shuffled(
+    rng,
+    clues.flatMap((c, i) => (c === null ? [i] : [])),
+  ).slice(0, Math.max(0, clues.filter((c) => c === null).length - maxFacts));
+  if (spare.length === 0) return;
+
+  const used = new Set<string>();
+  const predUsed = new Map<string, number>();
+  for (const c of clues) {
+    if (!c) continue;
+    used.add(formatHint(c));
+    predUsed.set(c.pred, (predUsed.get(c.pred) ?? 0) + 1);
+  }
+
+  // Four passes over the pool per card, each a loosening of the one before:
+  // colour, then arithmetic, then anything on an unspent predicate, then
+  // anything at all. Every pass walks the pool in `orderPool`'s order, so a
+  // filler is still drawn in something near the proportions the mix asks for.
+  const fresh = (h: Hint) => (predUsed.get(h.pred) ?? 0) < REPEAT_CAP;
+  const passes: ((h: Hint) => boolean)[] = [
+    (h) => namesColour(h) && fresh(h),
+    (h) => h.pred in ARITH_RATE && fresh(h),
+    fresh,
+    () => true,
+  ];
+
+  for (const host of spare) {
+    for (const wanted of passes) {
+      const hint = pool.find(
+        (h) =>
+          wanted(h) &&
+          !used.has(formatHint(h)) &&
+          !(h.pred === EXACT_SUM && (predUsed.get(EXACT_SUM) ?? 0) >= MAX_EXACT_SUMS) &&
+          !namedCards(board, h).has(host),
+      );
+      if (!hint) continue;
+      clues[host] = hint;
+      used.add(formatHint(hint));
+      predUsed.set(hint.pred, (predUsed.get(hint.pred) ?? 0) + 1);
+      break;
+    }
+  }
+}
+
+/** Whether a clue names a colour group, either as a unit or by name. */
+function namesColour(hint: Hint): boolean {
+  return hint.args.some((a) => a.t === 'colour' || (a.t === 'unit' && a.unit.kind === 'colour'));
+}
+
 interface ChainBuild {
   clues: Clues;
   flippedAt: number[][];
@@ -477,6 +565,10 @@ export function generatePuzzle(input: GenerateInput): GenerateResult {
       failures.push(`attempt ${attempt}: chain stalled`);
       continue;
     }
+
+    // Before anything is derived from the clues: paths, hint steps and metrics
+    // all have to describe the board the player is handed, fillers included.
+    fillSpareCards(rng, board, pool, built.clues, MAX_FACT_CARDS);
 
     let unreachable = -1;
     const paths: number[][][] = truth.map((_, i) => {

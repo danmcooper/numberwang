@@ -61,6 +61,13 @@ servable tree — rehearse a deploy with
 
     npm run build && mkdir -p site/dist/puzzles && cp puzzles/*.json site/dist/puzzles/ && npx vite preview
 
+Not every card carries a clue. The forcing chain only puts one on a card it
+deduces something *from*, which on a twenty-card board leaves a handful holding
+nothing; `fillSpareCards` gives those a real clue — true of the board, redundant
+to the solution, and indistinguishable from the rest until you try to use it —
+and leaves `MAX_FACT_CARDS` of them, three, carrying a maths or science fact in
+italic instead. The fact is a joke that lands once a board and not six times.
+
 A card has three states, and the solved two own the whole card:
 
 | State | Look |
@@ -97,7 +104,7 @@ missing a band: the first attempt that is uniquely solvable, fully chained and
 path-reachable on every card is kept, and `classify` names whatever it turned out
 to be. A reported label is an opinion; an aimed one would be a claim.
 
-## The clue mix, and why the arithmetic budgets are hand-set
+## The clue mix, and why two of its budgets are hand-set
 
 `config/clue-mix.json` holds the measured share of each predicate, each feature
 weight, and each colour-group shape. It was produced by running cbs2's
@@ -119,14 +126,32 @@ Numberwang cards in row 2 add to 47" clues on one board turn the puzzle into
 arithmetic homework. `MAX_EXACT_SUMS` is one per puzzle, enforced as a filter
 during generation and re-checked by the audit.
 
-Measured over the first week generated: 44 of 124 clues arithmetic (35%), all
-eight families present, two puzzles in eight carrying an exact sum.
+The second hand-set budget is `COLOUR_UNIT_RATE`, and it is hand-set for the
+opposite reason: colour *was* measured, at 5.7% of unit slots, and the
+measurement is of the wrong thing. In the source archive that unit is a
+profession competing with rows, columns, neighbours and spans; here the colour
+band is half of what an unsolved card even shows. At the measured share a whole
+board could go by without the band being worth looking at. `withColourBudget`
+lifts it to 0.3 and rescales the other features around it.
+
+Neither budget lands where it aims, and not in the same direction. Colour
+undershoots badly on its own — colour hints are under 2% of the candidate pool,
+and a group of two or three scattered cards is a poor thing to deduce from, so
+the chain passes over them however hard `orderPool` pushes. What actually spends
+the colour budget is `fillSpareCards`, which reaches for a colour clue first.
+
+Measured over the first week generated: 52 of 136 clues arithmetic (38%), all
+eight families present, two puzzles in eight carrying an exact sum, and 52
+clues naming a colour group (38%, against 11% before the budget).
 
 ## Colours
 
 Eight, from `PALETTE` in `shared/solver/vocab.ts`, all of them words a clue can
 say without explaining. Eight because that is what the source site averages in
 professions across cbs2's 66 scraped puzzles — mean 8.29, median 8, mode 8.
+
+Five or six clues a board name a colour group, and a clue that names one draws a
+small bar of it after the word: eight groups is more than a player holds by name.
 
 How the twenty cards divide among those eight is drawn from `colourShapes`, the
 group shapes the real archive actually produced, rather than split evenly. An

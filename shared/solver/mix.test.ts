@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import mixData from '../../config/clue-mix.json' with { type: 'json' };
-import { ARITH_RATE, MixFormatError, loadMix, withArithBudgets } from './mix';
+import {
+  ARITH_RATE,
+  COLOUR_UNIT_RATE,
+  MixFormatError,
+  loadMix,
+  withArithBudgets,
+  withBudgets,
+  withColourBudget,
+} from './mix';
 import { ARITH_PREDS } from './arith';
 
 const flat = loadMix(mixData);
@@ -93,5 +101,70 @@ describe('withArithBudgets', () => {
     for (const p of ARITH_PREDS) expect(flat.pred[p] ?? 0).toBe(0);
     const out = withArithBudgets(flat);
     for (const p of ARITH_PREDS) expect(out.pred[p], p).toBeGreaterThan(0);
+  });
+});
+
+describe('withColourBudget', () => {
+  const base = {
+    pred: {},
+    feature: { 'unit:colour': 0.057, 'unit:row': 0.4, 'unit:neighbor': 0.543 },
+    colourShapes: [[3, 3, 3, 3, 2, 2, 2, 2]],
+  };
+
+  it('gives the colour unit several times the share the archive measured', () => {
+    const out = withColourBudget(base);
+    expect(out.feature['unit:colour']).toBe(COLOUR_UNIT_RATE);
+    expect(out.feature['unit:colour']).toBeGreaterThan(base.feature['unit:colour'] * 3);
+  });
+
+  it('leaves the feature shares summing to 1', () => {
+    const out = withColourBudget(base);
+    const total = Object.values(out.feature).reduce((a, b) => a + b, 0);
+    expect(total).toBeCloseTo(1, 10);
+  });
+
+  it('does not disturb the other features relative to each other', () => {
+    const out = withColourBudget(base);
+    expect(out.feature['unit:row'] / out.feature['unit:neighbor']).toBeCloseTo(0.4 / 0.543, 10);
+  });
+
+  it('is idempotent, so a double-wrapped mix is still a mix', () => {
+    const once = withColourBudget(base);
+    expect(withColourBudget(once)).toEqual(once);
+  });
+
+  it('refuses a mix that is nothing but colour', () => {
+    expect(() => withColourBudget({ ...base, feature: { 'unit:colour': 1 } })).toThrow(
+      MixFormatError,
+    );
+  });
+
+  it('budgets the vendored archive mix, which measured colour as a minor unit', () => {
+    expect(flat.feature['unit:colour']).toBeLessThan(0.1);
+    expect(withColourBudget(flat).feature['unit:colour']).toBe(COLOUR_UNIT_RATE);
+  });
+});
+
+describe('withBudgets', () => {
+  // The two budgets touch different halves of the mix, so neither can undo the
+  // other however they are composed — which is what lets generation apply them
+  // in one call and the tests reason about them one at a time.
+  it('applies both, and agrees with either applied alone', () => {
+    const out = withBudgets(flat);
+    expect(out.pred).toEqual(withArithBudgets(flat).pred);
+    expect(out.feature).toEqual(withColourBudget(flat).feature);
+  });
+
+  // To rounding, not to the bit: the colour rescale divides by a total that is
+  // only 1 - COLOUR_UNIT_RATE to within a float, so a second pass moves the
+  // shares by an ulp. Applying it twice is a no-op for every purpose the mix has.
+  it('is idempotent to rounding', () => {
+    const once = withBudgets(flat);
+    const twice = withBudgets(once);
+    expect(Object.keys(twice.feature).sort()).toEqual(Object.keys(once.feature).sort());
+    for (const [k, v] of Object.entries(once.feature)) {
+      expect(twice.feature[k], k).toBeCloseTo(v, 12);
+    }
+    expect(twice.pred).toEqual(once.pred);
   });
 });

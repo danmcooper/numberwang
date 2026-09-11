@@ -112,3 +112,52 @@ export function withArithBudgets(mix: ClueMix): ClueMix {
   for (const [p, v] of Object.entries(ARITH_RATE)) pred[p] = v;
   return { ...mix, pred };
 }
+
+/**
+ * What share of a clue's unit slots name a colour group.
+ *
+ * Measured at 0.057, and that is an honest measurement of the wrong thing: in
+ * the source archive the unit is a profession, one of a cast the player learns
+ * by name, and it competes with rows, columns, neighbours and spans. Here the
+ * colour group is half of what a card *is* — the number and the colour band are
+ * the only two things on an unsolved card — and at the measured share a whole
+ * board could go by without the band being worth looking at.
+ *
+ * 0.3 is a judgement, like `ARITH_RATE`, not a measurement of anything. It is
+ * also an aim rather than a promise, and misses in both directions: colour
+ * groups are under 2% of the candidate pool, so the fitter in `orderPool` lifts
+ * the few hints carrying one very hard and still lands short of target in the
+ * head of the pool — and then the chain passes over more of them again, because
+ * a group of two or three scattered cards is a poor thing to deduce from. At
+ * 0.3 a finished board names a colour in something like a quarter of its clues,
+ * against 11% at the measured share.
+ */
+export const COLOUR_UNIT_RATE = 0.3;
+
+const COLOUR_UNIT = 'unit:colour';
+
+/**
+ * Rescale the measured feature shares to make room for the colour budget,
+ * leaving every other feature's proportion relative to the others untouched.
+ *
+ * Idempotent to rounding, and for the same reason `withArithBudgets` is: the
+ * rescale is computed from the non-colour shares alone.
+ */
+export function withColourBudget(mix: ClueMix): ClueMix {
+  const rest = Object.entries(mix.feature).filter(([k]) => k !== COLOUR_UNIT);
+  const restTotal = rest.reduce((a, [, v]) => a + v, 0);
+  if (restTotal <= 0) throw new MixFormatError('mix has no feature shares besides colour');
+
+  const feature: Record<string, number> = { [COLOUR_UNIT]: COLOUR_UNIT_RATE };
+  for (const [k, v] of rest) feature[k] = (v / restTotal) * (1 - COLOUR_UNIT_RATE);
+  return { ...mix, feature };
+}
+
+/**
+ * The mix as generation actually uses it: the measured shares with both
+ * hand-set budgets applied. The two are independent — one moves predicates, the
+ * other features — so the order they compose in does not matter.
+ */
+export function withBudgets(mix: ClueMix): ClueMix {
+  return withColourBudget(withArithBudgets(mix));
+}

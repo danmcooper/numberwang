@@ -1,65 +1,65 @@
 [
   {
     "date": "2026-09-17",
-    "id": "9815382a8bd4",
+    "id": "968f69755ac8",
     "difficulty": "Medium",
-    "title": "A Perfectly Ordinary Total",
+    "title": "An Even Number, Obviously",
     "width": 4,
     "height": 5
   },
   {
     "date": "2026-09-16",
-    "id": "9b9257866bfa",
+    "id": "01ec485e5616",
     "difficulty": "Medium",
-    "title": "Sum of the Parts",
+    "title": "Somebody Has Miscounted",
     "width": 4,
     "height": 5
   },
   {
     "date": "2026-09-15",
-    "id": "82ae146545a8",
+    "id": "46545a819a66",
     "difficulty": "Medium",
-    "title": "Round Three: Wangernumb",
+    "title": "The Numbers Were Always There",
     "width": 4,
     "height": 5
   },
   {
     "date": "2026-09-14",
-    "id": "3577b3dad9cf",
+    "id": "969d2010f91c",
     "difficulty": "Medium",
-    "title": "Every Total Tells",
+    "title": "The Quiet Half of the Board",
     "width": 4,
     "height": 5
   },
   {
     "date": "2026-09-13",
-    "id": "792d8fab8264",
-    "difficulty": "Medium",
-    "title": "One Row Gives It Away",
-    "width": 4,
-    "height": 5
-  },
-  {
-    "date": "2026-09-12",
-    "id": "3c427c021d93",
-    "difficulty": "Medium",
-    "title": "Two of These Add Up",
-    "width": 4,
-    "height": 5
-  },
-  {
-    "date": "2026-09-11",
-    "id": "cb8e27e481dc",
+    "id": "53c792d8fab8",
     "difficulty": "Medium",
     "title": "The Board Does Not Explain Itself",
     "width": 4,
     "height": 5
   },
   {
-    "date": "2026-09-10",
-    "id": "635d7bbfe365",
+    "date": "2026-09-12",
+    "id": "cc4e00f7b83e",
     "difficulty": "Medium",
-    "title": "Sum of the Parts",
+    "title": "Let Us Move to the Next Round",
+    "width": 4,
+    "height": 5
+  },
+  {
+    "date": "2026-09-11",
+    "id": "1fcb8e27e481",
+    "difficulty": "Medium",
+    "title": "Not All Numbers Are Numberwang",
+    "width": 4,
+    "height": 5
+  },
+  {
+    "date": "2026-09-10",
+    "id": "c7d497424097",
+    "difficulty": "Medium",
+    "title": "Round Three: Wangernumb",
     "width": 4,
     "height": 5
   }

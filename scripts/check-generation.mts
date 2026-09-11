@@ -18,7 +18,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import mixData from '../config/clue-mix.json' with { type: 'json' };
 import { validatePuzzle } from '../shared/puzzle.ts';
-import { loadMix, withArithBudgets } from '../shared/solver/mix.ts';
+import { loadMix, withBudgets } from '../shared/solver/mix.ts';
 import { bandsFor, classify, loadBands, measure } from '../shared/solver/difficulty.ts';
 import { generatePuzzle } from '../shared/solver/generate.ts';
 import { offeredShapes } from '../shared/solver/vocab.ts';
@@ -44,7 +44,7 @@ if (!band) {
   process.exit(2);
 }
 
-const mix = withArithBudgets(loadMix(mixData));
+const mix = withBudgets(loadMix(mixData));
 // Bands are calibrated on the archive's 4x5 board; on any other board they have
 // to be refitted to it before a label off them means anything.
 const boardBands = bandsFor(bands, width * height);

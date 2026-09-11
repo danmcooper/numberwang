@@ -44,6 +44,15 @@
   from about 10 clue cards to 14-18, and the arithmetic budget went from 0.23
   of the clues to 0.375 weighted toward the three predicates that add, so
   "add to" turns up on nearly every board.
+- **At most three cards carry a fact, and colour is named far more often than
+  the archive named a profession.** Asked for after Task 7, and generator-side
+  again. `fillSpareCards` gives every card the chain never hosted from a true,
+  redundant clue, keeping `MAX_FACT_CARDS` — three — for a fact; and
+  `COLOUR_UNIT_RATE` lifts the colour unit from its measured 5.7% to 0.3, with
+  the filler reaching for a colour clue before anything else, because the chain
+  will not deduce from a scattered two-card group however the pool is weighted.
+  A board went from 17 clues / 3-6 facts with 11% of clues naming a colour, to
+  17 clues / 3 facts with 38%.
 - **No analytics.** `cbsbd`'s `index.html` carries a umami script with cbsbd's own website id; it does not come along.
 - **Deploy base path is `/numberwang/`**, with no UUID and no `config/site.json`.
 - **Local-storage keys are namespaced `nw:`**, so a browser that has played `cbsbd` on the same host cannot collide.

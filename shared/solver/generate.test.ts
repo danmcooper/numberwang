@@ -11,10 +11,11 @@ import { forcedGiven, isUniquelySolvable, parseClues, solveChain } from './solve
 import { candidateHints } from './candidates';
 import { IS_ARITH } from './arith';
 import mixData from '../../config/clue-mix.json' with { type: 'json' };
-import { type ClueMix, loadMix, withArithBudgets } from './mix';
+import { type ClueMix, loadMix, withBudgets } from './mix';
 import {
   GenerationError,
   MAX_EXACT_SUMS,
+  MAX_FACT_CARDS,
   generatePuzzle,
   makeRng,
   orderPool,
@@ -66,7 +67,7 @@ function trimShape(shape: readonly number[], size: number): number[] {
 // Budgeted, the way every real generation path loads it. The archive measured no
 // arithmetic clue, so a bare mix gives the eight share 0 and `orderPool`
 // multiplies by share — this file would then never see one.
-const boardMix: ClueMix = withArithBudgets({
+const boardMix: ClueMix = withBudgets({
   ...mix,
   colourShapes: mix.colourShapes.map((s) => trimShape(s, BOARD.width * BOARD.height)),
 });
@@ -308,26 +309,34 @@ describe('generatePuzzle', () => {
   // carrying a maths fact instead. Before the single-reveal preference a
   // twenty-card board came out half facts, which is a board with half as much
   // to read on it as the game is for.
-  it('leaves most of the board carrying clues rather than facts', () => {
+  it('leaves at most MAX_FACT_CARDS of the board carrying a fact', () => {
     // The shipped reveal ceiling, not this file's wide one: `maxReveals` is
     // `ceil(meanRevealsPerStep.max)`, and a ceiling of 8 lets half this board
     // flip on one clue in a way no shipped puzzle can.
     const shipped: LabelBand = { ...band, meanRevealsPerStep: { min: 1, max: 2.375 } };
-    const shares: number[] = [];
+    const facts: number[] = [];
+    const colours: number[] = [];
     for (let seed = 1; seed <= 5; seed++) {
       const { puzzle: p } = generatePuzzle({
         date: '2026-01-01', difficulty: 'Medium', band: shipped, seed, mix: boardMix, ...BOARD,
       });
-      shares.push(p.people.filter((q) => q.origHint !== null).length / p.people.length);
+      facts.push(p.people.filter((q) => q.origHint === null).length);
+      colours.push(p.people.filter((q) => q.origHint?.includes('colour')).length);
     }
-    // A floor every board clears and a mean that says the usual board is better
-    // than the floor. The shipped 4x5 runs 14 to 18 clue cards of 20; this
-    // smaller board, with fewer cards to host a clue from, sits under that, and
-    // the numbers to beat are the ones this preference replaced — a mean of
-    // 0.53 and boards that came out 9 clues of 20.
-    const mean = shares.reduce((a, b) => a + b, 0) / shares.length;
-    expect(Math.min(...shares), shares.join(', ')).toBeGreaterThan(0.6);
-    expect(mean, shares.join(', ')).toBeGreaterThan(0.68);
+    // A hard cap, not a preference: `fillSpareCards` puts a real clue on every
+    // card the chain left over beyond this many. It is a cap rather than a
+    // count because a board whose chain hosts from nearly every card has fewer
+    // than MAX_FACT_CARDS spare to begin with.
+    expect(Math.max(...facts), facts.join(', ')).toBeLessThanOrEqual(MAX_FACT_CARDS);
+    // And the spare cards are where the colour budget is actually spent: the
+    // chain deduces poorly from a scattered two-card group whatever the mix
+    // asks for, so without the filler's colour pass a board can name a colour
+    // once or not at all. A mean rather than a floor — this 4x4 board splits
+    // sixteen cards over eight colours, so half its groups are a single card
+    // and a run of them leaves one board with almost nothing to say.
+    const meanColours = colours.reduce((a, b) => a + b, 0) / colours.length;
+    expect(Math.min(...colours), colours.join(', ')).toBeGreaterThan(0);
+    expect(meanColours, colours.join(', ')).toBeGreaterThan(2.5);
   }, 120_000);
 
   it('actually spends its arithmetic budget', () => {

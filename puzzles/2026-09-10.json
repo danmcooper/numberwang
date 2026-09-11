@@ -1,225 +1,127 @@
 {
   "formatVersion": 1,
-  "id": "635d7bbfe365",
+  "id": "c7d497424097",
   "date": "2026-09-10",
-  "title": "Sum of the Parts",
+  "title": "Round Three: Wangernumb",
   "difficulty": "Medium",
   "width": 4,
   "height": 5,
   "initialReveals": [
-    19
+    18
   ],
   "source": "generated",
   "people": [
     {
-      "number": 9,
-      "colour": "yellow",
+      "number": 10,
+      "colour": "orange",
       "numberwang": false,
-      "clue": "Two Wangernumb cards neighboring #NAME:15 subtract to 12",
-      "origHint": "diff_of_two_traits_in_unit(unit(neighbor,15),not_numberwang,12)",
+      "clue": "#NAME:13 is one of 4 Wangernumb cards #BETWEEN:pair(1,17)",
+      "origHint": "is_one_of_n_traits_in_unit(unit(between,pair(1,17)),13,not_numberwang,4)",
       "paths": [
         [
-          1
-        ]
-      ]
-    },
-    {
-      "number": 3,
-      "colour": "purple",
-      "numberwang": false,
-      "clue": "#NAME:0 is one of 3 Wangernumb cards #BETWEEN:pair(0,12)",
-      "origHint": "is_one_of_n_traits_in_unit(unit(between,pair(0,12)),0,not_numberwang,3)",
-      "paths": [
-        [
-          18
-        ]
-      ]
-    },
-    {
-      "number": 2,
-      "colour": "teal",
-      "numberwang": false,
-      "clue": "Exactly 3 of the 11 Wangernumb cards on the edges are #BETWEEN:pair(4,16)",
-      "origHint": "unit_shares_n_out_of_n_traits_with_unit(unit(edge,void),unit(between,pair(4,16)),not_numberwang,3,11)",
-      "paths": [
-        [
-          11
-        ]
-      ]
-    },
-    {
-      "number": 19,
-      "colour": "green",
-      "numberwang": true,
-      "clue": "Only 1 of the 3 Wangernumb cards #BETWEEN:pair(16,19) is in column #C:4",
-      "origHint": "unit_shares_n_out_of_n_traits_with_unit(unit(between,pair(16,19)),unit(col,4),not_numberwang,1,3)",
-      "paths": [
+          11,
+          15,
+          17
+        ],
         [
           1,
+          11,
           15
         ],
         [
-          0,
-          15,
-          18
-        ]
-      ]
-    },
-    {
-      "number": 8,
-      "colour": "green",
-      "numberwang": true,
-      "clue": "Euclid proved there is no largest prime more than two thousand years ago.",
-      "origHint": null,
-      "paths": [
-        [
-          5,
-          7,
-          13,
-          16,
-          17,
-          18,
-          19
-        ],
-        [
-          0,
-          5,
-          13,
-          16,
-          17,
-          18,
-          19
-        ],
-        [
           1,
-          5
+          2,
+          15
         ]
       ]
     },
     {
       "number": 16,
-      "colour": "yellow",
-      "numberwang": false,
-      "clue": "There are exactly 2 Wangernumb cards #BETWEEN:pair(8,12)",
-      "origHint": "number_of_traits_in_unit(unit(between,pair(8,12)),not_numberwang,2)",
+      "colour": "orange",
+      "numberwang": true,
+      "clue": "There's an odd number of Wangernumb #COLOURS:teal",
+      "origHint": "odd_number_of_traits_in_unit(unit(colour,teal),not_numberwang)",
       "paths": [
         [
-          3,
-          7,
-          9,
-          11,
-          18,
-          19
-        ],
-        [
-          0,
-          7,
-          9,
-          15,
           17
         ]
       ]
     },
     {
-      "number": 11,
-      "colour": "teal",
-      "numberwang": false,
-      "clue": "Every whole number is the sum of at most four square numbers.",
-      "origHint": null,
+      "number": 3,
+      "colour": "green",
+      "numberwang": true,
+      "clue": "None of the Wangernumb cards in the corners is odd",
+      "origHint": "n_traits_in_unit_are_odd(unit(corner,void),not_numberwang,0)",
       "paths": [
         [
-          9,
-          12,
-          13,
-          16,
-          17,
-          18,
-          19
-        ],
-        [
-          0,
-          12,
-          13,
-          15,
-          16,
-          17,
-          19
-        ]
-      ]
-    },
-    {
-      "number": 15,
-      "colour": "blue",
-      "numberwang": false,
-      "clue": "The Numberwang cards in row 5 add to more than the Numberwang cards in row 3",
-      "origHint": "more_sum_in_unit_than_unit(unit(row,5),unit(row,3),numberwang)",
-      "paths": [
-        [
-          2,
-          3,
+          11,
           16
-        ],
-        [
-          1,
-          2,
-          3
         ]
       ]
     },
     {
       "number": 1,
-      "colour": "blue",
-      "numberwang": false,
-      "clue": "The Wangernumb cards neighboring #NAME:14 add to 84",
-      "origHint": "sum_of_trait_in_unit(unit(neighbor,14),not_numberwang,84)",
+      "colour": "pink",
+      "numberwang": true,
+      "clue": "Only 1 of the 2 Numberwang cards neighboring #NAME:19 is #NAMES:15 neighbor",
+      "origHint": "unit_shares_n_out_of_n_traits_with_unit(unit(neighbor,19),unit(neighbor,15),numberwang,1,2)",
       "paths": [
         [
-          5
-        ],
-        [
-          0,
-          15,
-          17,
-          18
-        ],
-        [
-          1,
-          15,
-          17
+          2
         ]
       ]
     },
     {
-      "number": 14,
-      "colour": "orange",
+      "number": 2,
+      "colour": "blue",
       "numberwang": false,
-      "clue": "There's an odd number of Numberwang cards neighboring #NAME:6",
-      "origHint": "odd_number_of_traits_in_unit(unit(neighbor,6),numberwang)",
+      "clue": "#NAME:17 is one of #NAMES:13 4 Wangernumb neighbors",
+      "origHint": "is_one_of_n_traits_in_unit(unit(neighbor,13),17,not_numberwang,4)",
       "paths": [
         [
           7,
-          16,
-          18
-        ],
-        [
-          0,
-          15,
-          17,
-          18
-        ],
-        [
-          1,
-          15,
-          17
+          16
         ]
       ]
     },
     {
       "number": 7,
-      "colour": "orange",
+      "colour": "purple",
       "numberwang": false,
-      "clue": "None of the Numberwang cards in row 5 is prime",
-      "origHint": "n_traits_in_unit_are_prime(unit(row,5),numberwang,0)",
+      "clue": "None of the Wangernumb cards among the #COLOURS:red is prime",
+      "origHint": "n_traits_in_unit_are_prime(unit(colour,red),not_numberwang,0)",
+      "paths": [
+        [
+          0,
+          17
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "number": 20,
+      "colour": "teal",
+      "numberwang": true,
+      "clue": "Only 1 of the 3 Numberwang cards neighboring #NAME:9 is #NAMES:4 neighbor",
+      "origHint": "unit_shares_n_out_of_n_traits_with_unit(unit(neighbor,9),unit(neighbor,4),numberwang,1,3)",
+      "paths": [
+        [
+          1,
+          16,
+          19
+        ]
+      ]
+    },
+    {
+      "number": 6,
+      "colour": "yellow",
+      "numberwang": true,
+      "clue": "Exactly one of the Wangernumb cards in column #C:1 is prime",
+      "origHint": "n_traits_in_unit_are_prime(unit(col,1),not_numberwang,1)",
       "paths": [
         [
           19
@@ -227,140 +129,206 @@
       ]
     },
     {
-      "number": 5,
+      "number": 14,
       "colour": "pink",
-      "numberwang": false,
-      "clue": "Exactly one of the Wangernumb cards in row 1 is even",
-      "origHint": "n_traits_in_unit_are_even(unit(row,1),not_numberwang,1)",
+      "numberwang": true,
+      "clue": "Starfish have no brain, and manage perfectly well without one.",
+      "origHint": null,
       "paths": [
         [
-          0
+          0,
+          6,
+          17
+        ],
+        [
+          0,
+          1,
+          6
         ]
       ]
     },
     {
-      "number": 4,
-      "colour": "orange",
+      "number": 11,
+      "colour": "purple",
       "numberwang": false,
-      "clue": "Thunder takes about three seconds to travel a kilometre. Count, and you have the distance.",
+      "clue": "Venus is hotter than Mercury, despite being further from the Sun.",
       "origHint": null,
       "paths": [
         [
-          5
+          0,
+          17
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "number": 17,
+      "colour": "red",
+      "numberwang": true,
+      "clue": "The Wangernumb cards among the #COLOURS:orange add to 28",
+      "origHint": "sum_of_trait_in_unit(unit(colour,orange),not_numberwang,28)",
+      "paths": [
+        [
+          3,
+          11,
+          12,
+          19
         ]
       ]
     },
     {
       "number": 18,
-      "colour": "red",
+      "colour": "orange",
       "numberwang": false,
-      "clue": "Exactly 1 of #COLOURN:red has exactly 6 Wangernumb neighbors",
-      "origHint": "only_one_person_in_unit_has_exactly_n_trait_neighbors(unit(colour,red),not_numberwang,6)",
+      "clue": "There's an odd number of Numberwang #COLOURS:green",
+      "origHint": "odd_number_of_traits_in_unit(unit(colour,green),numberwang)",
       "paths": [
         [
-          8
+          6,
+          7,
+          12,
+          16,
+          18
+        ],
+        [
+          1,
+          6,
+          7,
+          12,
+          18
+        ],
+        [
+          4,
+          6,
+          12,
+          18
+        ]
+      ]
+    },
+    {
+      "number": 9,
+      "colour": "green",
+      "numberwang": false,
+      "clue": "Only 1 of the 3 Wangernumb cards neighboring #NAME:15 is in row 5",
+      "origHint": "unit_shares_n_out_of_n_traits_with_unit(unit(neighbor,15),unit(row,5),not_numberwang,1,3)",
+      "paths": [
+        [
+          16
+        ]
+      ]
+    },
+    {
+      "number": 8,
+      "colour": "pink",
+      "numberwang": false,
+      "clue": "The Numberwang cards among the #COLOURS:teal add to an odd number",
+      "origHint": "sum_parity_in_unit(unit(colour,teal),numberwang,1)",
+      "paths": [
+        [
+          18
+        ]
+      ]
+    },
+    {
+      "number": 5,
+      "colour": "yellow",
+      "numberwang": false,
+      "clue": "There are 43,252,003,274,489,856,000 ways to scramble a Rubik’s cube.",
+      "origHint": null,
+      "paths": [
+        [
+          3,
+          18
+        ]
+      ]
+    },
+    {
+      "number": 19,
+      "colour": "yellow",
+      "numberwang": true,
+      "clue": "There are more Wangernumb #COLOURS:orange than Numberwang #COLOURS:green",
+      "origHint": "more_traits_in_unit_than_traits_in_unit(unit(colour,orange),not_numberwang,unit(colour,green),numberwang)",
+      "paths": [
+        [
+          3
+        ]
+      ]
+    },
+    {
+      "number": 13,
+      "colour": "teal",
+      "numberwang": true,
+      "clue": "Exactly one of the Wangernumb cards neighboring #NAME:8 is divisible by 9",
+      "origHint": "n_traits_in_unit_are_divisible(unit(neighbor,8),not_numberwang,9,1)",
+      "paths": [
+        [
+          13
         ]
       ]
     },
     {
       "number": 12,
       "colour": "blue",
+      "numberwang": false,
+      "clue": "#NAME:1 is Numberwang",
+      "origHint": "has_trait(1,numberwang)",
+      "paths": [
+        [
+          4
+        ]
+      ]
+    },
+    {
+      "number": 15,
+      "colour": "red",
       "numberwang": true,
-      "clue": "Sixty minutes and three hundred and sixty degrees are Babylonian. They counted in sixties.",
-      "origHint": null,
-      "paths": [
-        [
-          9,
-          12,
-          13,
-          16,
-          17,
-          18,
-          19
-        ],
-        [
-          0,
-          12,
-          13,
-          15,
-          16,
-          17,
-          19
-        ]
-      ]
-    },
-    {
-      "number": 10,
-      "colour": "yellow",
-      "numberwang": false,
-      "clue": "The Numberwang cards in row 1 add to an odd number",
-      "origHint": "sum_parity_in_unit(unit(row,1),numberwang,1)",
-      "paths": [
-        [
-          16
-        ]
-      ]
-    },
-    {
-      "number": 20,
-      "colour": "purple",
-      "numberwang": false,
-      "clue": "There are no Numberwang cards #BETWEEN:pair(15,19)",
-      "origHint": "number_of_traits_in_unit(unit(between,pair(15,19)),numberwang,0)",
-      "paths": [
-        [
-          1,
-          2
-        ]
-      ]
-    },
-    {
-      "number": 6,
-      "colour": "teal",
-      "numberwang": true,
-      "clue": "Only one card #BETWEEN:pair(4,7) has no Numberwang neighbors",
-      "origHint": "only_one_person_in_unit_has_exactly_n_trait_neighbors(unit(between,pair(4,7)),numberwang,0)",
-      "paths": [
-        [
-          3,
-          16,
-          18
-        ],
-        [
-          0,
-          3,
-          16
-        ]
-      ]
-    },
-    {
-      "number": 17,
-      "colour": "pink",
-      "numberwang": false,
-      "clue": "The Wangernumb cards in column #C:2 add to an odd number",
-      "origHint": "sum_parity_in_unit(unit(col,2),not_numberwang,1)",
-      "paths": [
-        [
-          10
-        ]
-      ]
-    },
-    {
-      "number": 13,
-      "colour": "pink",
-      "numberwang": false,
-      "clue": "#NAME:10 is one of 3 Wangernumb cards #BETWEEN:pair(2,14)",
-      "origHint": "is_one_of_n_traits_in_unit(unit(between,pair(2,14)),10,not_numberwang,3)",
+      "clue": "#NAME:13 is one of 2 Wangernumb cards #BETWEEN:pair(13,15)",
+      "origHint": "is_one_of_n_traits_in_unit(unit(between,pair(13,15)),13,not_numberwang,2)",
       "paths": []
+    },
+    {
+      "number": 4,
+      "colour": "teal",
+      "numberwang": false,
+      "clue": "Exactly 1 of #COLOURN:orange has a Numberwang card directly above them",
+      "origHint": "n_colours_have_trait_in_dir(orange,numberwang,0,-1,1)",
+      "paths": [
+        [
+          12,
+          18
+        ]
+      ]
     }
   ],
   "hints": [
     {
       "flipped": [
-        1
+        11,
+        15,
+        17
       ],
       "clues": [
+        11,
+        15,
+        17
+      ],
+      "reveals": [
+        0,
         1
+      ]
+    },
+    {
+      "flipped": [
+        1,
+        11,
+        15
+      ],
+      "clues": [
+        11,
+        15
       ],
       "reveals": [
         0
@@ -368,540 +336,118 @@
     },
     {
       "flipped": [
-        18
-      ],
-      "clues": [
-        18
-      ],
-      "reveals": [
-        1
-      ]
-    },
-    {
-      "flipped": [
-        11
-      ],
-      "clues": [
-        11
-      ],
-      "reveals": [
-        2
-      ]
-    },
-    {
-      "flipped": [
         1,
+        2,
         15
       ],
       "clues": [
-        1,
         15
       ],
       "reveals": [
         0,
-        3
-      ]
-    },
-    {
-      "flipped": [
-        0,
-        15,
-        18
-      ],
-      "clues": [
-        15,
-        18
-      ],
-      "reveals": [
-        1,
-        3
-      ]
-    },
-    {
-      "flipped": [
-        5,
-        7,
-        13,
-        16,
-        17,
-        18,
-        19
-      ],
-      "clues": [
-        5,
-        13,
-        17,
-        18,
-        19
-      ],
-      "reveals": [
-        0,
-        1,
-        2,
-        4,
-        6,
-        8,
-        9,
-        10,
-        12,
-        14
-      ]
-    },
-    {
-      "flipped": [
-        0,
-        5,
-        13,
-        16,
-        17,
-        18,
-        19
-      ],
-      "clues": [
-        5,
-        13,
-        17,
-        18,
-        19
-      ],
-      "reveals": [
-        1,
-        2,
-        4,
-        6,
-        8,
-        9,
-        10,
-        12,
-        14
-      ]
-    },
-    {
-      "flipped": [
-        1,
-        5
-      ],
-      "clues": [
-        1,
-        5
-      ],
-      "reveals": [
-        0,
-        4,
-        8,
+        11,
         12
       ]
     },
     {
       "flipped": [
-        3,
-        7,
-        9,
-        11,
-        18,
-        19
-      ],
-      "clues": [
-        9,
-        11,
-        18,
-        19
-      ],
-      "reveals": [
-        1,
-        2,
-        5,
-        10
-      ]
-    },
-    {
-      "flipped": [
-        0,
-        7,
-        9,
-        15,
         17
       ],
       "clues": [
-        0,
-        9,
-        15,
         17
       ],
       "reveals": [
-        5,
+        1
+      ]
+    },
+    {
+      "flipped": [
         11,
-        18
-      ]
-    },
-    {
-      "flipped": [
-        9,
-        12,
-        13,
-        16,
-        17,
-        18,
-        19
-      ],
-      "clues": [
-        9,
-        13,
-        17,
-        19
-      ],
-      "reveals": [
-        2,
-        6,
-        8,
-        10,
-        14
-      ]
-    },
-    {
-      "flipped": [
-        0,
-        12,
-        13,
-        15,
-        16,
-        17,
-        19
-      ],
-      "clues": [
-        0,
-        13,
-        15,
-        17,
-        19
-      ],
-      "reveals": [
-        2,
-        6,
-        8,
-        9,
-        10,
-        11,
-        14,
-        18
-      ]
-    },
-    {
-      "flipped": [
-        2,
-        3,
         16
       ],
       "clues": [
-        2,
-        3
-      ],
-      "reveals": [
-        0,
-        1,
-        7,
         11,
-        15,
-        19
-      ]
-    },
-    {
-      "flipped": [
-        1,
-        2,
-        3
-      ],
-      "clues": [
-        1,
-        2,
-        3
+        16
       ],
       "reveals": [
-        0,
-        7,
-        11,
-        15,
-        16,
-        19
-      ]
-    },
-    {
-      "flipped": [
-        5
-      ],
-      "clues": [
-        5
-      ],
-      "reveals": [
-        8,
+        2,
         12
       ]
     },
     {
       "flipped": [
-        0,
-        15,
-        17,
-        18
+        2
       ],
       "clues": [
-        15,
-        17,
-        18
+        2
       ],
       "reveals": [
-        1,
         3,
-        8,
-        9
+        16
       ]
     },
     {
       "flipped": [
-        1,
-        15,
-        17
-      ],
-      "clues": [
-        1,
-        15,
-        17
-      ],
-      "reveals": [
-        0,
-        3,
-        8,
-        9
-      ]
-    },
-    {
-      "flipped": [
-        7,
-        16,
-        18
-      ],
-      "clues": [
         7,
         16
       ],
+      "clues": [
+        7
+      ],
       "reveals": [
-        9,
-        10,
-        15,
-        17,
-        19
+        4
       ]
     },
     {
       "flipped": [
-        19
+        0,
+        17
       ],
       "clues": [
-        19
+        0,
+        17
       ],
       "reveals": [
-        10
+        1,
+        5,
+        9,
+        13
       ]
     },
     {
       "flipped": [
+        0,
+        1
+      ],
+      "clues": [
         0
       ],
-      "clues": [
-        0
-      ],
       "reveals": [
-        11,
-        18
-      ]
-    },
-    {
-      "flipped": [
-        8
-      ],
-      "clues": [
-        8
-      ],
-      "reveals": [
+        5,
         9,
-        10,
-        11,
         13,
-        15,
-        17,
-        18,
-        19
-      ]
-    },
-    {
-      "flipped": [
-        16
-      ],
-      "clues": [
-        16
-      ],
-      "reveals": [
-        15,
-        19
+        17
       ]
     },
     {
       "flipped": [
         1,
-        2
-      ],
-      "clues": [
-        1,
-        2
-      ],
-      "reveals": [
-        0,
-        16
-      ]
-    },
-    {
-      "flipped": [
-        3,
         16,
-        18
-      ],
-      "clues": [
-        3
-      ],
-      "reveals": [
-        17,
         19
-      ]
-    },
-    {
-      "flipped": [
-        0,
-        3,
-        16
       ],
       "clues": [
-        0,
-        3
+        1
       ],
       "reveals": [
-        11,
-        17,
-        18,
-        19
+        6
       ]
     },
     {
       "flipped": [
-        10
-      ],
-      "clues": [
-        10
-      ],
-      "reveals": [
-        18,
-        19
-      ]
-    },
-    {
-      "flipped": [
-        3,
-        17
-      ],
-      "clues": [
-        17
-      ],
-      "reveals": [
-        0,
-        1,
-        8,
-        9
-      ]
-    },
-    {
-      "flipped": [
-        14,
         19
       ],
       "clues": [
         19
-      ],
-      "reveals": [
-        2,
-        6,
-        10
-      ]
-    },
-    {
-      "flipped": [
-        1,
-        2,
-        5,
-        6,
-        7,
-        9,
-        10,
-        11,
-        17
-      ],
-      "clues": [
-        17
-      ],
-      "reveals": [
-        0,
-        3,
-        4,
-        8
-      ]
-    },
-    {
-      "flipped": [
-        2,
-        3,
-        5,
-        6,
-        10,
-        17
-      ],
-      "clues": [
-        17
-      ],
-      "reveals": [
-        0,
-        1,
-        4,
-        8,
-        9
-      ]
-    },
-    {
-      "flipped": [
-        3,
-        4,
-        17
-      ],
-      "clues": [
-        17
-      ],
-      "reveals": [
-        0,
-        1,
-        5,
-        8,
-        9
-      ]
-    },
-    {
-      "flipped": [
-        1,
-        2,
-        3,
-        5,
-        9,
-        10,
-        11
-      ],
-      "clues": [
-        9
       ],
       "reveals": [
         7
@@ -909,69 +455,292 @@
     },
     {
       "flipped": [
-        1,
-        2,
-        3,
-        5,
-        7,
-        9,
-        10
+        0,
+        6,
+        17
       ],
       "clues": [
-        9
+        0,
+        6,
+        17
       ],
       "reveals": [
-        11
+        1,
+        5,
+        8,
+        9,
+        13
       ]
     },
     {
       "flipped": [
-        13,
-        14,
-        17
+        0,
+        1,
+        6
       ],
       "clues": [
-        13
+        0,
+        6
       ],
       "reveals": [
+        5,
         8,
         9,
-        10,
+        13,
+        17
+      ]
+    },
+    {
+      "flipped": [
+        3,
+        11,
         12,
-        16,
+        19
+      ],
+      "clues": [
+        3,
+        12
+      ],
+      "reveals": [
+        10,
+        14,
+        15,
         18
       ]
     },
     {
       "flipped": [
-        2,
         6,
-        19
+        7,
+        12,
+        16,
+        18
       ],
       "clues": [
-        19
+        6,
+        7,
+        12,
+        18
       ],
       "reveals": [
+        4,
+        11,
+        13,
+        19
+      ]
+    },
+    {
+      "flipped": [
+        1,
+        6,
+        7,
+        12,
+        18
+      ],
+      "clues": [
+        1,
+        6,
+        7,
+        12,
+        18
+      ],
+      "reveals": [
+        4,
+        11,
+        13,
+        16,
+        19
+      ]
+    },
+    {
+      "flipped": [
+        4,
+        6,
+        12,
+        18
+      ],
+      "clues": [
+        6,
+        12,
+        18
+      ],
+      "reveals": [
+        11,
+        13,
+        19
+      ]
+    },
+    {
+      "flipped": [
+        16
+      ],
+      "clues": [
+        16
+      ],
+      "reveals": [
+        12
+      ]
+    },
+    {
+      "flipped": [
+        18
+      ],
+      "clues": [
+        18
+      ],
+      "reveals": [
+        13
+      ]
+    },
+    {
+      "flipped": [
+        3,
+        18
+      ],
+      "clues": [
+        3
+      ],
+      "reveals": [
+        14,
+        15
+      ]
+    },
+    {
+      "flipped": [
+        3
+      ],
+      "clues": [
+        3
+      ],
+      "reveals": [
+        15
+      ]
+    },
+    {
+      "flipped": [
+        13
+      ],
+      "clues": [
+        13
+      ],
+      "reveals": [
+        16
+      ]
+    },
+    {
+      "flipped": [
+        4
+      ],
+      "clues": [
+        4
+      ],
+      "reveals": [
+        17
+      ]
+    },
+    {
+      "flipped": [
+        12,
+        18
+      ],
+      "clues": [
+        12
+      ],
+      "reveals": [
+        19
+      ]
+    },
+    {
+      "flipped": [
+        11,
+        12
+      ],
+      "clues": [
+        11
+      ],
+      "reveals": [
+        2
+      ]
+    },
+    {
+      "flipped": [
+        6,
+        8
+      ],
+      "clues": [
+        6
+      ],
+      "reveals": [
+        5
+      ]
+    },
+    {
+      "flipped": [
+        5,
+        6
+      ],
+      "clues": [
+        6
+      ],
+      "reveals": [
+        8
+      ]
+    },
+    {
+      "flipped": [
+        4,
+        8,
         10,
+        16,
+        18
+      ],
+      "clues": [
+        4
+      ],
+      "reveals": [
+        9,
+        12,
+        14,
+        17
+      ]
+    },
+    {
+      "flipped": [
+        11,
+        12,
+        14
+      ],
+      "clues": [
+        12
+      ],
+      "reveals": [
+        10
+      ]
+    },
+    {
+      "flipped": [
+        15,
+        18
+      ],
+      "clues": [
+        18
+      ],
+      "reveals": [
+        13,
         14
       ]
     },
     {
       "flipped": [
-        8,
-        9,
-        10,
-        12,
-        13,
-        16,
+        14,
         18
       ],
       "clues": [
-        13
+        18
       ],
       "reveals": [
-        14,
-        17
+        13,
+        15
       ]
     }
   ]
