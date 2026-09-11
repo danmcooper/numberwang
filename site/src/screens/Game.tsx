@@ -229,15 +229,15 @@ function GuessModal({
         className="modal"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="modal-number">{person.number}</div>
-        {/* The card's band, repeated: the modal covers the board, so without it
-            a clue about a colour group cannot be checked against the card being
-            called. */}
+        {/* The card, repeated: the modal covers the board, so a clue about a
+            colour group has to be checkable against the card being called, and
+            the card says its group the same way — coloured ink, no swatch. */}
         <div
-          className="modal-colour"
-          style={{ background: `var(--colour-${person.colour})` }}
-          aria-label={person.colour}
-        />
+          className="modal-number"
+          style={{ ["--card-colour" as string]: `var(--colour-${person.colour})` }}
+        >
+          {person.number}
+        </div>
         <div className="modal-choices">
           <button
             className="btn-numberwang"

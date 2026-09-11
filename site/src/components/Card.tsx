@@ -4,6 +4,9 @@ import { TAG_COLORS, type Tag } from "../game/reducer";
 
 const LONG_PRESS_MS = 400;
 
+/** One span each, thrown on its own bearing by `--i`. See `.confetti-piece`. */
+const CONFETTI_PIECES = Array.from({ length: 14 }, (_, i) => i);
+
 interface CardProps {
   person: Person;
   label: string;
@@ -80,6 +83,11 @@ export default function Card({
 
   const classes = [
     "card",
+    // The colour group's highlight, which used to be a ring on the band. With
+    // the band gone the card itself takes it: the number already glows for a
+    // number reference, and two glows on one card could not be told apart.
+    colourReferenced ? "colour-ref" : "",
+    colourBounce ? "colour-bounce" : "",
     flipped ? "flipped" : "",
     // The card's own word for the trait the DSL calls `not_numberwang`, which
     // keeps its underscored name in hints and puzzle data. Tests still read
@@ -100,9 +108,8 @@ export default function Card({
         role="group"
         className={classes}
         style={{
-          ["--confetti-seed" as string]: String(person.number),
-          // The card's group colour, for the rules that want it as ink rather
-          // than as a band (the big unsolved number).
+          // The card's group colour. The number is drawn in it, and that is
+          // the only place the group shows on the card.
           ["--card-colour" as string]: `var(--colour-${person.colour})`,
         }}
         onClick={flipped ? undefined : onOpen}
@@ -124,20 +131,6 @@ export default function Card({
           onPointerLeave={endPress}
           onContextMenu={(e) => e.preventDefault()}
           onClick={(e) => e.stopPropagation()}
-        />
-        {/* The band carries no text — eight colours were chosen over a named
-            band deliberately. So the name goes where a screen reader can still
-            reach it, since nothing else on the card says which group this is. */}
-        <div
-          className={[
-            "colour-band",
-            colourReferenced ? "referenced" : "",
-            colourBounce ? "bounce" : "",
-          ]
-            .filter(Boolean)
-            .join(" ")}
-          style={{ background: `var(--colour-${person.colour})` }}
-          aria-label={person.colour}
         />
         <div className="card-pos">{label}</div>
         {justFlipped && (
@@ -169,6 +162,17 @@ export default function Card({
           </div>
         )}
       </div>
+      {/* The burst goes outside the card, which is `overflow: hidden`: confetti
+          that cannot leave the card it is thrown from is just a pattern. It
+          lives as long as the bubble does and then unmounts, so nothing is left
+          speckling a solved board. */}
+      {justFlipped && person.numberwang && (
+        <div className="confetti-burst" aria-hidden="true">
+          {CONFETTI_PIECES.map((i) => (
+            <span key={i} className="confetti-piece" style={{ ["--i" as string]: String(i) }} />
+          ))}
+        </div>
+      )}
       {pickerOpen && (
         <div className="tag-picker" onClick={(e) => e.stopPropagation()}>
           {TAG_COLORS.map((color) => (

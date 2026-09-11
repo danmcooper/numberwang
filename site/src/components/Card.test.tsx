@@ -38,27 +38,16 @@ describe('Card', () => {
     expect(screen.getByText('17')).toBeTruthy();
   });
 
-  it('carries a colour band in every state, and the band has no text', () => {
+  it('shows the colour group as the number\'s ink and nothing else', () => {
     for (const flipped of [false, true]) {
       const { unmount, container } = render(
         <Card {...base} flipped={flipped} person={person(17, 'teal', true)} />,
       );
-      const band = container.querySelector('.colour-band');
-      expect(band).toBeTruthy();
-      expect(band!.textContent).toBe('');
+      expect(container.querySelector('.colour-band')).toBeNull();
+      // The group is never spelled out either: no card says "teal".
+      expect(container.textContent).not.toContain('teal');
       unmount();
     }
-  });
-
-  it('names the colour on the band for assistive tech, since it carries no text', () => {
-    const { container } = render(<Card {...base} person={person(17, 'teal')} />);
-    expect(container.querySelector('.colour-band')!.getAttribute('aria-label')).toBe('teal');
-  });
-
-  it('takes the band colour from a custom property, not an inline hex', () => {
-    const { container } = render(<Card {...base} person={person(17, 'teal')} />);
-    const band = container.querySelector('.colour-band') as HTMLElement;
-    expect(band.style.background).toBe('var(--colour-teal)');
   });
 
   it('is neither solved class while unflipped', () => {
@@ -111,21 +100,51 @@ describe('Card', () => {
     expect(container.querySelector('.card-number')).toBeTruthy();
   });
 
-  it('highlights the number and the band independently', () => {
-    const { container } = render(
-      <Card {...base} numberReferenced colourReferenced person={person(17, 'teal')} />,
+  it('highlights a number reference and a colour reference independently', () => {
+    const { container, unmount } = render(
+      <Card {...base} numberReferenced person={person(17, 'teal')} />,
     );
     expect(container.querySelector('.card-number')!.className).toContain('referenced');
-    expect(container.querySelector('.colour-band')!.className).toContain('referenced');
+    expect(cardEl().className).not.toContain('colour-ref');
+    unmount();
+    // The colour has no element of its own now, so its reference rings the card.
+    render(<Card {...base} colourReferenced person={person(17, 'teal')} />);
+    expect(cardEl().className).toContain('colour-ref');
+    expect(document.querySelector('.card-number')!.className).not.toContain('referenced');
   });
 
-  it('gives the confetti a per-card offset so solved cards do not look stamped', () => {
-    const seed = (n: number) => {
-      const { container } = render(<Card {...base} flipped person={person(n, 'red', true)} />);
-      return (container.querySelector('.card') as HTMLElement).style.getPropertyValue(
-        '--confetti-seed',
+  it('throws confetti with the catchphrase, and only then', () => {
+    const burst = (p: Person, justFlipped = true) => {
+      const { container, unmount } = render(
+        <Card {...base} flipped justFlipped={justFlipped} person={p} />,
       );
+      const found = container.querySelectorAll('.confetti-piece').length;
+      unmount();
+      return found;
     };
-    expect(seed(3)).not.toBe(seed(18));
+    const numberwang = person(17, 'teal', true);
+    expect(burst(numberwang)).toBeGreaterThan(0);
+    // Not on a Wangernumb call, and not on a card that was already solved when
+    // the board was drawn: the burst is the moment, not the state.
+    expect(burst(person(17, 'teal', false))).toBe(0);
+    expect(burst(numberwang, false)).toBe(0);
+  });
+
+  it('aims each piece of confetti somewhere different', () => {
+    const { container } = render(
+      <Card {...base} flipped justFlipped person={person(17, 'teal', true)} />,
+    );
+    const bearings = [...container.querySelectorAll('.confetti-piece')].map((el) =>
+      (el as HTMLElement).style.getPropertyValue('--i'),
+    );
+    expect(new Set(bearings).size).toBe(bearings.length);
+  });
+
+  it('keeps the confetti clear of the card, which clips its own overflow', () => {
+    const { container } = render(
+      <Card {...base} flipped justFlipped person={person(17, 'teal', true)} />,
+    );
+    expect(container.querySelector('.card .confetti-burst')).toBeNull();
+    expect(container.querySelector('.card-container > .confetti-burst')).toBeTruthy();
   });
 });

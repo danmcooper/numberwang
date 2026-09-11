@@ -73,14 +73,20 @@ A card has three states, and the solved two own the whole card:
 | State | Look |
 |---|---|
 | Unsolved | Dark slate ground, the clue text on it |
-| Numberwang | Clues by Sam's green (`#264d3b`), white number, faint confetti |
-| Wangernumb | Clues by Sam's red (`#5c2235`), white number |
+| Numberwang | Clues by Sam's green (`#264d3b`), a burst of confetti as it lands |
+| Wangernumb | Clues by Sam's red (`#5c2235`) |
 
-Because the solved states take the background, a card's colour lives in a plain
-band across the top, present in all three states. The band carries no text by
-choice: eight colours is past what colour alone reliably carries, and the design
-records a named band as the first thing to add back if identifying colours turns
-out to be a friction in play — `docs/superpowers/specs/2026-09-10-numberwang-design.md`,
+A card's colour group is the colour of its number, in all three states, and is
+nowhere else on the card: no band, no swatch, no word — the guess modal draws
+its number the same way. The confetti is a one-second burst thrown from the card
+that was just called Numberwang, not a pattern the solved card keeps; a board of
+twenty kept patterns was twenty patterns, and the confetti stopped meaning
+anything. A clue that names a colour group rings the cards in that group, in the
+group's own colour.
+
+Eight colours is past what colour alone reliably carries, and the design records
+a named band as the first thing to add back if identifying groups turns out to
+be a friction in play — `docs/superpowers/specs/2026-09-10-numberwang-design.md`,
 "The card".
 
 ## Everything a date's puzzle is comes from the date
@@ -129,9 +135,9 @@ during generation and re-checked by the audit.
 The second hand-set budget is `COLOUR_UNIT_RATE`, and it is hand-set for the
 opposite reason: colour *was* measured, at 5.7% of unit slots, and the
 measurement is of the wrong thing. In the source archive that unit is a
-profession competing with rows, columns, neighbours and spans; here the colour
-band is half of what an unsolved card even shows. At the measured share a whole
-board could go by without the band being worth looking at. `withColourBudget`
+profession competing with rows, columns, neighbours and spans; here the group's
+colour is half of what an unsolved card even shows. At the measured share a
+whole board could go by without a card's colour being worth looking at. `withColourBudget`
 lifts it to 0.3 and rescales the other features around it.
 
 Neither budget lands where it aims, and not in the same direction. Colour

@@ -100,18 +100,23 @@ lose the ability to reason about the group you just learned something about.
 
 | State | Appearance |
 | --- | --- |
-| Unsolved | Neutral card, dark number |
-| Numberwang | Peach ground with subtle blue and pink confetti |
-| Not Numberwang | Black ground, white number |
+| Unsolved | Neutral card, the number in the group's colour |
+| Numberwang | Green ground, and a one-second burst of confetti as it lands |
+| Not Numberwang | Red ground |
 
-Both solved states own the card's *background*, so colour lives in a **plain
-band across the top** — a solid strip the background never touches, readable at
-grid scale, present in all three states.
+Both solved states own the card's *background*, so colour lives in the **number's
+own ink** — the digits are drawn in the group's colour, lifted for the dark
+ground, in all three states. The guess modal draws its number the same way, and
+a clue naming a colour group rings that group's cards in their colour.
 
-The band carries no text. Eight colours is past what colour alone reliably
-carries, and a named band was considered and rejected in favour of the quieter
-card; if colour identification proves to be a real friction in play, the name is
-the first thing to add back.
+*Superseded:* colour was a plain band across the top of the card until the ink
+proved enough on its own; the band and its 14px strip are gone, and so is the
+permanent confetti a solved Numberwang card used to keep.
+
+Colour carries no text anywhere. Eight colours is past what colour alone
+reliably carries, and a named group was considered and rejected in favour of the
+quieter card; if colour identification proves to be a real friction in play, the
+name is the first thing to add back.
 
 ## The clue language
 
@@ -273,5 +278,5 @@ out of scope.
 - The weekday board schedule, and boards other than 4x5.
 - One-offs and variants.
 - Difficulty targeting and band recalibration.
-- Named colour bands (recorded above as the first thing to add back if colour
+- Named colour groups (recorded above as the first thing to add back if colour
   identification turns out to be a friction).

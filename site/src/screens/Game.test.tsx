@@ -76,8 +76,10 @@ describe('Game', () => {
     await user.click(screen.getByText('4'));
     const modal = screen.getByRole('dialog');
     expect(modal.textContent).toContain('4');
-    // The colour is a band now, not a word, so it is named rather than written.
-    expect(modal.querySelector('.modal-colour')!.getAttribute('aria-label')).toBe('red');
+    // The colour is the ink of the number here too, exactly as on the card.
+    expect(
+      (modal.querySelector('.modal-number') as HTMLElement).style.getPropertyValue('--card-colour'),
+    ).toBe('var(--colour-red)');
     await user.click(screen.getByRole('button', { name: 'Close' }));
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(screen.getAllByRole('group')[2].className).not.toContain('flipped');
@@ -158,14 +160,16 @@ describe('Game', () => {
 });
 
 describe('the guess modal', () => {
-  it('identifies the card by its number and its colour', async () => {
+  it('identifies the card by its number, drawn in its colour', async () => {
     const user = userEvent.setup();
     await renderGame(user);
     await user.click(screen.getAllByRole('group')[2]); // card 4, unrevealed
     const modal = screen.getByRole('dialog');
     expect(modal.getAttribute('aria-label')).toBe('4');
     expect(modal.textContent).toContain('4');
-    expect(modal.querySelector('.modal-colour')!.getAttribute('aria-label')).toBe('red');
+    expect(
+      (modal.querySelector('.modal-number') as HTMLElement).style.getPropertyValue('--card-colour'),
+    ).toBe('var(--colour-red)');
   });
 
   it('offers the two verdicts by name', async () => {
