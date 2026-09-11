@@ -634,6 +634,11 @@ function Board({ puzzle, slug }: { puzzle: Puzzle; slug: string }) {
               now: Date.now(),
             });
             setGuessing(null);
+            // A guess closes the mark picker whatever it was open over and
+            // however the guess went: the board changes underneath it, and a
+            // strip of colours left floating over a card that just flipped
+            // reads as part of the result.
+            setPickerIndex(null);
           }}
           onClose={() => setGuessing(null)}
         />

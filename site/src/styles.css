@@ -331,6 +331,22 @@ a {
   background: #75fbfd;
 }
 
+/* A tick the player has coloured outranks the colour-group ring (z-index 5).
+   The ring is the clue talking about a whole group; a coloured tick is the
+   player's own note about this one card, so the note keeps its corner. An
+   untagged tick is the neutral gray, not a note, and the ring crosses it. */
+.tag.tag-yellow,
+.tag.tag-red,
+.tag.tag-green,
+.mark.mark-yellow,
+.mark.mark-red,
+.mark.mark-green,
+.mark.mark-orange,
+.mark.mark-magenta,
+.mark.mark-cyan {
+  z-index: 6;
+}
+
 /* Mark color picker (real site's color strip, tap-to-pick). */
 .card-container {
   position: relative;
@@ -498,11 +514,22 @@ a {
 .card-number.referenced {
   text-shadow: 0 0 6px currentColor;
 }
-.card.colour-ref {
+/* A layer of its own rather than the card's own inset shadow: the corner tag
+   and mark sit above the card's background (z-index 4, so a long clue cannot
+   steal their clicks), and an inset shadow paints under every child, so the
+   bottom-left wedge bit a notch out of the ring. */
+.card.colour-ref::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* The card's 6px, less its 1px border: this box is the padding box. */
+  border-radius: 5px;
   /* The group's own colour, not the white the band used to take: the band was
      already the colour, so its ring only had to be seen. A white ring here says
      "this card" where the point is "this group". */
-  box-shadow: 0 1px 6px #000, inset 0 0 0 2px var(--card-colour);
+  box-shadow: inset 0 0 0 2px var(--card-colour);
+  pointer-events: none;
+  z-index: 5;
 }
 .card-number.bounce {
   animation: bounce-ref 0.27s ease-in-out;
@@ -510,12 +537,12 @@ a {
 /* The card cannot bounce — twenty cards are a grid and one of them growing
    moves nothing but itself — so the ring thickens and thins instead, over the
    same beat. */
-.card.colour-bounce {
+.card.colour-bounce::after {
   animation: ring-ref 0.27s ease-in-out;
 }
 @keyframes ring-ref {
   50% {
-    box-shadow: 0 1px 6px #000, inset 0 0 0 4px var(--card-colour);
+    box-shadow: inset 0 0 0 4px var(--card-colour);
   }
 }
 @keyframes bounce-ref {

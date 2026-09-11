@@ -909,6 +909,21 @@ describe('mark color picker', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
+  it('no guess leaves the picker open, right or wrong', async () => {
+    const user = userEvent.setup();
+    await renderGame();
+    await longPress(user, document.querySelectorAll('.mark')[1] as HTMLElement);
+    expect(document.querySelector('.tag-picker')).toBeTruthy();
+    await user.click(screen.getByText('1'));
+    await user.click(screen.getByRole('button', { name: 'Wangernumb' })); // wrong trait
+    expect(document.querySelector('.tag-picker')).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    await longPress(user, document.querySelectorAll('.mark')[1] as HTMLElement);
+    await user.click(screen.getByText('1'));
+    await user.click(screen.getByRole('button', { name: 'Numberwang' })); // correct
+    expect(document.querySelector('.tag-picker')).toBeNull();
+  });
+
   it('the top-right tag cycles on click and never opens the picker', async () => {
     const user = userEvent.setup();
     await renderGame();
