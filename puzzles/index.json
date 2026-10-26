@@ -1,5 +1,13 @@
 [
   {
+    "date": "2026-11-01",
+    "id": "7d073dbc5aa0",
+    "difficulty": "Medium",
+    "title": "Rotate the Board",
+    "width": 4,
+    "height": 5
+  },
+  {
     "date": "2026-10-31",
     "id": "875f69dea743",
     "difficulty": "Medium",
